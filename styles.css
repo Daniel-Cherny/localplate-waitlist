@@ -26,6 +26,19 @@
     --font-serif: 'Playfair Display', Georgia, serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     
+    /* Fluid Typography Scale */
+    --text-xs: clamp(0.7rem, 0.66rem + 0.2vw, 0.75rem);
+    --text-sm: clamp(0.8rem, 0.73rem + 0.35vw, 0.875rem);
+    --text-base: clamp(0.95rem, 0.85rem + 0.5vw, 1rem);
+    --text-lg: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --text-xl: clamp(1.1rem, 0.96rem + 0.7vw, 1.25rem);
+    --text-2xl: clamp(1.3rem, 1.08rem + 1.1vw, 1.5rem);
+    --text-3xl: clamp(1.5rem, 1.24rem + 1.3vw, 1.875rem);
+    --text-4xl: clamp(1.75rem, 1.48rem + 1.35vw, 2.25rem);
+    --text-5xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+    --text-6xl: clamp(2.5rem, 1.86rem + 3.2vw, 3.75rem);
+    --text-7xl: clamp(3rem, 2rem + 5vw, 4.5rem);
+    
     /* Spacing */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -134,7 +147,7 @@ h1, h2, h3 {
     mix-blend-mode: screen;
 }
 
-/* Ken Burns Effect */
+/* Ken Burns Effect - Optimized for Mobile */
 .ken-burns-container {
     position: absolute;
     top: 0;
@@ -142,6 +155,9 @@ h1, h2, h3 {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    /* Force hardware acceleration */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .ken-burns-image {
@@ -151,17 +167,39 @@ h1, h2, h3 {
     background-size: cover;
     background-position: center;
     animation: kenBurns 30s ease-in-out infinite;
+    /* GPU acceleration for smooth mobile performance */
+    transform: translateZ(0);
+    will-change: transform;
+    /* Optimize for mobile */
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 
 @keyframes kenBurns {
     0% {
-        transform: scale(1) translate(0, 0);
+        transform: translateZ(0) scale3d(1, 1, 1) translate3d(0, 0, 0);
     }
     50% {
-        transform: scale(1.1) translate(-2%, -2%);
+        transform: translateZ(0) scale3d(1.05, 1.05, 1) translate3d(-1%, -1%, 0);
     }
     100% {
-        transform: scale(1) translate(0, 0);
+        transform: translateZ(0) scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+}
+
+/* Reduce Ken Burns intensity on mobile for better performance */
+@media (max-width: 768px) {
+    .ken-burns-image {
+        animation-duration: 45s; /* Slower animation */
+    }
+    
+    @keyframes kenBurns {
+        0%, 100% {
+            transform: translateZ(0) scale3d(1, 1, 1) translate3d(0, 0, 0);
+        }
+        50% {
+            transform: translateZ(0) scale3d(1.02, 1.02, 1) translate3d(-0.5%, -0.5%, 0);
+        }
     }
 }
 
@@ -361,7 +399,8 @@ h1, h2, h3 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 1.5rem;
+    min-height: 48px;
     background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
     color: white;
     font-weight: 600;
@@ -386,7 +425,8 @@ h1, h2, h3 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 1.5rem;
+    min-height: 48px;
     background: var(--gray-100);
     color: var(--gray-700);
     font-weight: 600;
@@ -409,30 +449,38 @@ h1, h2, h3 {
     background: var(--gray-600);
 }
 
-/* Restaurant Marquee */
+/* Restaurant Marquee - Mobile Optimized */
 .marquee-container {
     display: flex;
     overflow: hidden;
     user-select: none;
     gap: 2rem;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .marquee-content {
     display: flex;
     gap: 2rem;
     animation: marquee 30s linear infinite;
+    /* GPU acceleration for smooth scrolling */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
-.marquee-container:hover .marquee-content {
+/* Pause on hover (desktop) and touch (mobile) */
+.marquee-container:hover .marquee-content,
+.marquee-container.paused .marquee-content {
     animation-play-state: paused;
 }
 
 @keyframes marquee {
     0% {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translateX(calc(-100% - 2rem));
+        transform: translate3d(calc(-100% - 2rem), 0, 0);
     }
 }
 
@@ -447,12 +495,46 @@ h1, h2, h3 {
     opacity: 0.7;
     transition: all var(--transition-base);
     cursor: pointer;
+    /* Prevent layout shifts */
+    transform: translateZ(0);
 }
 
 .restaurant-logo:hover {
     filter: grayscale(0%);
     opacity: 1;
-    transform: scale(1.05);
+    transform: translateZ(0) scale(1.05);
+}
+
+/* Mobile-specific marquee optimizations */
+@media (max-width: 768px) {
+    .marquee-container {
+        gap: 1.5rem;
+    }
+    
+    .marquee-content {
+        gap: 1.5rem;
+        /* Slower animation on mobile for better readability */
+        animation-duration: 40s;
+    }
+    
+    .restaurant-logo {
+        height: 48px;
+        /* Disable hover effects on touch devices */
+        transition: none;
+    }
+    
+    .restaurant-logo:hover {
+        transform: translateZ(0);
+        filter: grayscale(100%);
+        opacity: 0.7;
+    }
+    
+    /* Touch-friendly active state */
+    .restaurant-logo:active {
+        filter: grayscale(0%);
+        opacity: 1;
+        transform: translateZ(0) scale(0.95);
+    }
 }
 
 /* Feature Cards */
@@ -508,16 +590,27 @@ h1, h2, h3 {
     background: var(--gray-800);
 }
 
-/* Scroll Reveal Animations */
+/* Scroll Reveal Animations - Optimized for Mobile */
 .reveal-on-scroll {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translate3d(0, 30px, 0);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
 }
 
 .reveal-on-scroll.revealed {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    will-change: auto;
+}
+
+/* Faster animations on mobile for better performance */
+@media (max-width: 768px) {
+    .reveal-on-scroll {
+        transition-duration: 0.6s;
+        transform: translate3d(0, 20px, 0);
+    }
 }
 
 .animation-delay-100 {
@@ -611,6 +704,60 @@ h1, h2, h3 {
 @media (min-width: 1280px) {
     .container {
         max-width: 1280px;
+    }
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+    /* Reduce noise texture opacity on mobile for better performance */
+    .noise-overlay {
+        opacity: 0.015;
+        background-size: 100px 100px; /* Smaller pattern */
+    }
+    
+    /* Simplify form card texture on mobile */
+    .form-card::before {
+        opacity: 0.01;
+    }
+    
+    /* Optimize button hover effects for touch */
+    .btn-primary:active {
+        transform: scale(0.98);
+        transition-duration: 0.1s;
+    }
+    
+    /* Reduce gradient animation complexity */
+    .animate-gradient {
+        background-size: 150% 150%; /* Smaller than desktop */
+        animation-duration: 8s; /* Slower */
+    }
+    
+    /* Optimize feature card animations */
+    .feature-card {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: none; /* Disable transform on mobile */
+    }
+    
+    /* Optimize step indicators for touch */
+    .step-indicator {
+        min-width: 44px; /* Touch-friendly size */
+        min-height: 44px;
+    }
+    
+    .step-number {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+/* High DPI displays optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .noise-overlay,
+    .form-card::before {
+        background-size: 50% 50%; /* Smaller patterns for high DPI */
     }
 }
 
@@ -830,35 +977,35 @@ h1, h2, h3 {
 }
 
 .text-xs {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
 }
 
 .text-sm {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
 }
 
 .text-lg {
-    font-size: 1.125rem;
+    font-size: var(--text-lg);
 }
 
 .text-xl {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
 }
 
 .text-2xl {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
 }
 
 .text-3xl {
-    font-size: 1.875rem;
+    font-size: var(--text-3xl);
 }
 
 .text-4xl {
-    font-size: 2.25rem;
+    font-size: var(--text-4xl);
 }
 
 .text-5xl {
-    font-size: 3rem;
+    font-size: var(--text-5xl);
 }
 
 .text-6xl {
@@ -1282,6 +1429,19 @@ h1, h2, h3 {
     }
 }
 
+/* Tablet-specific overrides */
+@media (min-width: 768px) and (max-width: 1023px) {
+    /* Testimonials grid - 2 columns on tablets */
+    .testimonials-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    
+    /* Form width optimization for tablets */
+    .form-container {
+        max-width: 36rem; /* 576px instead of 448px */
+    }
+}
+
 @media (min-width: 1024px) {
     .lg\:text-7xl {
         font-size: 4.5rem;
@@ -1297,21 +1457,54 @@ h1, h2, h3 {
     }
 }
 
-/* Accessibility */
+/* Accessibility - Enhanced Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
-    * {
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+        transform: none !important;
     }
     
+    /* Disable all marquee animations */
     .marquee-content {
-        animation: none;
+        animation: none !important;
+        transform: translateX(0) !important;
     }
     
+    /* Disable Ken Burns effect */
     .ken-burns-image {
-        animation: none;
+        animation: none !important;
+        transform: scale(1) !important;
+        will-change: auto !important;
+    }
+    
+    /* Disable hover animations */
+    .feature-card:hover,
+    .testimonial-card:hover,
+    .btn-primary:hover,
+    .restaurant-logo:hover {
+        transform: none !important;
+    }
+    
+    /* Disable pulse animations */
+    .animate-pulse-slow,
+    .animate-gradient {
+        animation: none !important;
+    }
+    
+    /* Disable scroll reveals */
+    .reveal-on-scroll {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    /* Disable step indicator animations */
+    .step-indicator.active .step-number {
+        transform: none !important;
     }
 }
 
@@ -1354,4 +1547,112 @@ h1, h2, h3 {
 
 .dark ::-webkit-scrollbar-thumb:hover {
     background: var(--emerald-500);
+}
+
+/* Mobile Navigation */
+.mobile-nav-link {
+    color: var(--gray-700);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus {
+    color: var(--emerald-600);
+    background-color: var(--gray-50);
+    outline: none;
+}
+
+.mobile-nav-link:active {
+    background-color: var(--gray-100);
+}
+
+.dark .mobile-nav-link {
+    color: var(--gray-300);
+}
+
+.dark .mobile-nav-link:hover,
+.dark .mobile-nav-link:focus {
+    color: var(--emerald-400);
+    background-color: var(--gray-800);
+}
+
+.dark .mobile-nav-link:active {
+    background-color: var(--gray-700);
+}
+
+/* Mobile menu open state */
+.mobile-menu-open {
+    transform: translateX(0) !important;
+}
+
+/* Prevent scroll when mobile menu is open */
+.mobile-menu-active {
+    overflow: hidden;
+}
+
+/* Hamburger button touch optimization */
+#mobile-menu-button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+    /* Reduce container padding on mobile */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Optimize section padding */
+    .py-16 {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+    
+    .py-20 {
+        padding-top: 3.5rem;
+        padding-bottom: 3.5rem;
+    }
+    
+    /* Optimize form card padding */
+    .form-card {
+        padding: 1.5rem;
+    }
+    
+    /* Reduce excessive margins */
+    .mb-8 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .mb-12 {
+        margin-bottom: 2rem;
+    }
+    
+    /* Optimize hero section */
+    .min-h-screen {
+        min-height: calc(100vh - 64px);
+        padding-top: 2rem;
+    }
+}
+
+/* Ultra-small mobile (320px) */
+@media (max-width: 380px) {
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+    
+    .form-card {
+        padding: 1.25rem;
+    }
+    
+    /* Hide step labels on very small screens */
+    .step-label {
+        display: none;
+    }
 }

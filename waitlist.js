@@ -21,14 +21,29 @@ const formData = {
     restaurantSuggestion: ''
 };
 
-// Initialize everything when DOM is ready
+// Initialize everything when DOM is ready - Mobile Optimized
 document.addEventListener('DOMContentLoaded', () => {
+    // Critical path - initialize immediately
     initDarkMode();
-    initScrollReveal();
     initFormHandlers();
-    initMarquee();
-    updateWaitlistCount();
-    checkReferral();
+    
+    // Defer non-critical initializations for better mobile performance
+    if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => {
+            initScrollReveal();
+            initMarquee();
+            updateWaitlistCount();
+            checkReferral();
+        }, { timeout: 2000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            initScrollReveal();
+            initMarquee();
+            updateWaitlistCount();
+            checkReferral();
+        }, 100);
+    }
 });
 
 // Dark Mode Toggle
@@ -55,17 +70,27 @@ function initDarkMode() {
     });
 }
 
-// Scroll Reveal Animations
+// Scroll Reveal Animations - Mobile Optimized
 function initScrollReveal() {
+    // Detect mobile device for optimized settings
+    const isMobile = window.innerWidth <= 768;
+    
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: isMobile ? [0.1, 0.3] : [0.1, 0.3, 0.5], // Multiple thresholds for better mobile performance
+        rootMargin: isMobile ? '0px 0px -50px 0px' : '0px 0px -100px 0px' // Smaller margin on mobile
     };
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
+                // Add small delay for mobile to ensure smooth animation
+                if (isMobile) {
+                    setTimeout(() => {
+                        entry.target.classList.add('revealed');
+                    }, 50);
+                } else {
+                    entry.target.classList.add('revealed');
+                }
                 observer.unobserve(entry.target);
             }
         });
@@ -362,21 +387,53 @@ function animateCount(element, target) {
     }, 16);
 }
 
-// Initialize marquee pause on hover
+// Initialize marquee pause on hover and touch support
 function initMarquee() {
     const marqueeContainer = document.querySelector('.marquee-container');
-    const marqueeContent = document.querySelectorAll('.marquee-content');
     
     if (marqueeContainer) {
-        // Pause on hover is handled via CSS
-        // Could add touch support for mobile here
+        // Touch support for mobile - pause on touch
+        let touchStartTime = 0;
+        
+        marqueeContainer.addEventListener('touchstart', () => {
+            touchStartTime = Date.now();
+            marqueeContainer.classList.add('paused');
+        }, { passive: true });
+        
+        marqueeContainer.addEventListener('touchend', () => {
+            const touchDuration = Date.now() - touchStartTime;
+            // Only resume if it was a brief touch (not a scroll gesture)
+            if (touchDuration < 200) {
+                setTimeout(() => {
+                    marqueeContainer.classList.remove('paused');
+                }, 1000);
+            } else {
+                marqueeContainer.classList.remove('paused');
+            }
+        }, { passive: true });
+        
+        // Pause on scroll to prevent jank on mobile
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            if (window.innerWidth <= 768) {
+                marqueeContainer.classList.add('paused');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    marqueeContainer.classList.remove('paused');
+                }, 150);
+            }
+        }, { passive: true });
         
         // Optional: Add click tracking for restaurant logos
         document.querySelectorAll('.restaurant-logo').forEach(logo => {
-            logo.addEventListener('click', () => {
+            logo.addEventListener('click', (e) => {
+                e.preventDefault();
                 const restaurantName = logo.alt;
                 console.log('Restaurant clicked:', restaurantName);
                 // Track engagement
+                trackEvent('restaurant_logo_click', {
+                    restaurant_name: restaurantName
+                });
             });
         });
     }
@@ -399,17 +456,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Add subtle parallax effect to hero
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.ken-burns-image');
-    
-    parallaxElements.forEach(el => {
-        const speed = 0.5;
-        el.style.transform = `translateY(${scrolled * speed}px) scale(1.1)`;
-    });
-});
-
 // Performance optimization - Debounce scroll events
 function debounce(func, wait) {
     let timeout;
@@ -423,12 +469,44 @@ function debounce(func, wait) {
     };
 }
 
-// Optimized scroll handler
-const optimizedScroll = debounce(() => {
-    // Parallax and other scroll effects
-}, 10);
+// Mobile-optimized parallax effect
+function initParallax() {
+    const isMobile = window.innerWidth <= 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Disable parallax on mobile and for users who prefer reduced motion
+    if (isMobile || prefersReducedMotion) {
+        return;
+    }
+    
+    const parallaxHandler = () => {
+        const scrolled = window.pageYOffset;
+        const parallaxElements = document.querySelectorAll('.ken-burns-image');
+        
+        parallaxElements.forEach(el => {
+            const speed = 0.3; // Reduced intensity
+            // Use transform3d for better performance
+            el.style.transform = `translate3d(0, ${scrolled * speed}px, 0) scale3d(1.05, 1.05, 1)`;
+        });
+    };
+    
+    // Optimized scroll handler with requestAnimationFrame
+    let ticking = false;
+    const optimizedParallax = () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                parallaxHandler();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
+    
+    window.addEventListener('scroll', optimizedParallax, { passive: true });
+}
 
-window.addEventListener('scroll', optimizedScroll);
+// Initialize parallax on page load
+initParallax();
 
 // Respect prefers-reduced-motion
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -472,27 +550,134 @@ document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
     });
 });
 
-// Add ripple styles dynamically
-const style = document.createElement('style');
-style.textContent = `
-    .btn-primary, .btn-secondary {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        transform: scale(0);
-        animation: ripple-animation 0.6s ease-out;
-    }
-    
-    @keyframes ripple-animation {
-        to {
-            transform: scale(4);
-            opacity: 0;
+// Add ripple styles dynamically (only on non-mobile devices)
+if (window.innerWidth > 768) {
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-primary, .btn-secondary {
+            position: relative;
+            overflow: hidden;
         }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Mobile Performance Monitoring
+function initMobilePerformanceMonitoring() {
+    if (window.innerWidth <= 768) {
+        // Monitor frame rate
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        function trackFPS() {
+            frameCount++;
+            const currentTime = performance.now();
+            
+            if (currentTime >= lastTime + 1000) {
+                const fps = Math.round(frameCount * 1000 / (currentTime - lastTime));
+                
+                // Log performance issues
+                if (fps < 30) {
+                    console.warn(`Low FPS detected: ${fps}fps`);
+                    trackEvent('performance_issue', {
+                        fps: fps,
+                        user_agent: navigator.userAgent
+                    });
+                }
+                
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            requestAnimationFrame(trackFPS);
+        }
+        
+        // Start monitoring after page load
+        window.addEventListener('load', () => {
+            setTimeout(trackFPS, 2000);
+        });
     }
-`;
-document.head.appendChild(style);
+}
+
+// Mobile Menu Functionality
+function initMobileMenu() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const body = document.body;
+    
+    if (!mobileMenuButton || !mobileMenu) return;
+    
+    let isMenuOpen = false;
+    
+    // Toggle mobile menu
+    mobileMenuButton.addEventListener('click', () => {
+        isMenuOpen = !isMenuOpen;
+        
+        if (isMenuOpen) {
+            mobileMenu.classList.add('mobile-menu-open');
+            hamburgerIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+            body.classList.add('mobile-menu-active');
+            mobileMenuButton.setAttribute('aria-expanded', 'true');
+            
+            // Focus first menu item
+            const firstLink = mobileMenu.querySelector('a');
+            if (firstLink) firstLink.focus();
+        } else {
+            closeMobileMenu();
+        }
+    });
+    
+    // Close menu function
+    function closeMobileMenu() {
+        mobileMenu.classList.remove('mobile-menu-open');
+        hamburgerIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        body.classList.remove('mobile-menu-active');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+        isMenuOpen = false;
+    }
+    
+    // Close menu when clicking links
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMenuOpen) {
+            closeMobileMenu();
+            mobileMenuButton.focus();
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 640 && isMenuOpen) {
+            closeMobileMenu();
+        }
+    });
+}
+
+// Initialize mobile menu
+document.addEventListener('DOMContentLoaded', initMobileMenu);
+
+// Initialize performance monitoring
+initMobilePerformanceMonitoring();

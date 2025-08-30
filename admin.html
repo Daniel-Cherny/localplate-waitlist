@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPlate Waitlist Admin Dashboard</title>
+    
+    <!-- Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Supabase & Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased">
+    
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-admin)"/>
+                        <defs>
+                            <linearGradient id="gradient-admin" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-bold">LocalPlate Admin</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshData()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium">
+                        Refresh Data
+                    </button>
+                    <button onclick="exportData()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors text-sm font-medium">
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Signups -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Total Signups</span>
+                    <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white" id="total-signups">1,247</div>
+                <div class="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% from last week</div>
+            </div>
+            
+            <!-- Today's Signups -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Today's Signups</span>
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white" id="today-signups">47</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Last 24 hours</div>
+            </div>
+            
+            <!-- Referral Rate -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Referral Rate</span>
+                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white" id="referral-rate">23.4%</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Via referrals</div>
+            </div>
+            
+            <!-- Avg Position -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Conversion Rate</span>
+                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l2.293 2.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white" id="conversion-rate">67.8%</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Landing to signup</div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Signups Over Time -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Signups Over Time</h3>
+                <canvas id="signups-chart" height="150"></canvas>
+            </div>
+            
+            <!-- Top Referrers -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Top Referrers</h3>
+                <div class="space-y-3" id="top-referrers">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">1</span>
+                            </div>
+                            <span class="text-sm font-medium">ABC123</span>
+                        </div>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">24 referrals</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-gray-600 dark:text-gray-400">2</span>
+                            </div>
+                            <span class="text-sm font-medium">XYZ789</span>
+                        </div>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">18 referrals</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-gray-600 dark:text-gray-400">3</span>
+                            </div>
+                            <span class="text-sm font-medium">DEF456</span>
+                        </div>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">15 referrals</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Signups Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold">Recent Signups</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ZIP Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Referral Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Referred By</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-signups" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </main>
+    
+    <script>
+        // Initialize Supabase (use your credentials)
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        let supabase = null;
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        
+        // Mock data for demo
+        const mockData = {
+            totalSignups: 1247,
+            todaySignups: 47,
+            referralRate: 23.4,
+            conversionRate: 67.8,
+            chartData: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                data: [145, 189, 203, 178, 198, 167, 217]
+            },
+            topReferrers: [
+                { code: 'ABC123', count: 24 },
+                { code: 'XYZ789', count: 18 },
+                { code: 'DEF456', count: 15 }
+            ],
+            recentSignups: [
+                { email: 'john.doe@example.com', zipcode: '94102', referralCode: 'JD123456', referredBy: 'ABC123', joinedAt: new Date() },
+                { email: 'jane.smith@example.com', zipcode: '94103', referralCode: 'JS789012', referredBy: null, joinedAt: new Date(Date.now() - 3600000) },
+                { email: 'bob.wilson@example.com', zipcode: '94104', referralCode: 'BW345678', referredBy: 'XYZ789', joinedAt: new Date(Date.now() - 7200000) }
+            ]
+        };
+        
+        // Load dashboard data
+        async function loadDashboardData() {
+            if (supabase) {
+                try {
+                    // Fetch stats
+                    const { data: stats } = await supabase
+                        .from('waitlist_stats')
+                        .select('*')
+                        .single();
+                    
+                    // Fetch recent signups
+                    const { data: recent } = await supabase
+                        .from('waitlist')
+                        .select('*')
+                        .order('joined_at', { ascending: false })
+                        .limit(10);
+                    
+                    // Fetch top referrers
+                    const { data: referrers } = await supabase
+                        .from('referral_leaderboard')
+                        .select('*')
+                        .limit(5);
+                    
+                    // Update UI with real data
+                    updateDashboard(stats, recent, referrers);
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    // Fall back to mock data
+                    updateDashboard(mockData);
+                }
+            } else {
+                // Use mock data for demo
+                updateDashboard(mockData);
+            }
+        }
+        
+        // Update dashboard UI
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('total-signups').textContent = data.totalSignups?.toLocaleString() || '0';
+            document.getElementById('today-signups').textContent = data.todaySignups?.toLocaleString() || '0';
+            document.getElementById('referral-rate').textContent = `${data.referralRate || 0}%`;
+            document.getElementById('conversion-rate').textContent = `${data.conversionRate || 0}%`;
+            
+            // Update chart
+            updateChart(data.chartData);
+            
+            // Update top referrers
+            updateTopReferrers(data.topReferrers);
+            
+            // Update recent signups table
+            updateRecentSignups(data.recentSignups);
+        }
+        
+        // Update chart
+        function updateChart(chartData) {
+            const ctx = document.getElementById('signups-chart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Signups',
+                        data: chartData.data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(107, 114, 128, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update top referrers
+        function updateTopReferrers(referrers) {
+            const container = document.getElementById('top-referrers');
+            container.innerHTML = referrers.map((ref, index) => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 ${index === 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-gray-200 dark:bg-gray-800'} rounded-full flex items-center justify-center">
+                            <span class="text-xs font-bold ${index === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}">${index + 1}</span>
+                        </div>
+                        <span class="text-sm font-medium">${ref.code}</span>
+                    </div>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">${ref.count} referrals</span>
+                </div>
+            `).join('');
+        }
+        
+        // Update recent signups table
+        function updateRecentSignups(signups) {
+            const tbody = document.getElementById('recent-signups');
+            tbody.innerHTML = signups.map(signup => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${signup.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${signup.zipcode || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400">${signup.referralCode}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${signup.referredBy || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatDate(signup.joinedAt)}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // Format date
+        function formatDate(date) {
+            const d = new Date(date);
+            const now = new Date();
+            const diff = now - d;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return d.toLocaleDateString();
+        }
+        
+        // Refresh data
+        function refreshData() {
+            loadDashboardData();
+        }
+        
+        // Export to CSV
+        function exportData() {
+            // In production, this would fetch all data and generate CSV
+            alert('Export functionality would download waitlist data as CSV');
+        }
+        
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            
+            // Refresh every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+        
+        // Dark mode support
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body>
+</html>

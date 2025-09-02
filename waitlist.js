@@ -180,6 +180,21 @@ function initScrollReveal() {
 function initFormHandlers() {
     const form = document.getElementById('waitlist-form');
     
+    // CRITICAL: Log form detection
+    console.log('[INIT] Form element found:', !!form);
+    if (!form) {
+        console.error('[INIT] CRITICAL: waitlist-form not found! Submit handler will not attach.');
+        // Try again after a delay
+        setTimeout(() => {
+            const retryForm = document.getElementById('waitlist-form');
+            if (retryForm) {
+                console.log('[INIT] Form found on retry, attaching handler');
+                retryForm.addEventListener('submit', handleFormSubmit);
+            }
+        }, 100);
+        return;
+    }
+    
     // First name validation
     const firstNameInput = document.getElementById('firstName');
     firstNameInput?.addEventListener('blur', () => {
@@ -213,8 +228,13 @@ function initFormHandlers() {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
     });
     
-    // Form submission
-    form?.addEventListener('submit', handleFormSubmit);
+    // Form submission - CRITICAL PATH
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+        console.log('[INIT] Submit handler attached successfully');
+    } else {
+        console.error('[INIT] Cannot attach submit handler - form is null');
+    }
     
     // Initialize step indicators
     updateStepIndicators();
@@ -429,6 +449,7 @@ function showInlineSuccess(message) {
 // Handle form submission - Simple and direct with Supabase
 async function handleFormSubmit(e) {
     e.preventDefault();
+    console.log('[SUBMIT] Handler fired! Form submission started');
     trace('[submit] form submission started');
     
     if (!validateCurrentStep()) {
@@ -548,8 +569,14 @@ async function handleFormSubmit(e) {
         
         trace('[submit] success data stored, about to redirect');
         
-        // Redirect to success page
-        window.location.href = 'success.html';
+        // CRITICAL: Only redirect if we have confirmed data
+        if (data && data.length > 0) {
+            console.log('[SUBMIT] Insert confirmed with ID:', data[0].id, '- navigating to success');
+            window.location.href = 'success.html';
+        } else {
+            console.error('[SUBMIT] No data returned from insert - refusing to navigate');
+            showInlineError('Database insert did not complete. Please try again.');
+        }
         
     } catch (error) {
         trace('[submit] exception caught', error.message);

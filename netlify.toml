@@ -1,5 +1,5 @@
 [build]
-  command = ""
+  command = "node netlify-build.js"
   publish = "."
 
 [[headers]]

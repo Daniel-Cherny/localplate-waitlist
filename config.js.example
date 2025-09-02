@@ -1,0 +1,23 @@
+// LocalPlate Waitlist Configuration Template
+// 
+// IMPORTANT: 
+// 1. Copy this file to config.js
+// 2. Replace the placeholder values with your actual Supabase credentials
+// 3. Never commit config.js to version control (it's in .gitignore)
+//
+// For Netlify deployment:
+// Set these as environment variables in your Netlify dashboard:
+// - SUPABASE_URL
+// - SUPABASE_ANON_KEY
+
+window.LOCALPLATE_CONFIG = {
+    supabase: {
+        url: 'YOUR_SUPABASE_URL',
+        anonKey: 'YOUR_SUPABASE_ANON_KEY'
+    }
+};
+
+// For production deployment on Netlify:
+// 1. Go to Site Settings > Environment Variables
+// 2. Add SUPABASE_URL and SUPABASE_ANON_KEY
+// 3. Use a build plugin or inject script to create config.js during build

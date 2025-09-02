@@ -6,6 +6,9 @@ node_modules/
 .env.local
 .env.production
 
+# Configuration files with credentials
+config.js
+
 # System files
 .DS_Store
 Thumbs.db

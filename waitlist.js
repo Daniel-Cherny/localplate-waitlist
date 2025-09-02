@@ -1,8 +1,8 @@
 // LocalPlate Premium Waitlist JavaScript
 
 // Configuration
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://iihzbnyxbxhsrexqsori.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpaHpibnl4Ynhoc3JleHFzb3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NTgwOTMsImV4cCI6MjA2ODEzNDA5M30.bsTztXcwzZ_zyw6Wtl0glXkY_O8Xcmn6rcS0VRPdIcg';
 
 // Initialize Supabase client if configured
 let supabase = null;
@@ -14,7 +14,10 @@ if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE
 let currentStep = 1;
 const totalSteps = 3;
 const formData = {
+    firstName: '',
+    lastName: '',
     email: '',
+    phone: '',
     zipcode: '',
     preferences: [],
     referralSource: '',
@@ -106,10 +109,31 @@ function initScrollReveal() {
 function initFormHandlers() {
     const form = document.getElementById('waitlist-form');
     
+    // First name validation
+    const firstNameInput = document.getElementById('firstName');
+    firstNameInput?.addEventListener('blur', () => {
+        validateName(firstNameInput, 'First name');
+    });
+    
+    // Last name validation
+    const lastNameInput = document.getElementById('lastName');
+    lastNameInput?.addEventListener('blur', () => {
+        validateName(lastNameInput, 'Last name');
+    });
+    
     // Email validation
     const emailInput = document.getElementById('email');
     emailInput?.addEventListener('blur', () => {
         validateEmail(emailInput.value);
+    });
+    
+    // Phone number formatting and validation
+    const phoneInput = document.getElementById('phone');
+    phoneInput?.addEventListener('input', (e) => {
+        e.target.value = formatPhoneNumber(e.target.value);
+    });
+    phoneInput?.addEventListener('blur', () => {
+        validatePhone(phoneInput.value);
     });
     
     // ZIP code formatting
@@ -152,13 +176,44 @@ window.previousStep = function() {
 // Validate current step
 function validateCurrentStep() {
     if (currentStep === 1) {
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        
+        if (!firstName.trim()) {
+            showError('firstName', 'First name is required');
+            return false;
+        }
+        if (!lastName.trim()) {
+            showError('lastName', 'Last name is required');
+            return false;
+        }
         if (!validateEmail(email)) {
             showError('email-error');
             return false;
         }
+        if (!validatePhone(phone)) {
+            showError('phone-error');
+            return false;
+        }
+    } else if (currentStep === 2) {
+        const zipcode = document.getElementById('zipcode').value;
+        if (!validateZipcode(zipcode)) {
+            showError('zipcode-error');
+            return false;
+        }
     }
     return true;
+}
+
+// Validate name fields
+function validateName(input, fieldName) {
+    const isValid = input.value.trim().length > 0;
+    if (!isValid) {
+        showError(input.id, `${fieldName} is required`);
+    }
+    return isValid;
 }
 
 // Validate email format
@@ -168,6 +223,49 @@ function validateEmail(email) {
     
     const errorElement = document.getElementById('email-error');
     if (!isValid && email) {
+        errorElement?.classList.remove('hidden');
+    } else {
+        errorElement?.classList.add('hidden');
+    }
+    
+    return isValid;
+}
+
+// Validate phone number
+function validatePhone(phone) {
+    const cleaned = phone.replace(/\D/g, '');
+    const isValid = cleaned.length === 10;
+    
+    const errorElement = document.getElementById('phone-error');
+    if (!isValid && phone) {
+        errorElement?.classList.remove('hidden');
+    } else {
+        errorElement?.classList.add('hidden');
+    }
+    
+    return isValid;
+}
+
+// Format phone number as user types
+function formatPhoneNumber(value) {
+    const cleaned = value.replace(/\D/g, '');
+    let formatted = cleaned;
+    
+    if (cleaned.length >= 6) {
+        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+    } else if (cleaned.length >= 3) {
+        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+    }
+    
+    return formatted;
+}
+
+// Validate ZIP code
+function validateZipcode(zipcode) {
+    const isValid = /^\d{5}$/.test(zipcode);
+    
+    const errorElement = document.getElementById('zipcode-error');
+    if (!isValid && zipcode) {
         errorElement?.classList.remove('hidden');
     } else {
         errorElement?.classList.add('hidden');
@@ -191,7 +289,10 @@ function showError(errorId) {
 function saveStepData() {
     switch(currentStep) {
         case 1:
+            formData.firstName = document.getElementById('firstName').value;
+            formData.lastName = document.getElementById('lastName').value;
             formData.email = document.getElementById('email').value;
+            formData.phone = document.getElementById('phone').value.replace(/\D/g, ''); // Store clean phone number
             break;
         case 2:
             formData.zipcode = document.getElementById('zipcode').value;
@@ -261,9 +362,16 @@ async function handleFormSubmit(e) {
         // Get referrer if exists
         const referredBy = getReferralFromURL();
         
-        // Prepare submission data
+        // Prepare submission data with proper field names for database
         const submissionData = {
-            ...formData,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            zipcode: formData.zipcode,
+            dietary_preferences: formData.preferences,
+            referral_source: formData.referralSource,
+            restaurant_suggestion: formData.restaurantSuggestion,
             referral_code: referralCode,
             referred_by: referredBy,
             joined_at: new Date().toISOString(),

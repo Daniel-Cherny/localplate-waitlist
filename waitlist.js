@@ -1,15 +1,17 @@
 // LocalPlate Premium Waitlist JavaScript
 
-// Get configuration from config.js (loaded separately for security)
-const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
-
-// Initialize Supabase client if configured
-let supabase = null;
-if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-    console.warn('Supabase not configured. Please copy config.js.example to config.js and add your credentials.');
+// Initialize Supabase client when needed (fixes timing issue)
+function getSupabaseClient() {
+    // Get configuration from config.js (loaded separately for security)
+    const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+    
+    if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+        console.warn('Supabase not configured. Please copy config.js.example to config.js and add your credentials.');
+        return null;
+    }
 }
 
 // Form state
@@ -383,6 +385,7 @@ async function handleFormSubmit(e) {
         };
         
         // Submit directly to Supabase (with RLS this is fine)
+        const supabase = getSupabaseClient();
         if (supabase) {
             const { data, error } = await supabase
                 .from('waitlist')
@@ -464,6 +467,7 @@ async function updateWaitlistCount() {
     let targetCount = 1247; // Default
     
     try {
+        const supabase = getSupabaseClient();
         if (supabase) {
             const { count, error } = await supabase
                 .from('waitlist')

@@ -169,10 +169,18 @@
         
     </main>
     
+    <script src="config.js"></script>
     <script>
-        // Initialize Supabase (use your credentials)
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // Simple password protection (good enough for a waitlist admin)
+        const password = prompt('Enter admin password:');
+        if (password !== 'localplate2025admin') {
+            document.body.innerHTML = 'Access Denied';
+            throw new Error('Unauthorized');
+        }
+        
+        // Initialize Supabase
+        const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
         
         let supabase = null;
         if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
@@ -297,34 +305,84 @@
             });
         }
         
-        // Update top referrers
+        // Update top referrers - Fixed XSS vulnerability
         function updateTopReferrers(referrers) {
             const container = document.getElementById('top-referrers');
-            container.innerHTML = referrers.map((ref, index) => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 ${index === 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-gray-200 dark:bg-gray-800'} rounded-full flex items-center justify-center">
-                            <span class="text-xs font-bold ${index === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}">${index + 1}</span>
-                        </div>
-                        <span class="text-sm font-medium">${ref.code}</span>
-                    </div>
-                    <span class="text-sm text-gray-600 dark:text-gray-400">${ref.count} referrals</span>
-                </div>
-            `).join('');
+            // Clear existing content
+            container.innerHTML = '';
+            
+            referrers.forEach((ref, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg';
+                
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'flex items-center space-x-3';
+                
+                const circleDiv = document.createElement('div');
+                circleDiv.className = `w-8 h-8 ${index === 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-gray-200 dark:bg-gray-800'} rounded-full flex items-center justify-center`;
+                
+                const numberSpan = document.createElement('span');
+                numberSpan.className = `text-xs font-bold ${index === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`;
+                numberSpan.textContent = String(index + 1);
+                
+                const codeSpan = document.createElement('span');
+                codeSpan.className = 'text-sm font-medium';
+                codeSpan.textContent = ref.code;
+                
+                const countSpan = document.createElement('span');
+                countSpan.className = 'text-sm text-gray-600 dark:text-gray-400';
+                countSpan.textContent = `${ref.count} referrals`;
+                
+                circleDiv.appendChild(numberSpan);
+                leftDiv.appendChild(circleDiv);
+                leftDiv.appendChild(codeSpan);
+                div.appendChild(leftDiv);
+                div.appendChild(countSpan);
+                container.appendChild(div);
+            });
         }
         
-        // Update recent signups table
+        // Update recent signups table - Fixed XSS vulnerability
         function updateRecentSignups(signups) {
             const tbody = document.getElementById('recent-signups');
-            tbody.innerHTML = signups.map(signup => `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${signup.email}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${signup.zipcode || '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400">${signup.referralCode}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${signup.referredBy || '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatDate(signup.joinedAt)}</td>
-                </tr>
-            `).join('');
+            // Clear existing content
+            tbody.innerHTML = '';
+            
+            signups.forEach(signup => {
+                const tr = document.createElement('tr');
+                
+                // Email cell
+                const emailTd = document.createElement('td');
+                emailTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white';
+                emailTd.textContent = signup.email;
+                
+                // ZIP code cell
+                const zipTd = document.createElement('td');
+                zipTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                zipTd.textContent = signup.zipcode || '-';
+                
+                // Referral code cell
+                const codeTd = document.createElement('td');
+                codeTd.className = 'px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400';
+                codeTd.textContent = signup.referralCode;
+                
+                // Referred by cell
+                const referredTd = document.createElement('td');
+                referredTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                referredTd.textContent = signup.referredBy || '-';
+                
+                // Joined date cell
+                const dateTd = document.createElement('td');
+                dateTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                dateTd.textContent = formatDate(signup.joinedAt);
+                
+                tr.appendChild(emailTd);
+                tr.appendChild(zipTd);
+                tr.appendChild(codeTd);
+                tr.appendChild(referredTd);
+                tr.appendChild(dateTd);
+                tbody.appendChild(tr);
+            });
         }
         
         // Format date

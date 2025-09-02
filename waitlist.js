@@ -338,7 +338,7 @@ function updateStepIndicators() {
     });
 }
 
-// Handle form submission
+// Handle form submission - Simple and direct with Supabase
 async function handleFormSubmit(e) {
     e.preventDefault();
     
@@ -364,7 +364,7 @@ async function handleFormSubmit(e) {
         // Get referrer if exists
         const referredBy = getReferralFromURL();
         
-        // Prepare submission data with proper field names for database
+        // Prepare submission data
         const submissionData = {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -382,16 +382,21 @@ async function handleFormSubmit(e) {
             language: navigator.language
         };
         
-        // Submit to Supabase or localStorage
+        // Submit directly to Supabase (with RLS this is fine)
         if (supabase) {
             const { data, error } = await supabase
                 .from('waitlist')
                 .insert([submissionData])
                 .select();
             
-            if (error) throw new Error(error.message);
+            if (error) {
+                if (error.message?.includes('duplicate')) {
+                    throw new Error('This email is already on the waitlist.');
+                }
+                throw new Error(error.message);
+            }
             
-            // Update referrer count
+            // Update referrer count if applicable
             if (referredBy) {
                 await supabase
                     .from('waitlist')
@@ -399,7 +404,7 @@ async function handleFormSubmit(e) {
                     .eq('referral_code', referredBy);
             }
         } else {
-            // Fallback to localStorage
+            // Fallback to localStorage if Supabase not configured
             const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
             waitlist.push(submissionData);
             localStorage.setItem('localplate_waitlist', JSON.stringify(waitlist));
@@ -417,7 +422,7 @@ async function handleFormSubmit(e) {
         
     } catch (error) {
         console.error('Submission error:', error);
-        alert('Something went wrong. Please try again.');
+        alert(error.message || 'Something went wrong. Please try again.');
     } finally {
         submitButton.disabled = false;
         submitText.classList.remove('hidden');

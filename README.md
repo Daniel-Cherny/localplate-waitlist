@@ -83,11 +83,13 @@ Upload all files to your web server or deploy to services like:
 waitlist/
 ├── index.html          # Main waitlist landing page
 ├── success.html        # Success page after signup
-├── admin.html          # Admin dashboard
+├── admin-panel-x8k9m2q.html  # Admin dashboard (hidden URL)
 ├── styles.css          # Tailwind-inspired styles
 ├── waitlist.js         # Main JavaScript functionality
 ├── config.js           # Configuration file
 ├── supabase-setup.sql  # Database setup script
+├── supabase-simple-rls.sql  # Security policies
+├── SIMPLE_SECURITY.md  # Security documentation
 └── README.md          # This file
 ```
 
@@ -207,7 +209,7 @@ All user-facing text is in the HTML files and can be easily modified to match yo
 
 ## 📈 Admin Dashboard
 
-Access the admin dashboard at `/admin.html` to view:
+Access the admin dashboard at `/admin-panel-x8k9m2q.html` (password protected) to view:
 - Total signups count
 - Today's signups
 - Referral conversion rate
@@ -216,10 +218,10 @@ Access the admin dashboard at `/admin.html` to view:
 - Recent signups table
 
 ### Security Note
-In production, protect the admin dashboard with authentication. Consider:
-- Supabase Auth
-- Basic Auth via server
-- OAuth integration
+The admin dashboard is protected with:
+- Hidden URL (unguessable filename)
+- Password protection (change default password before deploying)
+- See `SIMPLE_SECURITY.md` for complete security setup
 
 ## 🚢 Deployment Checklist
 
@@ -229,7 +231,8 @@ In production, protect the admin dashboard with authentication. Consider:
 - [ ] Configure email service
 - [ ] Add analytics tracking
 - [ ] Test referral system
-- [ ] Secure admin dashboard
+- [ ] Change admin password in admin-panel-x8k9m2q.html
+- [ ] Run supabase-simple-rls.sql for security policies
 - [ ] Set up SSL certificate
 - [ ] Configure CDN for assets
 - [ ] Test on mobile devices

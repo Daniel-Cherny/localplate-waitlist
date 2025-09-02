@@ -205,10 +205,23 @@
     </div>
     
     <script>
+        // Debug mode check
+        const DEBUG = new URLSearchParams(location.search).has('debug');
+        
         // Get user data from session storage
         const email = sessionStorage.getItem('waitlist_email');
         const referralCode = sessionStorage.getItem('waitlist_referral_code');
-        const position = sessionStorage.getItem('waitlist_position') || Math.floor(Math.random() * 500) + 1000;
+        
+        // Position handling - disable fake positions in debug mode
+        let position;
+        if (DEBUG) {
+            position = sessionStorage.getItem('waitlist_position') || 'UNKNOWN';
+            if (position === 'UNKNOWN') {
+                console.warn('[DEBUG] No real position found - fake position disabled');
+            }
+        } else {
+            position = sessionStorage.getItem('waitlist_position') || Math.floor(Math.random() * 500) + 1000;
+        }
         
         // Update page with user data
         if (email) {

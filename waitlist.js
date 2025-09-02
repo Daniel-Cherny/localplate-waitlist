@@ -1,17 +1,65 @@
 // LocalPlate Premium Waitlist JavaScript
 
+// Debug mode toggle
+const DEBUG = new URLSearchParams(location.search).has('debug');
+
+// Debug tracing helper
+const trace = (...args) => {
+    if (!DEBUG) return;
+    const t = (performance.now() / 1000).toFixed(3);
+    console.log(`[waitlist ${t}s]`, ...args);
+};
+
+// Assertion helper
+const assertOrThrow = (cond, msg) => {
+    if (!cond) throw new Error(`ASSERTION FAILED: ${msg}`);
+};
+
+// Debug fetch wrapper to trace Supabase network calls
+function createDebugFetch(origFetch = fetch) {
+    return async (url, opts) => {
+        const start = performance.now();
+        trace('[supabase fetch] →', opts?.method || 'GET', String(url), {
+            headers: opts?.headers ? Object.keys(opts.headers) : [],
+            bodyBytes: opts?.body ? (typeof opts.body === 'string' ? opts.body.length : 'binary') : 0,
+        });
+        try {
+            const res = await origFetch(url, opts);
+            trace('[supabase fetch] ←', res.status, res.statusText, `${(performance.now()-start).toFixed(1)}ms`);
+            return res;
+        } catch (err) {
+            trace('[supabase fetch] ✖', err.message);
+            throw err;
+        }
+    };
+}
+
 // Initialize Supabase client when needed (fixes timing issue)
 function getSupabaseClient() {
+    trace('[getSupabaseClient] called');
+    
+    // Assert config is loaded
+    assertOrThrow(window.LOCALPLATE_CONFIG, 'LOCALPLATE_CONFIG missing (config.js not loaded)');
+    
     // Get configuration from config.js (loaded separately for security)
     const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
     const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
     
-    if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } else {
-        console.warn('Supabase not configured. Please copy config.js.example to config.js and add your credentials.');
-        return null;
-    }
+    // Assert credentials exist
+    assertOrThrow(SUPABASE_URL !== 'YOUR_SUPABASE_URL', 'SUPABASE_URL not configured');
+    assertOrThrow(SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY not configured');
+    
+    trace('[getSupabaseClient] url:', SUPABASE_URL, 'anon key length:', SUPABASE_ANON_KEY.length);
+    
+    // Create client with debug fetch if in debug mode
+    const options = DEBUG ? {
+        global: { fetch: createDebugFetch(fetch) }
+    } : {};
+    
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, options);
+    trace('[getSupabaseClient] client created');
+    
+    return client;
 }
 
 // Form state
@@ -30,6 +78,25 @@ const formData = {
 
 // Initialize everything when DOM is ready - Mobile Optimized
 document.addEventListener('DOMContentLoaded', () => {
+    trace('[init] DOM ready');
+    
+    // DEBUG: Network monitoring
+    if (DEBUG && 'PerformanceObserver' in window) {
+        trace('[init] setting up network monitoring');
+        try {
+            const po = new PerformanceObserver((list) => {
+                for (const e of list.getEntries()) {
+                    if (e.initiatorType === 'fetch' && e.name.includes('supabase.co')) {
+                        trace('[perf fetch]', e.name, `${e.duration.toFixed(1)}ms`);
+                    }
+                }
+            });
+            po.observe({ entryTypes: ['resource'] });
+        } catch (err) {
+            trace('[init] network monitoring setup failed:', err.message);
+        }
+    }
+    
     // Critical path - initialize immediately
     initDarkMode();
     initFormHandlers();
@@ -340,15 +407,37 @@ function updateStepIndicators() {
     });
 }
 
+// Show inline error helper
+function showInlineError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+    errorDiv.textContent = `ERROR: ${message}`;
+    document.querySelector('.form-step.active').prepend(errorDiv);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => errorDiv.remove(), 10000);
+}
+
+// Show inline success helper  
+function showInlineSuccess(message) {
+    const successDiv = document.createElement('div');
+    successDiv.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4';
+    successDiv.textContent = `SUCCESS: ${message}`;
+    document.querySelector('.form-step.active').prepend(successDiv);
+}
+
 // Handle form submission - Simple and direct with Supabase
 async function handleFormSubmit(e) {
     e.preventDefault();
+    trace('[submit] form submission started');
     
     if (!validateCurrentStep()) {
+        trace('[submit] validation failed');
         return;
     }
     
     saveStepData();
+    trace('[submit] step data saved');
     
     // Show loading state
     const submitButton = e.target.querySelector('button[type="submit"]');
@@ -362,9 +451,11 @@ async function handleFormSubmit(e) {
     try {
         // Generate referral code
         const referralCode = generateReferralCode(formData.email);
+        trace('[submit] referral code generated:', referralCode);
         
         // Get referrer if exists
         const referredBy = getReferralFromURL();
+        trace('[submit] referred by:', referredBy || 'none');
         
         // Prepare submission data
         const submissionData = {
@@ -383,53 +474,98 @@ async function handleFormSubmit(e) {
             user_agent: navigator.userAgent,
             language: navigator.language
         };
+        trace('[submit] payload built', { email: submissionData.email });
+        
+        // Create Supabase client with assertions
+        const supabase = getSupabaseClient();
+        assertOrThrow(supabase, 'Supabase client not created');
+        
+        // DEBUG ONLY: Connectivity sanity check
+        if (DEBUG) {
+            trace('[submit] debug connectivity check...');
+            const { error: pingErr } = await supabase
+                .from('waitlist')
+                .select('*', { head: true, count: 'estimated' });
+            trace('[submit] connectivity check result:', pingErr || 'ok');
+        }
+        
+        // **CRITICAL: Block navigation while insert is pending**
+        let insertPending = true;
+        const beforeUnload = (evt) => {
+            if (insertPending) {
+                evt.preventDefault();
+                evt.returnValue = 'Database operation in progress...';
+                trace('[submit] navigation blocked - insert pending');
+            }
+        };
+        window.addEventListener('beforeunload', beforeUnload);
         
         // Submit directly to Supabase (with RLS this is fine)
-        const supabase = getSupabaseClient();
-        if (supabase) {
-            const { data, error } = await supabase
+        trace('[submit] starting database insert...');
+        const { data, error } = await supabase
+            .from('waitlist')
+            .insert([submissionData])
+            .select();
+        
+        // Clear navigation block immediately
+        insertPending = false;
+        window.removeEventListener('beforeunload', beforeUnload);
+        
+        trace('[submit] insert result', { error: error?.message, rows: data?.length || 0 });
+        
+        if (error) {
+            const errorMsg = error.message?.includes('duplicate') 
+                ? 'This email is already on the waitlist.'
+                : error.message;
+            
+            showInlineError(`Database error: ${errorMsg}`);
+            localStorage.setItem('localplate:lastError', JSON.stringify({ 
+                at: Date.now(), 
+                error: errorMsg 
+            }));
+            
+            throw new Error(errorMsg);
+        }
+        
+        // Update referrer count if applicable
+        if (referredBy) {
+            trace('[submit] updating referrer count...');
+            await supabase
                 .from('waitlist')
-                .insert([submissionData])
-                .select();
-            
-            if (error) {
-                if (error.message?.includes('duplicate')) {
-                    throw new Error('This email is already on the waitlist.');
-                }
-                throw new Error(error.message);
-            }
-            
-            // Update referrer count if applicable
-            if (referredBy) {
-                await supabase
-                    .from('waitlist')
-                    .update({ referral_count: supabase.raw('referral_count + 1') })
-                    .eq('referral_code', referredBy);
-            }
-        } else {
-            // Fallback to localStorage if Supabase not configured
-            const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
-            waitlist.push(submissionData);
-            localStorage.setItem('localplate_waitlist', JSON.stringify(waitlist));
-            
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+                .update({ referral_count: supabase.raw('referral_count + 1') })
+                .eq('referral_code', referredBy);
         }
         
         // Store success data
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
         
+        // Store real position from database response
+        if (data && data.length > 0 && data[0].position) {
+            sessionStorage.setItem('waitlist_position', data[0].position);
+            trace('[submit] real position stored:', data[0].position);
+        }
+        
+        trace('[submit] success data stored, about to redirect');
+        
         // Redirect to success page
         window.location.href = 'success.html';
         
     } catch (error) {
+        trace('[submit] exception caught', error.message);
         console.error('Submission error:', error);
-        alert(error.message || 'Something went wrong. Please try again.');
+        
+        showInlineError(error.message || 'Something went wrong. Please try again.');
+        localStorage.setItem('localplate:lastError', JSON.stringify({ 
+            at: Date.now(), 
+            error: String(error) 
+        }));
     } finally {
+        // Always restore UI state
         submitButton.disabled = false;
         submitText.classList.remove('hidden');
         submitLoader.classList.add('hidden');
+        trace('[submit] UI state restored');
     }
 }
 

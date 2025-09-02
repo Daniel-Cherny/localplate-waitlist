@@ -28,6 +28,21 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <!-- Config override for production (fixes build environment variable issue) -->
+    <script>
+        if (window.LOCALPLATE_CONFIG && 
+            (window.LOCALPLATE_CONFIG.supabase.url === 'YOUR_SUPABASE_URL' || 
+             window.LOCALPLATE_CONFIG.supabase.anonKey === 'YOUR_SUPABASE_ANON_KEY')) {
+            // Override with real production credentials
+            window.LOCALPLATE_CONFIG = {
+                supabase: {
+                    url: 'https://iihzbnyxbxhsrexqsori.supabase.co',
+                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpaHpibnl4Ynhoc3JleHFzb3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NTgwOTMsImV4cCI6MjA2ODEzNDA5M30.bsTztXcwzZ_zyw6Wtl0glXkY_O8Xcmn6rcS0VRPdIcg'
+                }
+            };
+            console.log('✅ Config override applied - production credentials loaded');
+        }
+    </script>
     <script defer src="waitlist.js"></script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">

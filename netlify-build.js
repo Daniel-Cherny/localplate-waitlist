@@ -7,6 +7,10 @@ const fs = require('fs');
 const SUPABASE_URL = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
 
+// Debug: Log what we're getting (mask sensitive data)
+console.log('🔍 Debug: SUPABASE_URL =', SUPABASE_URL?.startsWith('https://') ? 'FOUND (valid URL)' : 'NOT_FOUND_OR_INVALID');
+console.log('🔍 Debug: SUPABASE_ANON_KEY =', SUPABASE_ANON_KEY?.startsWith('eyJ') ? 'FOUND (valid JWT)' : 'NOT_FOUND_OR_INVALID');
+
 // Create config.js content
 const configContent = `// LocalPlate Waitlist Configuration
 // Auto-generated during Netlify build

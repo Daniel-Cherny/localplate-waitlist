@@ -205,10 +205,71 @@
     </div>
     
     <script>
+        // CRITICAL: Guard against false positives - verify user actually submitted form
+        (function validateSuccessPage() {
+            const email = sessionStorage.getItem('waitlist_email');
+            const referralCode = sessionStorage.getItem('waitlist_referral_code');
+            const timestamp = sessionStorage.getItem('waitlist_timestamp');
+            
+            // Check if required data exists
+            if (!email || !referralCode || !timestamp) {
+                console.error('[SUCCESS GUARD] Missing required session data', {
+                    hasEmail: !!email,
+                    hasReferralCode: !!referralCode,
+                    hasTimestamp: !!timestamp
+                });
+                // Store error for debugging
+                localStorage.setItem('localplate:successError', JSON.stringify({
+                    at: Date.now(),
+                    error: 'Missing session data',
+                    hasEmail: !!email,
+                    hasReferralCode: !!referralCode,
+                    hasTimestamp: !!timestamp
+                }));
+                // Redirect to home
+                window.location.replace('index.html');
+                return;
+            }
+            
+            // Validate timestamp is recent (within 60 seconds)
+            const submittedAt = parseInt(timestamp, 10);
+            const now = Date.now();
+            const ageMs = now - submittedAt;
+            
+            if (isNaN(submittedAt) || ageMs > 60000 || ageMs < 0) {
+                console.error('[SUCCESS GUARD] Invalid or expired timestamp', {
+                    timestamp,
+                    ageMs,
+                    maxAge: 60000
+                });
+                // Store error for debugging
+                localStorage.setItem('localplate:successError', JSON.stringify({
+                    at: now,
+                    error: 'Expired or invalid timestamp',
+                    ageMs,
+                    timestamp
+                }));
+                // Clear stale data
+                sessionStorage.removeItem('waitlist_email');
+                sessionStorage.removeItem('waitlist_referral_code');
+                sessionStorage.removeItem('waitlist_timestamp');
+                sessionStorage.removeItem('waitlist_inserted_id');
+                // Redirect to home
+                window.location.replace('index.html');
+                return;
+            }
+            
+            console.log('[SUCCESS GUARD] Validation passed', {
+                email,
+                referralCode,
+                ageMs: ageMs + 'ms'
+            });
+        })();
+        
         // Debug mode check
         const DEBUG = new URLSearchParams(location.search).has('debug');
         
-        // Get user data from session storage
+        // Get user data from session storage (already validated above)
         const email = sessionStorage.getItem('waitlist_email');
         const referralCode = sessionStorage.getItem('waitlist_referral_code');
         

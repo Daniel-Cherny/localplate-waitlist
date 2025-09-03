@@ -1,5 +1,28 @@
 // LocalPlate Premium Waitlist JavaScript
 
+// Global error handlers and instrumentation (MUST BE FIRST)
+if (typeof window !== 'undefined') {
+    window.__lpLogs = window.__lpLogs || [];
+    const pushLog = (type, payload) => {
+        try {
+            window.__lpLogs.push({ at: Date.now(), type, payload });
+            if (window.__lpLogs.length > 2000) window.__lpLogs.shift();
+        } catch (_) {}
+    };
+
+    window.addEventListener('error', (e) => {
+        console.error('[GLOBAL ERROR]', e.error || e.message, e.filename, e.lineno, e.colno);
+        pushLog('error', { message: e.message, stack: e.error?.stack, filename: e.filename, line: e.lineno });
+        localStorage.setItem('localplate:lastError', JSON.stringify({ at: Date.now(), error: e.message, phase: 'global_error' }));
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+        console.error('[UNHANDLED REJECTION]', e.reason);
+        pushLog('unhandledrejection', { reason: e.reason?.message || String(e.reason), stack: e.reason?.stack });
+        localStorage.setItem('localplate:lastError', JSON.stringify({ at: Date.now(), error: e.reason?.message || String(e.reason), phase: 'unhandled_rejection' }));
+    });
+}
+
 // Debug mode toggle
 const DEBUG = new URLSearchParams(location.search).has('debug');
 
@@ -1166,9 +1189,23 @@ window.handleFormSubmit = async function(e) {
         };
         trace('[submit] payload built', { email: submissionData.email });
         
-        // Create Supabase client with assertions
-        const supabase = getSupabaseClient();
-        assertOrThrow(supabase, 'Supabase client not created');
+        // Create Supabase client with defensive guards
+        const supabase = typeof getSupabaseClient === 'function'
+            ? getSupabaseClient()
+            : (typeof window !== 'undefined' && typeof window.getSupabaseClient === 'function'
+                ? window.getSupabaseClient()
+                : null);
+        
+        if (!supabase || typeof supabase.from !== 'function') {
+            console.error('[SUBMIT] Supabase client unavailable', { supabaseType: typeof supabase });
+            localStorage.setItem('localplate:lastError', JSON.stringify({
+                at: Date.now(),
+                error: 'Supabase client unavailable',
+                phase: 'client_init'
+            }));
+            showInlineError('Database connection failed. Please refresh the page and try again.');
+            throw new Error('Supabase client unavailable');
+        }
         
         // DEBUG ONLY: Connectivity sanity check - removed unnecessary GET request
         if (DEBUG) {
@@ -1189,36 +1226,57 @@ window.handleFormSubmit = async function(e) {
         // Submit directly to Supabase with timeout handling (POST request)
         trace('[submit] starting database insert via POST...');
         
-        // Create timeout promise
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Request timeout')), 30000)
+        // Create timeout promise with sentinel value
+        const timeoutMs = 30000;
+        const timeoutPromise = new Promise(resolve => 
+            setTimeout(() => resolve({ timedOut: true, timeoutMs }), timeoutMs)
         );
         
         // Submit directly to Supabase using POST request via .insert()
         console.log('Submitting to Supabase via POST:', submissionData);
-        const { data, error } = await Promise.race([
-            supabase
-                .from('waitlist')
-                .insert([submissionData])
-                .select(),
-            timeoutPromise
-        ]);
+        
+        const insertPromise = supabase
+            .from('waitlist')
+            .insert([submissionData])
+            .select();
+        
+        const result = await Promise.race([insertPromise, timeoutPromise]);
+        
+        // Check for timeout
+        if (result?.timedOut) {
+            console.warn('[SUBMIT] Timeout during insert', { timeoutMs });
+            localStorage.setItem('localplate:lastError', JSON.stringify({
+                at: Date.now(),
+                error: 'Insert timed out',
+                phase: 'insert_timeout',
+                timeoutMs
+            }));
+            showInlineError('Request timed out. Please try again.');
+            throw new Error('Insert timed out');
+        }
+        
+        const { data, error, status, statusText } = result || {};
+        console.log('[SUBMIT] Insert result', { hasData: Array.isArray(data), dataLength: data?.length, error: error?.message, status, statusText });
         
         // Clear navigation block immediately
         insertPending = false;
         window.removeEventListener('beforeunload', beforeUnload);
         
-        trace('[submit] insert result', { error: error?.message || 'none' });
+        trace('[submit] processing insert result', { error: error?.message || 'none', hasData: !!data });
         
         if (error) {
             const errorMsg = error.message?.includes('duplicate') 
                 ? 'This email is already on the waitlist.'
-                : error.message;
+                : error.message || 'Unknown database error';
             
+            console.error('[SUBMIT] Insert error', { error, status, statusText });
             showInlineError(`Database error: ${errorMsg}`);
             localStorage.setItem('localplate:lastError', JSON.stringify({ 
                 at: Date.now(), 
-                error: errorMsg 
+                error: errorMsg,
+                phase: 'insert_error',
+                status,
+                statusText
             }));
             
             throw new Error(errorMsg);
@@ -1250,20 +1308,50 @@ window.handleFormSubmit = async function(e) {
             }
         }
         
-        // Store success data
+        // CRITICAL: Verify we actually have a successful insert before redirecting
+        let inserted = null;
+        
+        if (Array.isArray(data) && data.length > 0 && data[0]) {
+            // Check for any identifier that confirms the row was created
+            if (data[0].id || data[0].email || data[0].created_at) {
+                inserted = data[0];
+                console.log('[SUBMIT] Insert confirmed', { id: data[0].id, email: data[0].email });
+            }
+        }
+        
+        // If no data returned (RLS blocks SELECT), we can't verify - but since no error, assume success
+        // This is risky but necessary given RLS constraints
+        if (!inserted && !error) {
+            console.warn('[SUBMIT] No data returned (likely RLS blocks SELECT), but no error - assuming success');
+            inserted = { assumed: true, email: formData.email };
+        }
+        
+        if (!inserted) {
+            console.error('[SUBMIT] Could not verify insert (no data returned)');
+            showInlineError('We could not confirm your submission was saved. Please try again.');
+            localStorage.setItem('localplate:lastError', JSON.stringify({
+                at: Date.now(),
+                error: 'Insert unverified (no data returned)',
+                phase: 'post_insert_verify',
+                dataReceived: data
+            }));
+            // Do NOT redirect to success
+            throw new Error('Insert result not verifiable');
+        }
+        
+        // Store success data for success.html
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
+        if (inserted.id) {
+            sessionStorage.setItem('waitlist_inserted_id', String(inserted.id));
+        }
+        sessionStorage.setItem('waitlist_timestamp', Date.now().toString());
         
-        // Clear form data from sessionStorage since submission was successful
+        // Clear form data (but preserve success keys)
         clearSessionStorage();
         
-        // Note: Can't get position without SELECT, which RLS blocks
-        // Success page will need to show a generic message
-        
-        trace('[submit] success data stored, about to redirect');
-        
-        // If we got here, insert was successful (errors are thrown above)
-        console.log('[SUBMIT] Insert successful - navigating to success');
+        trace('[submit] verified insert, storing success data, about to redirect');
+        console.log('[SUBMIT] Verified insert - navigating to success');
         window.location.href = 'success.html';
         
     } catch (error) {

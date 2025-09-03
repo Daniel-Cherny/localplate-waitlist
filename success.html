@@ -305,7 +305,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script defer src="waitlist.js?v=20250903-fix3"></script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">
     
@@ -1159,6 +1158,56 @@
         
         // Debug mode check
         const DEBUG = new URLSearchParams(location.search).has('debug');
+        
+        // Initialize Supabase client when needed
+        window.getSupabaseClient = function() {
+            if (DEBUG) console.log('[getSupabaseClient] called');
+            
+            try {
+                // Check if supabase library is loaded
+                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    throw new Error('Supabase library not loaded. Please check your internet connection and try refreshing the page.');
+                }
+                
+                // Assert config is loaded
+                if (!window.LOCALPLATE_CONFIG) {
+                    throw new Error('Configuration not loaded. Please refresh the page and try again.');
+                }
+                
+                // Get configuration from config.js
+                const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+                const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+                
+                // Validate credentials
+                if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_URL) {
+                    throw new Error('Supabase URL not configured properly');
+                }
+                if (SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' || !SUPABASE_ANON_KEY) {
+                    throw new Error('Supabase API key not configured properly');
+                }
+                
+                // Validate URL format
+                if (!SUPABASE_URL.startsWith('https://') || !SUPABASE_URL.includes('supabase.co')) {
+                    throw new Error('Invalid Supabase URL format');
+                }
+                
+                if (DEBUG) console.log('[getSupabaseClient] Creating client...');
+                
+                // Create client
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                if (!client) {
+                    throw new Error('Failed to create Supabase client');
+                }
+                
+                if (DEBUG) console.log('[getSupabaseClient] Client created successfully');
+                return client;
+                
+            } catch (error) {
+                console.error('Failed to initialize Supabase client:', error.message);
+                throw new Error(`Database connection failed: ${error.message}`);
+            }
+        }
         
         // Get user data from session storage (already validated above)
         const email = sessionStorage.getItem('waitlist_email');

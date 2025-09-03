@@ -1198,13 +1198,12 @@ window.handleFormSubmit = async function(e) {
             setTimeout(() => reject(new Error('Request timeout')), 30000)
         );
         
-        // Race the insert operation against timeout
-        const insertPromise = supabase
+        // Submit directly to Supabase
+        console.log('Submitting to Supabase:', submissionData);
+        const { data, error } = await supabase
             .from('waitlist')
-            .insert([submissionData]);
-        
-        const { error } = await Promise.race([insertPromise, timeoutPromise]);
-        // Note: Removed .select() because RLS blocks SELECT for anon users
+            .insert([submissionData])
+            .select();
         
         // Clear navigation block immediately
         insertPending = false;

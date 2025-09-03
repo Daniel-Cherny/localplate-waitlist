@@ -1110,7 +1110,6 @@ window.localplateDiagnostics = runDiagnostics;
 
 // Handle form submission - Simple and direct with Supabase
 window.handleFormSubmit = async function(e) {
-    debugger; // Gemini debug point
     e.preventDefault();
     console.log('[SUBMIT] Handler fired! Form submission started');
     trace('[submit] form submission started');

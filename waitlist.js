@@ -1123,9 +1123,9 @@ window.handleFormSubmit = async function(e) {
     trace('[submit] step data saved');
     
     // Show loading state
-    const submitButton = document.getElementById('submit-btn');
-    const submitText = document.getElementById('submit-text');
-    const submitLoader = document.getElementById('submit-loader');
+    const submitButton = e.target.closest('button');
+    const submitText = submitButton.querySelector('#submit-text');
+    const submitLoader = submitButton.querySelector('#submit-loader');
     
     // Add null checking before manipulating elements
     if (submitButton) {

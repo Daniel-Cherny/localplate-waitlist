@@ -35,7 +35,7 @@ function createDebugFetch(origFetch = fetch) {
 }
 
 // Initialize Supabase client when needed (fixes timing issue)
-function getSupabaseClient() {
+window.getSupabaseClient = function() {
     trace('[getSupabaseClient] called');
     
     try {

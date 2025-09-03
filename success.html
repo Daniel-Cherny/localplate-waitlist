@@ -384,7 +384,7 @@
                 
                 <!-- Subheading -->
                 <p class="text-xl text-gray-600 dark:text-gray-300 mb-4 animate-fade-in-up animation-delay-200">
-                    Welcome to LocalPlate, <span id="user-email" class="font-medium text-gray-900 dark:text-white">friend</span>!
+                    Welcome to LocalPlate, <span id="user-name" class="font-medium text-gray-900 dark:text-white">friend</span>!
                 </p>
                 
                 <!-- Live Stats Display -->
@@ -1226,7 +1226,8 @@
         
         // Update page with user data
         if (email) {
-            document.getElementById('user-email').textContent = email;
+            const firstName = sessionStorage.getItem('waitlist_first_name') || 'friend';
+            document.getElementById('user-name').textContent = firstName;
         }
         
         if (referralCode) {

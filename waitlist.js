@@ -1457,6 +1457,7 @@ window._handleFormSubmitImpl = async function(e) {
         
         // Store success data for success.html
         sessionStorage.setItem('waitlist_email', formData.email);
+        sessionStorage.setItem('waitlist_first_name', formData.firstName);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
         if (inserted.id) {
             sessionStorage.setItem('waitlist_inserted_id', String(inserted.id));

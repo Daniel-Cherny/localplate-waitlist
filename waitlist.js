@@ -523,16 +523,16 @@ window.handleFormSubmit = async function(e) {
         
         // Submit directly to Supabase (with RLS this is fine)
         trace('[submit] starting database insert...');
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('waitlist')
-            .insert([submissionData])
-            .select();
+            .insert([submissionData]);
+        // Note: Removed .select() because RLS blocks SELECT for anon users
         
         // Clear navigation block immediately
         insertPending = false;
         window.removeEventListener('beforeunload', beforeUnload);
         
-        trace('[submit] insert result', { error: error?.message, rows: data?.length || 0 });
+        trace('[submit] insert result', { error: error?.message || 'none' });
         
         if (error) {
             const errorMsg = error.message?.includes('duplicate') 
@@ -551,32 +551,23 @@ window.handleFormSubmit = async function(e) {
         // Update referrer count if applicable
         if (referredBy) {
             trace('[submit] updating referrer count...');
-            await supabase
-                .from('waitlist')
-                .update({ referral_count: supabase.raw('referral_count + 1') })
-                .eq('referral_code', referredBy);
+            // Note: Removed supabase.raw() - doesn't exist in v2
+            // This should be handled by a server-side function or RPC
+            // For now, skipping referral count update
         }
         
         // Store success data
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
         
-        // Store real position from database response
-        if (data && data.length > 0 && data[0].position) {
-            sessionStorage.setItem('waitlist_position', data[0].position);
-            trace('[submit] real position stored:', data[0].position);
-        }
+        // Note: Can't get position without SELECT, which RLS blocks
+        // Success page will need to show a generic message
         
         trace('[submit] success data stored, about to redirect');
         
-        // CRITICAL: Only redirect if we have confirmed data
-        if (data && data.length > 0) {
-            console.log('[SUBMIT] Insert confirmed with ID:', data[0].id, '- navigating to success');
-            window.location.href = 'success.html';
-        } else {
-            console.error('[SUBMIT] No data returned from insert - refusing to navigate');
-            showInlineError('Database insert did not complete. Please try again.');
-        }
+        // If we got here, insert was successful (errors are thrown above)
+        console.log('[SUBMIT] Insert successful - navigating to success');
+        window.location.href = 'success.html';
         
     } catch (error) {
         trace('[submit] exception caught', error.message);

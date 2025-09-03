@@ -23,10 +23,18 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     process.exit(1);
 }
 
-// Debug: Log what we're getting (mask sensitive data)
+// Debug: Log what we're getting (mask sensitive data)  
 console.log('🔍 Debug: SUPABASE_URL =', SUPABASE_URL?.startsWith('https://') ? 'FOUND (valid URL)' : 'NOT_FOUND_OR_INVALID');
 console.log('🔍 Debug: SUPABASE_ANON_KEY =', SUPABASE_ANON_KEY?.startsWith('eyJ') ? 'FOUND (valid JWT)' : 'NOT_FOUND_OR_INVALID');
 console.log('🔍 Debug: Raw SUPABASE_URL =', SUPABASE_URL === 'YOUR_SUPABASE_URL' ? 'PLACEHOLDER' : 'ACTUAL VALUE SET');
+
+// Additional debugging for Netlify
+console.log('🔍 All environment variables starting with SUPABASE:');
+Object.keys(process.env)
+    .filter(key => key.startsWith('SUPABASE'))
+    .forEach(key => {
+        console.log(`   ${key}: ${process.env[key] ? 'SET' : 'EMPTY'}`);
+    });
 
 // Create config.js content
 const configContent = `// LocalPlate Waitlist Configuration
@@ -40,8 +48,13 @@ window.LOCALPLATE_CONFIG = {
 };`;
 
 // Write config.js file
-fs.writeFileSync('config.js', configContent, 'utf8');
-console.log('✅ config.js created successfully');
+try {
+    fs.writeFileSync('config.js', configContent, 'utf8');
+    console.log('✅ config.js created successfully');
+} catch (error) {
+    console.error('❌ CRITICAL: Failed to write config.js:', error.message);
+    process.exit(1);
+}
 
 // Verify the file was created and doesn't contain placeholders
 if (fs.existsSync('config.js')) {
@@ -58,7 +71,15 @@ if (fs.existsSync('config.js')) {
         process.exit(1);
     }
     console.log('✅ config.js file exists and contains real values');
-    console.log('📋 Config preview (first 150 chars):', configContent.substring(0, 150) + '...');
+    
+    // Safe preview that masks sensitive data
+    const safePreview = configContent
+        .replace(SUPABASE_URL, 'https://[MASKED-PROJECT-ID].supabase.co')
+        .replace(SUPABASE_ANON_KEY, 'eyJ[MASKED-JWT-TOKEN]');
+    console.log('📋 Config preview (masked):', safePreview.substring(0, 200) + '...');
+    
+    // Final validation
+    console.log('🔒 SECURITY CHECK: Credentials properly injected from environment variables ✅');
 } else {
     console.error('❌ Failed to create config.js');
     process.exit(1);

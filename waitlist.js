@@ -630,6 +630,34 @@ function saveStepData() {
     }
 }
 
+// Save all form data regardless of current step (for form submission)
+function saveAllFormData() {
+    // Step 1 data
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const email = document.getElementById('email');
+    const phone = document.getElementById('phone');
+    
+    if (firstName) formData.firstName = firstName.value;
+    if (lastName) formData.lastName = lastName.value;
+    if (email) formData.email = email.value;
+    if (phone) formData.phone = phone.value.replace(/\D/g, '');
+    
+    // Step 2 data
+    const zipcode = document.getElementById('zipcode');
+    if (zipcode) formData.zipcode = zipcode.value;
+    
+    const preferences = document.querySelectorAll('input[name="preferences"]:checked');
+    formData.preferences = Array.from(preferences).map(cb => cb.value);
+    
+    // Step 3 data
+    const referralSource = document.getElementById('referral-source');
+    const restaurantSuggestion = document.getElementById('restaurant-suggestion');
+    
+    if (referralSource) formData.referralSource = referralSource.value;
+    if (restaurantSuggestion) formData.restaurantSuggestion = restaurantSuggestion.value;
+}
+
 // Save form data to sessionStorage to prevent data loss
 function saveToSessionStorage() {
     try {
@@ -1226,8 +1254,9 @@ window._handleFormSubmitImpl = async function(e) {
         return;
     }
     
-    saveStepData();
-    trace('[submit] step data saved');
+    // Ensure all form data is captured before submission
+    saveAllFormData();
+    trace('[submit] all form data saved');
     
     // Show loading state
     // The submit button is the actual button with id="submit-btn" in step 3
@@ -1455,9 +1484,12 @@ window._handleFormSubmitImpl = async function(e) {
             throw new Error('Insert result not verifiable');
         }
         
-        // Store success data for success.html
+        // Store success data for success.html - ensure firstName is captured from DOM
+        const firstNameElement = document.getElementById('firstName');
+        const actualFirstName = firstNameElement ? firstNameElement.value : formData.firstName;
+        
         sessionStorage.setItem('waitlist_email', formData.email);
-        sessionStorage.setItem('waitlist_first_name', formData.firstName);
+        sessionStorage.setItem('waitlist_first_name', actualFirstName);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
         if (inserted.id) {
             sessionStorage.setItem('waitlist_inserted_id', String(inserted.id));

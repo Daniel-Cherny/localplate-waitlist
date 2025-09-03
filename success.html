@@ -1226,8 +1226,17 @@
         
         // Update page with user data
         if (email) {
-            const firstName = sessionStorage.getItem('waitlist_first_name') || 'friend';
-            document.getElementById('user-name').textContent = firstName;
+            const v = sessionStorage.getItem('waitlist_first_name');
+            console.log('[success] read first_name:', v, 'at', performance.now(), 'on', location.origin);
+            console.log('[success] all sessionStorage keys:', Object.keys(sessionStorage));
+            const firstName = v || 'friend';
+            document.addEventListener('DOMContentLoaded', () => {
+                const el = document.getElementById('user-name');
+                if (el) {
+                    el.textContent = firstName;
+                    console.log('[success] set user-name to:', firstName);
+                }
+            });
         }
         
         if (referralCode) {

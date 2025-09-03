@@ -638,7 +638,11 @@ function saveAllFormData() {
     const email = document.getElementById('email');
     const phone = document.getElementById('phone');
     
-    if (firstName) formData.firstName = firstName.value;
+    if (firstName) {
+        formData.firstName = (firstName.value || '').trim();
+        // Persist firstName immediately to eliminate races
+        try { sessionStorage.setItem('waitlist_first_name', formData.firstName); } catch (e) { console.warn('Failed to persist firstName:', e); }
+    }
     if (lastName) formData.lastName = lastName.value;
     if (email) formData.email = email.value;
     if (phone) formData.phone = phone.value.replace(/\D/g, '');
@@ -1485,9 +1489,12 @@ window._handleFormSubmitImpl = async function(e) {
         }
         
         // Store success data for success.html - use formData which was populated by saveAllFormData
+        console.log('[waitlist submit] setting first_name:', formData.firstName, 'at', performance.now(), 'on', location.origin);
+        console.log('[waitlist submit] full formData:', formData);
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_first_name', formData.firstName);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
+        console.log('[waitlist submit] sessionStorage set. Verification:', sessionStorage.getItem('waitlist_first_name'));
         if (inserted.id) {
             sessionStorage.setItem('waitlist_inserted_id', String(inserted.id));
         }

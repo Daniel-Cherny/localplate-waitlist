@@ -1170,13 +1170,9 @@ window.handleFormSubmit = async function(e) {
         const supabase = getSupabaseClient();
         assertOrThrow(supabase, 'Supabase client not created');
         
-        // DEBUG ONLY: Connectivity sanity check
+        // DEBUG ONLY: Connectivity sanity check - removed unnecessary GET request
         if (DEBUG) {
-            trace('[submit] debug connectivity check...');
-            const { error: pingErr } = await supabase
-                .from('waitlist')
-                .select('*', { head: true, count: 'estimated' });
-            trace('[submit] connectivity check result:', pingErr || 'ok');
+            trace('[submit] debug connectivity check skipped - using direct insert');
         }
         
         // **CRITICAL: Block navigation while insert is pending**
@@ -1190,20 +1186,23 @@ window.handleFormSubmit = async function(e) {
         };
         window.addEventListener('beforeunload', beforeUnload);
         
-        // Submit directly to Supabase with timeout handling
-        trace('[submit] starting database insert...');
+        // Submit directly to Supabase with timeout handling (POST request)
+        trace('[submit] starting database insert via POST...');
         
         // Create timeout promise
         const timeoutPromise = new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Request timeout')), 30000)
         );
         
-        // Submit directly to Supabase
-        console.log('Submitting to Supabase:', submissionData);
-        const { data, error } = await supabase
-            .from('waitlist')
-            .insert([submissionData])
-            .select();
+        // Submit directly to Supabase using POST request via .insert()
+        console.log('Submitting to Supabase via POST:', submissionData);
+        const { data, error } = await Promise.race([
+            supabase
+                .from('waitlist')
+                .insert([submissionData])
+                .select(),
+            timeoutPromise
+        ]);
         
         // Clear navigation block immediately
         insertPending = false;
@@ -1229,6 +1228,7 @@ window.handleFormSubmit = async function(e) {
         if (referredBy) {
             trace('[submit] updating referrer count...');
             try {
+                // RPC call uses POST method as per Supabase documentation
                 const { data: referralResult, error: referralError } = await supabase
                     .rpc('record_referral', { referral_code: referredBy });
                 
@@ -1377,6 +1377,7 @@ async function updateWaitlistCount() {
                 setTimeout(() => reject(new Error('Count query timeout')), 10000)
             );
             
+            // Legitimate GET request for reading count data
             const countPromise = supabase
                 .from('waitlist_stats')
                 .select('total_signups')

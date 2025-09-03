@@ -1505,6 +1505,37 @@ textarea:focus {
     display: inline-block;
 }
 
+/* Success pulse animation */
+@keyframes successPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-success-pulse {
+    animation: successPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Enhanced typography for success page */
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Improved hover effects for rewards tiers */
+.group:hover .opacity-50 {
+    opacity: 0.75;
+    transition: opacity 0.3s ease;
+}
+
 .success-icon-wrapper::after {
     content: '';
     position: absolute;

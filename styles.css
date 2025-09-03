@@ -1794,8 +1794,9 @@ textarea:focus {
         padding-bottom: 3.5rem;
     }
     
-    /* Optimize form card padding */
-    .form-card {
+    /* Optimize form and success card padding */
+    .form-card,
+    .success-card {
         padding: 1.5rem;
     }
     
@@ -1822,7 +1823,8 @@ textarea:focus {
         padding-right: 0.75rem;
     }
     
-    .form-card {
+    .form-card,
+    .success-card {
         padding: 1.25rem;
     }
     

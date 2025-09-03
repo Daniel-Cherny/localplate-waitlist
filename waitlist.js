@@ -447,7 +447,7 @@ function showInlineSuccess(message) {
 }
 
 // Handle form submission - Simple and direct with Supabase
-async function handleFormSubmit(e) {
+window.handleFormSubmit = async function(e) {
     e.preventDefault();
     console.log('[SUBMIT] Handler fired! Form submission started');
     trace('[submit] form submission started');

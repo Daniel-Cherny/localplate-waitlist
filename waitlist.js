@@ -1368,7 +1368,7 @@ async function updateWaitlistCount() {
         return;
     }
     
-    let targetCount = 1247; // Fallback default
+    let targetCount = null;
     
     try {
         const supabase = getSupabaseClient();
@@ -1385,34 +1385,26 @@ async function updateWaitlistCount() {
             
             const { data, error } = await Promise.race([countPromise, timeoutPromise]);
             
-            if (error) {
-                console.warn('Count query error:', error.message);
-                trace('[updateWaitlistCount] using fallback count due to error:', error.message);
-                // Fall through to use default count
-            } else if (data && data.total_signups) {
+            if (!error && data && data.total_signups) {
                 targetCount = data.total_signups;
                 trace('[updateWaitlistCount] retrieved count:', data.total_signups);
             } else {
-                trace('[updateWaitlistCount] no data returned, using default');
+                console.warn('Count query error or no data:', error?.message);
+                trace('[updateWaitlistCount] count unavailable:', error?.message || 'no data');
+                // Hide the count if we can't get real data
+                countElement.style.display = 'none';
+                return;
             }
         } else {
-            // Use localStorage count as fallback
-            const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
-            targetCount = 1247 + waitlist.length;
-            trace('[updateWaitlistCount] using localStorage fallback count:', targetCount);
+            trace('[updateWaitlistCount] no supabase client, hiding count');
+            countElement.style.display = 'none';
+            return;
         }
     } catch (error) {
         console.warn('Error fetching waitlist count:', error.message);
-        trace('[updateWaitlistCount] exception caught, using fallback:', error.message);
-        
-        // Try localStorage as final fallback
-        try {
-            const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
-            targetCount = 1247 + waitlist.length;
-        } catch (storageError) {
-            console.warn('localStorage fallback also failed:', storageError.message);
-            // Keep the default count of 1247
-        }
+        trace('[updateWaitlistCount] exception caught, hiding count:', error.message);
+        countElement.style.display = 'none';
+        return;
     }
     
     // Animate the count (this should always work)

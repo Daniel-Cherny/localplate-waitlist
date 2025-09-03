@@ -1131,6 +1131,68 @@ function runDiagnostics() {
 // Make diagnostics available globally for debugging
 window.localplateDiagnostics = runDiagnostics;
 
+// CRITICAL TEST: Check for request cancellation issue (GPT-5 identified)
+window.testRequestCancellation = async function() {
+    console.log('=== TESTING FOR REQUEST CANCELLATION BUG ===');
+    console.log('This test will determine if navigation is killing your Supabase insert.');
+    console.log('Watch the Network tab for a request to /rest/v1/waitlist');
+    console.log('If it shows "(canceled)" = FOUND THE BUG!');
+    
+    const testData = {
+        first_name: 'Test',
+        last_name: 'Cancel',
+        email: 'cancel-test-' + Date.now() + '@test.com',
+        phone: '5551234567',
+        zipcode: '90210',
+        dietary_preferences: [],
+        referral_source: 'cancel_test',
+        restaurant_suggestion: 'Test Restaurant',
+        referral_code: 'TESTCANCEL',
+        referred_by: null,
+        joined_at: new Date().toISOString(),
+        source: 'cancel_test',
+        user_agent: navigator.userAgent,
+        language: navigator.language
+    };
+    
+    try {
+        const supabase = window.getSupabaseClient();
+        
+        console.log('Starting insert WITHOUT awaiting...');
+        // Intentionally NOT awaiting to simulate the bug
+        const insertPromise = supabase
+            .from('waitlist')
+            .insert([testData])
+            .select();
+            
+        // Simulate navigation after 100ms (before request completes)
+        setTimeout(() => {
+            console.log('SIMULATING NAVIGATION - Watch Network tab NOW!');
+            // Don't actually navigate, just log what would happen
+            console.warn('In real scenario, window.location.href would be set here');
+            console.warn('This would CANCEL the pending insert request!');
+        }, 100);
+        
+        // Now properly await to see if it succeeds when not interrupted
+        const { data, error } = await insertPromise;
+        
+        if (error) {
+            console.error('Insert failed:', error);
+        } else if (data && data[0]) {
+            console.log('✅ Insert succeeded when not interrupted:', data[0]);
+            console.log('This proves navigation IS the problem!');
+        } else {
+            console.log('⚠️ Insert returned no data (check RLS policies)');
+        }
+        
+    } catch (err) {
+        console.error('Test error:', err);
+    }
+    
+    console.log('=== TEST COMPLETE ===');
+    console.log('To fix: Ensure you AWAIT the insert before ANY navigation!');
+};
+
 // Handle form submission - Simple and direct with Supabase
 window.handleFormSubmit = async function(e) {
     e.preventDefault();
@@ -1235,12 +1297,43 @@ window.handleFormSubmit = async function(e) {
         // Submit directly to Supabase using POST request via .insert()
         console.log('Submitting to Supabase via POST:', submissionData);
         
+        // Add abort detection to catch navigation cancellations
+        const abortController = new AbortController();
+        const navigationHandler = (e) => {
+            console.error('[CRITICAL] Navigation detected during insert!', e.type);
+            abortController.abort('Navigation during insert');
+        };
+        
+        // Monitor for navigation events that could cancel our request
+        window.addEventListener('beforeunload', navigationHandler);
+        window.addEventListener('popstate', navigationHandler);
+        
         const insertPromise = supabase
             .from('waitlist')
             .insert([submissionData])
-            .select();
+            .select()
+            .abortSignal(abortController.signal)
+            .then(result => {
+                console.log('[INSERT] Request completed successfully');
+                return result;
+            })
+            .catch(err => {
+                if (err.name === 'AbortError') {
+                    console.error('[INSERT] Request ABORTED - navigation canceled the request!');
+                    localStorage.setItem('localplate:lastError', JSON.stringify({
+                        at: Date.now(),
+                        error: 'Insert aborted by navigation',
+                        phase: 'insert_aborted'
+                    }));
+                }
+                throw err;
+            });
         
         const result = await Promise.race([insertPromise, timeoutPromise]);
+        
+        // Clean up navigation monitoring
+        window.removeEventListener('beforeunload', navigationHandler);
+        window.removeEventListener('popstate', navigationHandler);
         
         // Check for timeout
         if (result?.timedOut) {

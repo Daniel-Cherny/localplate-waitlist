@@ -26,6 +26,11 @@ if (typeof window !== 'undefined') {
 // Debug mode toggle
 const DEBUG = new URLSearchParams(location.search).has('debug');
 
+// Forward declarations to prevent initialization errors
+window.handleFormSubmit = null; // Will be defined later
+window.nextStep = null; // Will be defined later  
+window.previousStep = null; // Will be defined later
+
 // Debug tracing helper
 const trace = (...args) => {
     if (!DEBUG) return;
@@ -213,32 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Initialize connection monitoring
-connectionMonitor.onStatusChange((status) => {
-    if (status === 'online') {
-        trace('[connection] back online');
-        // Remove offline messages if any
-        const offlineMessages = document.querySelectorAll('.offline-message');
-        offlineMessages.forEach(msg => msg.remove());
-        
-        // Show reconnection message briefly
-        const reconnectDiv = document.createElement('div');
-        reconnectDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-50';
-        reconnectDiv.textContent = 'Connection restored';
-        document.body.appendChild(reconnectDiv);
-        
-        setTimeout(() => reconnectDiv.remove(), 3000);
-    } else if (status === 'offline') {
-        trace('[connection] went offline');
-        const offlineDiv = document.createElement('div');
-        offlineDiv.className = 'fixed top-4 left-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded z-50 offline-message';
-        offlineDiv.innerHTML = `
-            <strong>Connection Lost:</strong> You appear to be offline. 
-            Some features may not work until your connection is restored.
-        `;
-        document.body.prepend(offlineDiv);
-    }
-});
+// Connection monitoring will be initialized after ConnectionMonitor class is defined
 
 // Dark Mode Toggle
 function initDarkMode() {
@@ -385,8 +365,21 @@ function initFormHandlers() {
     
     // Form submission - CRITICAL PATH
     if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-        console.log('[INIT] Submit handler attached successfully');
+        if (typeof window.handleFormSubmit === 'function') {
+            form.addEventListener('submit', handleFormSubmit);
+            console.log('[INIT] Submit handler attached successfully');
+        } else {
+            console.warn('[INIT] handleFormSubmit not yet defined, will retry after full load');
+            // Retry after a delay to allow handleFormSubmit to be defined
+            setTimeout(() => {
+                if (typeof window.handleFormSubmit === 'function') {
+                    form.addEventListener('submit', handleFormSubmit);
+                    console.log('[INIT] Submit handler attached successfully (delayed)');
+                } else {
+                    console.error('[INIT] handleFormSubmit still not defined after delay');
+                }
+            }, 100);
+        }
     } else {
         console.error('[INIT] Cannot attach submit handler - form is null');
     }
@@ -1069,6 +1062,33 @@ class ConnectionMonitor {
 
 // Global connection monitor
 const connectionMonitor = new ConnectionMonitor();
+
+// Initialize connection monitoring
+connectionMonitor.onStatusChange((status) => {
+    if (status === 'online') {
+        trace('[connection] back online');
+        // Remove offline messages if any
+        const offlineMessages = document.querySelectorAll('.offline-message');
+        offlineMessages.forEach(msg => msg.remove());
+        
+        // Show reconnection message briefly
+        const reconnectDiv = document.createElement('div');
+        reconnectDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-50';
+        reconnectDiv.textContent = 'Connection restored';
+        document.body.appendChild(reconnectDiv);
+        
+        setTimeout(() => reconnectDiv.remove(), 3000);
+    } else if (status === 'offline') {
+        trace('[connection] went offline');
+        const offlineDiv = document.createElement('div');
+        offlineDiv.className = 'fixed top-4 left-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded z-50 offline-message';
+        offlineDiv.innerHTML = `
+            <strong>Connection Lost:</strong> You appear to be offline. 
+            Some features may not work until your connection is restored.
+        `;
+        document.body.prepend(offlineDiv);
+    }
+});
 
 // Diagnostic function for troubleshooting
 function runDiagnostics() {

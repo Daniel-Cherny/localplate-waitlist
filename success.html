@@ -27,11 +27,55 @@
     <!-- Noise Texture Overlay -->
     <div class="noise-overlay"></div>
     
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg z-50 border-b border-gray-100 dark:border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 logo-spin" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444" class="animate-pulse-slow"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b" class="animate-pulse-slow animation-delay-100"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16" class="animate-pulse-slow animation-delay-200"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                        LocalPlate
+                    </span>
+                </a>
+                
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                    </svg>
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
     <!-- Confetti Canvas -->
     <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
     
-    <!-- Main Content -->
-    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <!-- Hero Section with Ken Burns Effect -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <!-- Background Image with Ken Burns -->
+        <div class="absolute inset-0 ken-burns-container">
+            <div class="ken-burns-image"></div>
+        </div>
+        
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90 dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/90"></div>
         <div class="max-w-2xl w-full">
             
             <!-- Success Card -->
@@ -208,7 +252,44 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate-footer)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate-footer" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-lg font-semibold text-gray-900 dark:text-white">LocalPlate</span>
+                </div>
+                
+                <!-- Links -->
+                <div class="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
+                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms</a>
+                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</a>
+                </div>
+                
+                <!-- Copyright -->
+                <p class="text-sm text-gray-500 dark:text-gray-500">
+                    © 2025 LocalPlate. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
     
     <!-- Copy Toast -->
     <div id="copy-toast" class="hidden fixed bottom-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg animate-slide-up">

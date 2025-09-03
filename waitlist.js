@@ -27,9 +27,23 @@ if (typeof window !== 'undefined') {
 const DEBUG = new URLSearchParams(location.search).has('debug');
 
 // Forward declarations to prevent initialization errors
-window.handleFormSubmit = null; // Will be defined later
 window.nextStep = null; // Will be defined later  
 window.previousStep = null; // Will be defined later
+
+// Handle form submission - Defined early to prevent initialization race condition
+window.handleFormSubmit = async function(e) {
+    e.preventDefault();
+    console.log('[SUBMIT] Handler fired! Form submission started');
+    
+    // Defer to the full implementation that will be set up after all dependencies are loaded
+    // This ensures validateCurrentStep, saveStepData, etc. are available
+    if (window._handleFormSubmitImpl) {
+        return window._handleFormSubmitImpl(e);
+    }
+    
+    console.error('[SUBMIT] Form handler implementation not yet loaded');
+    return false;
+}
 
 // Debug tracing helper
 const trace = (...args) => {
@@ -365,21 +379,9 @@ function initFormHandlers() {
     
     // Form submission - CRITICAL PATH
     if (form) {
-        if (typeof window.handleFormSubmit === 'function') {
-            form.addEventListener('submit', handleFormSubmit);
-            console.log('[INIT] Submit handler attached successfully');
-        } else {
-            console.warn('[INIT] handleFormSubmit not yet defined, will retry after full load');
-            // Retry after a delay to allow handleFormSubmit to be defined
-            setTimeout(() => {
-                if (typeof window.handleFormSubmit === 'function') {
-                    form.addEventListener('submit', handleFormSubmit);
-                    console.log('[INIT] Submit handler attached successfully (delayed)');
-                } else {
-                    console.error('[INIT] handleFormSubmit still not defined after delay');
-                }
-            }, 100);
-        }
+        // handleFormSubmit is now defined early at the top of the file, so it's always available
+        form.addEventListener('submit', window.handleFormSubmit);
+        console.log('[INIT] Submit handler attached successfully');
     } else {
         console.error('[INIT] Cannot attach submit handler - form is null');
     }
@@ -1213,10 +1215,10 @@ window.testRequestCancellation = async function() {
     console.log('To fix: Ensure you AWAIT the insert before ANY navigation!');
 };
 
-// Handle form submission - Simple and direct with Supabase
-window.handleFormSubmit = async function(e) {
+// Handle form submission implementation - Simple and direct with Supabase
+window._handleFormSubmitImpl = async function(e) {
     e.preventDefault();
-    console.log('[SUBMIT] Handler fired! Form submission started');
+    // No need to log here since the wrapper already logged
     trace('[submit] form submission started');
     
     if (!validateCurrentStep()) {

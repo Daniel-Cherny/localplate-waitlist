@@ -28,21 +28,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <!-- Config override for production (fixes build environment variable issue) -->
-    <script>
-        if (window.LOCALPLATE_CONFIG && 
-            (window.LOCALPLATE_CONFIG.supabase.url === 'YOUR_SUPABASE_URL' || 
-             window.LOCALPLATE_CONFIG.supabase.anonKey === 'YOUR_SUPABASE_ANON_KEY')) {
-            // Override with real production credentials
-            window.LOCALPLATE_CONFIG = {
-                supabase: {
-                    url: 'https://iihzbnyxbxhsrexqsori.supabase.co',
-                    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpaHpibnl4Ynhoc3JleHFzb3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI1NTgwOTMsImV4cCI6MjA2ODEzNDA5M30.bsTztXcwzZ_zyw6Wtl0glXkY_O8Xcmn6rcS0VRPdIcg'
-                }
-            };
-            console.log('✅ Config override applied - production credentials loaded');
-        }
-    </script>
     <script defer src="waitlist.js"></script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">
@@ -99,11 +84,11 @@
                     </button>
                     
                     <!-- Theme Toggle -->
-                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110">
-                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
                     </svg>
-                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
                     </svg>
                 </button>
@@ -163,18 +148,18 @@
                 <!-- Multi-Step Form Container -->
                 <div class="max-w-md mx-auto form-container reveal-on-scroll animation-delay-300">
                     <!-- Form Progress Indicator -->
-                    <div class="flex items-center justify-center mb-8" id="progress-indicator">
+                    <div class="flex items-center justify-center mb-8" id="progress-indicator" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3" aria-label="Form progress">
                         <div class="flex items-center space-x-4">
-                            <div class="step-indicator active" data-step="1">
+                            <div class="step-indicator active" data-step="1" aria-current="step">
                                 <span class="step-number">1</span>
                                 <span class="step-label">Personal Info</span>
                             </div>
-                            <div class="step-connector"></div>
+                            <div class="step-connector" aria-hidden="true"></div>
                             <div class="step-indicator" data-step="2">
                                 <span class="step-number">2</span>
                                 <span class="step-label">Location</span>
                             </div>
-                            <div class="step-connector"></div>
+                            <div class="step-connector" aria-hidden="true"></div>
                             <div class="step-indicator" data-step="3">
                                 <span class="step-number">3</span>
                                 <span class="step-label">Finish</span>
@@ -183,7 +168,7 @@
                     </div>
                     
                     <!-- Form Card with Paper Texture -->
-                    <div class="form-card">
+                    <div class="form-card" aria-live="polite" aria-label="Multi-step waitlist form">
                         <form id="waitlist-form" class="relative" novalidate>
                             <!-- Step 1: Personal Information -->
                             <div class="form-step active" id="step-1">
@@ -198,7 +183,9 @@
                                                 required
                                                 placeholder="John"
                                                 class="form-input"
+                                                aria-describedby="firstName-help"
                                             >
+                                            <div id="firstName-help" class="sr-only">Enter your first name</div>
                                         </div>
                                         <div class="form-group">
                                             <label for="lastName" class="form-label">Last Name</label>
@@ -209,7 +196,9 @@
                                                 required
                                                 placeholder="Doe"
                                                 class="form-input"
+                                                aria-describedby="lastName-help"
                                             >
+                                            <div id="lastName-help" class="sr-only">Enter your last name</div>
                                         </div>
                                     </div>
                                     
@@ -222,8 +211,9 @@
                                             required
                                             placeholder="you@example.com"
                                             class="form-input"
+                                            aria-describedby="email-error"
                                         >
-                                        <span class="form-error hidden" id="email-error">Please enter a valid email address</span>
+                                        <span class="form-error hidden" id="email-error" role="alert" aria-live="assertive">Please enter a valid email address</span>
                                     </div>
                                     
                                     <div class="form-group">
@@ -235,8 +225,9 @@
                                             required
                                             placeholder="(555) 123-4567"
                                             class="form-input"
+                                            aria-describedby="phone-error"
                                         >
-                                        <span class="form-error hidden" id="phone-error">Please enter a valid phone number</span>
+                                        <span class="form-error hidden" id="phone-error" role="alert" aria-live="assertive">Please enter a valid phone number</span>
                                     </div>
                                     
                                     <button type="button" onclick="nextStep()" class="btn-primary w-full group">
@@ -262,26 +253,29 @@
                                             pattern="[0-9]{5}"
                                             maxlength="5"
                                             class="form-input"
+                                            aria-describedby="zipcode-error"
                                         >
-                                        <span class="form-error hidden" id="zipcode-error">Please enter a valid 5-digit ZIP code</span>
+                                        <span class="form-error hidden" id="zipcode-error" role="alert" aria-live="assertive">Please enter a valid 5-digit ZIP code</span>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label class="form-label">Dietary Preferences (Optional)</label>
-                                        <div class="space-y-2">
-                                            <label class="checkbox-label">
-                                                <input type="checkbox" name="preferences" value="vegetarian" class="checkbox">
-                                                <span>Vegetarian</span>
-                                            </label>
-                                            <label class="checkbox-label">
-                                                <input type="checkbox" name="preferences" value="vegan" class="checkbox">
-                                                <span>Vegan</span>
-                                            </label>
-                                            <label class="checkbox-label">
-                                                <input type="checkbox" name="preferences" value="gluten-free" class="checkbox">
-                                                <span>Gluten-Free</span>
-                                            </label>
-                                        </div>
+                                        <fieldset>
+                                            <legend class="form-label">Dietary Preferences (Optional)</legend>
+                                            <div class="space-y-2">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="preferences" value="vegetarian" class="checkbox">
+                                                    <span>Vegetarian</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="preferences" value="vegan" class="checkbox">
+                                                    <span>Vegan</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="preferences" value="gluten-free" class="checkbox">
+                                                    <span>Gluten-Free</span>
+                                                </label>
+                                            </div>
+                                        </fieldset>
                                     </div>
                                     
                                     <div class="flex space-x-3">
@@ -303,7 +297,7 @@
                                 <div class="space-y-4">
                                     <div class="form-group">
                                         <label for="referral-source" class="form-label">How did you hear about us?</label>
-                                        <select id="referral-source" name="referral-source" class="form-input">
+                                        <select id="referral-source" name="referral-source" class="form-input" aria-describedby="referral-help">
                                             <option value="">Select one...</option>
                                             <option value="social">Social Media</option>
                                             <option value="friend">Friend or Family</option>
@@ -311,6 +305,7 @@
                                             <option value="search">Google Search</option>
                                             <option value="other">Other</option>
                                         </select>
+                                        <div id="referral-help" class="sr-only">Optional: Select how you discovered LocalPlate</div>
                                     </div>
                                     
                                     <div class="form-group">
@@ -321,14 +316,16 @@
                                             name="restaurant-suggestion" 
                                             placeholder="Your favorite local spot"
                                             class="form-input"
+                                            aria-describedby="restaurant-help"
                                         >
+                                        <div id="restaurant-help" class="sr-only">Optional: Suggest a restaurant you'd like to see on LocalPlate</div>
                                     </div>
                                     
                                     <div class="flex space-x-3">
                                         <button type="button" onclick="previousStep()" class="btn-secondary flex-1">
                                             Back
                                         </button>
-                                        <button type="button" id="submit-btn" onclick="window.handleFormSubmit(event)" class="btn-primary flex-1 group">
+                                        <button type="submit" id="submit-btn" class="btn-primary flex-1 group">
                                             <span id="submit-text">Join Waitlist</span>
                                             <svg id="submit-loader" class="hidden animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

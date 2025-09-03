@@ -38,28 +38,62 @@ function createDebugFetch(origFetch = fetch) {
 function getSupabaseClient() {
     trace('[getSupabaseClient] called');
     
-    // Assert config is loaded
-    assertOrThrow(window.LOCALPLATE_CONFIG, 'LOCALPLATE_CONFIG missing (config.js not loaded)');
-    
-    // Get configuration from config.js (loaded separately for security)
-    const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
-    
-    // Assert credentials exist
-    assertOrThrow(SUPABASE_URL !== 'YOUR_SUPABASE_URL', 'SUPABASE_URL not configured');
-    assertOrThrow(SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY not configured');
-    
-    trace('[getSupabaseClient] url:', SUPABASE_URL, 'anon key length:', SUPABASE_ANON_KEY.length);
-    
-    // Create client with debug fetch if in debug mode
-    const options = DEBUG ? {
-        global: { fetch: createDebugFetch(fetch) }
-    } : {};
-    
-    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, options);
-    trace('[getSupabaseClient] client created');
-    
-    return client;
+    try {
+        // Check if supabase library is loaded
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+            throw new Error('Supabase library not loaded. Please check your internet connection and try refreshing the page.');
+        }
+        
+        // Assert config is loaded
+        if (!window.LOCALPLATE_CONFIG) {
+            throw new Error('Configuration not loaded. Please refresh the page and try again.');
+        }
+        
+        // Get configuration from config.js (loaded separately for security)
+        const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+        
+        // Validate credentials
+        if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_URL) {
+            throw new Error('Supabase URL not configured properly');
+        }
+        if (SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' || !SUPABASE_ANON_KEY) {
+            throw new Error('Supabase API key not configured properly');
+        }
+        
+        // Validate URL format
+        if (!SUPABASE_URL.startsWith('https://') || !SUPABASE_URL.includes('supabase.co')) {
+            throw new Error('Invalid Supabase URL format');
+        }
+        
+        trace('[getSupabaseClient] url:', SUPABASE_URL, 'anon key length:', SUPABASE_ANON_KEY.length);
+        
+        // Create client with debug fetch if in debug mode
+        const options = DEBUG ? {
+            global: { fetch: createDebugFetch(fetch) }
+        } : {};
+        
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, options);
+        
+        if (!client) {
+            throw new Error('Failed to create Supabase client');
+        }
+        
+        trace('[getSupabaseClient] client created successfully');
+        return client;
+        
+    } catch (error) {
+        console.error('Failed to initialize Supabase client:', error.message);
+        trace('[getSupabaseClient] error:', error.message);
+        
+        // Store error for user feedback
+        localStorage.setItem('localplate:supabaseError', JSON.stringify({
+            at: Date.now(),
+            error: error.message
+        }));
+        
+        throw new Error(`Database connection failed: ${error.message}`);
+    }
 }
 
 // Form state
@@ -80,43 +114,106 @@ const formData = {
 document.addEventListener('DOMContentLoaded', () => {
     trace('[init] DOM ready');
     
-    // DEBUG: Network monitoring
-    if (DEBUG && 'PerformanceObserver' in window) {
-        trace('[init] setting up network monitoring');
-        try {
-            const po = new PerformanceObserver((list) => {
-                for (const e of list.getEntries()) {
-                    if (e.initiatorType === 'fetch' && e.name.includes('supabase.co')) {
-                        trace('[perf fetch]', e.name, `${e.duration.toFixed(1)}ms`);
+    try {
+        // DEBUG: Network monitoring
+        if (DEBUG && 'PerformanceObserver' in window) {
+            trace('[init] setting up network monitoring');
+            try {
+                const po = new PerformanceObserver((list) => {
+                    for (const e of list.getEntries()) {
+                        if (e.initiatorType === 'fetch' && e.name.includes('supabase.co')) {
+                            trace('[perf fetch]', e.name, `${e.duration.toFixed(1)}ms`);
+                        }
                     }
+                });
+                po.observe({ entryTypes: ['resource'] });
+            } catch (err) {
+                trace('[init] network monitoring setup failed:', err.message);
+            }
+        }
+        
+        // Critical path - initialize immediately with error handling
+        try {
+            initDarkMode();
+        } catch (error) {
+            console.error('Dark mode initialization failed:', error);
+        }
+        
+        try {
+            initFormHandlers();
+        } catch (error) {
+            console.error('Form handlers initialization failed:', error);
+            reportError('init_form_handlers', error, 'Failed to initialize form');
+        }
+        
+        // Defer non-critical initializations for better mobile performance
+        const deferredInit = () => {
+            const initFunctions = [
+                { fn: initScrollReveal, name: 'scroll reveal' },
+                { fn: initMarquee, name: 'marquee' },
+                { fn: updateWaitlistCount, name: 'waitlist count' },
+                { fn: checkReferral, name: 'referral check' }
+            ];
+            
+            initFunctions.forEach(({ fn, name }) => {
+                try {
+                    fn();
+                } catch (error) {
+                    console.warn(`${name} initialization failed:`, error.message);
+                    trace(`[init] ${name} failed:`, error.message);
                 }
             });
-            po.observe({ entryTypes: ['resource'] });
-        } catch (err) {
-            trace('[init] network monitoring setup failed:', err.message);
+        };
+        
+        if (window.requestIdleCallback) {
+            window.requestIdleCallback(deferredInit, { timeout: 2000 });
+        } else {
+            // Fallback for browsers without requestIdleCallback
+            setTimeout(deferredInit, 100);
         }
-    }
-    
-    // Critical path - initialize immediately
-    initDarkMode();
-    initFormHandlers();
-    
-    // Defer non-critical initializations for better mobile performance
-    if (window.requestIdleCallback) {
-        window.requestIdleCallback(() => {
-            initScrollReveal();
-            initMarquee();
-            updateWaitlistCount();
-            checkReferral();
-        }, { timeout: 2000 });
-    } else {
-        // Fallback for browsers without requestIdleCallback
+        
+    } catch (criticalError) {
+        console.error('Critical initialization error:', criticalError);
+        reportError('critical_init', criticalError, 'Application failed to initialize properly');
+        
+        // Show user-friendly error message
         setTimeout(() => {
-            initScrollReveal();
-            initMarquee();
-            updateWaitlistCount();
-            checkReferral();
-        }, 100);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 left-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+            errorDiv.innerHTML = `
+                <strong>Loading Error:</strong> The application failed to initialize properly. 
+                Please refresh the page. If the problem persists, try clearing your browser cache.
+                <button onclick="window.location.reload()" class="ml-2 underline">Refresh Now</button>
+            `;
+            document.body.prepend(errorDiv);
+        }, 1000);
+    }
+});
+
+// Initialize connection monitoring
+connectionMonitor.onStatusChange((status) => {
+    if (status === 'online') {
+        trace('[connection] back online');
+        // Remove offline messages if any
+        const offlineMessages = document.querySelectorAll('.offline-message');
+        offlineMessages.forEach(msg => msg.remove());
+        
+        // Show reconnection message briefly
+        const reconnectDiv = document.createElement('div');
+        reconnectDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-50';
+        reconnectDiv.textContent = 'Connection restored';
+        document.body.appendChild(reconnectDiv);
+        
+        setTimeout(() => reconnectDiv.remove(), 3000);
+    } else if (status === 'offline') {
+        trace('[connection] went offline');
+        const offlineDiv = document.createElement('div');
+        offlineDiv.className = 'fixed top-4 left-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded z-50 offline-message';
+        offlineDiv.innerHTML = `
+            <strong>Connection Lost:</strong> You appear to be offline. 
+            Some features may not work until your connection is restored.
+        `;
+        document.body.prepend(offlineDiv);
     }
 });
 
@@ -184,48 +281,83 @@ function initFormHandlers() {
     console.log('[INIT] Form element found:', !!form);
     if (!form) {
         console.error('[INIT] CRITICAL: waitlist-form not found! Submit handler will not attach.');
-        // Try again after a delay
-        setTimeout(() => {
-            const retryForm = document.getElementById('waitlist-form');
-            if (retryForm) {
-                console.log('[INIT] Form found on retry, attaching handler');
-                retryForm.addEventListener('submit', handleFormSubmit);
-            }
-        }, 100);
         return;
     }
+
+    // Restore form data from sessionStorage on page load
+    restoreFormData();
     
-    // First name validation
+    // Save initial state to sessionStorage (in case user refreshes before entering data)
+    setTimeout(() => {
+        saveToSessionStorage();
+    }, 100);
+    
+    // First name validation with blur event handling
     const firstNameInput = document.getElementById('firstName');
     firstNameInput?.addEventListener('blur', () => {
         validateName(firstNameInput, 'First name');
+        saveStepData();
+        saveToSessionStorage();
     });
     
-    // Last name validation
+    // Last name validation with blur event handling
     const lastNameInput = document.getElementById('lastName');
     lastNameInput?.addEventListener('blur', () => {
         validateName(lastNameInput, 'Last name');
+        saveStepData();
+        saveToSessionStorage();
     });
     
-    // Email validation
+    // Email validation with blur event handling
     const emailInput = document.getElementById('email');
     emailInput?.addEventListener('blur', () => {
         validateEmail(emailInput.value);
+        saveStepData();
+        saveToSessionStorage();
     });
     
-    // Phone number formatting and validation
+    // Phone number formatting and validation with blur event handling
     const phoneInput = document.getElementById('phone');
     phoneInput?.addEventListener('input', (e) => {
         e.target.value = formatPhoneNumber(e.target.value);
     });
     phoneInput?.addEventListener('blur', () => {
         validatePhone(phoneInput.value);
+        saveStepData();
+        saveToSessionStorage();
     });
     
-    // ZIP code formatting
+    // ZIP code formatting with blur event handling
     const zipcodeInput = document.getElementById('zipcode');
     zipcodeInput?.addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+    });
+    zipcodeInput?.addEventListener('blur', () => {
+        saveStepData();
+        saveToSessionStorage();
+    });
+
+    // Dietary preferences checkboxes with change event handling
+    const preferenceInputs = document.querySelectorAll('input[name="preferences"]');
+    preferenceInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            saveStepData();
+            saveToSessionStorage();
+        });
+    });
+
+    // Referral source dropdown with change event handling
+    const referralSourceInput = document.getElementById('referral-source');
+    referralSourceInput?.addEventListener('change', () => {
+        saveStepData();
+        saveToSessionStorage();
+    });
+
+    // Restaurant suggestion input with blur event handling
+    const restaurantSuggestionInput = document.getElementById('restaurant-suggestion');
+    restaurantSuggestionInput?.addEventListener('blur', () => {
+        saveStepData();
+        saveToSessionStorage();
     });
     
     // Form submission - CRITICAL PATH
@@ -236,19 +368,48 @@ function initFormHandlers() {
         console.error('[INIT] Cannot attach submit handler - form is null');
     }
     
-    // Initialize step indicators
+    // Initialize step indicators and set up initial accessibility state
     updateStepIndicators();
+    
+    // Set up initial focus on first input
+    const firstInput = document.querySelector('#step-1 input:not([type="hidden"])');
+    if (firstInput) {
+        // Don't immediately focus - wait for user interaction
+        firstInput.setAttribute('tabindex', '0');
+    }
+    
+    // Add keyboard navigation for step indicators (for screen reader users)
+    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+        indicator.setAttribute('tabindex', '0');
+        indicator.setAttribute('role', 'button');
+        
+        indicator.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                // Only allow navigation to completed or current steps
+                const stepNum = index + 1;
+                if (stepNum <= currentStep) {
+                    currentStep = stepNum;
+                    showStep(currentStep);
+                    updateStepIndicators();
+                }
+            }
+        });
+    });
 }
 
 // Navigate to next step
 window.nextStep = function() {
     if (validateCurrentStep()) {
         saveStepData();
+        saveToSessionStorage();
         
         if (currentStep < totalSteps) {
             currentStep++;
             showStep(currentStep);
             updateStepIndicators();
+            // Save updated step to sessionStorage
+            saveToSessionStorage();
         }
     }
 };
@@ -256,46 +417,74 @@ window.nextStep = function() {
 // Navigate to previous step
 window.previousStep = function() {
     saveStepData();
+    saveToSessionStorage();
     
     if (currentStep > 1) {
         currentStep--;
         showStep(currentStep);
         updateStepIndicators();
+        // Save updated step to sessionStorage
+        saveToSessionStorage();
     }
 };
 
-// Validate current step
+// Validate current step with accessibility enhancements
 function validateCurrentStep() {
+    let isValid = true;
+    
     if (currentStep === 1) {
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
         const phone = document.getElementById('phone').value;
         
+        // Clear previous error states
+        clearErrorStates(['firstName', 'lastName', 'email', 'phone']);
+        
         if (!firstName.trim()) {
             showError('firstName', 'First name is required');
-            return false;
+            isValid = false;
         }
         if (!lastName.trim()) {
             showError('lastName', 'Last name is required');
-            return false;
+            isValid = false;
         }
         if (!validateEmail(email)) {
             showError('email-error');
-            return false;
+            isValid = false;
         }
         if (!validatePhone(phone)) {
             showError('phone-error');
-            return false;
+            isValid = false;
         }
     } else if (currentStep === 2) {
         const zipcode = document.getElementById('zipcode').value;
+        
+        // Clear previous error states
+        clearErrorStates(['zipcode']);
+        
         if (!validateZipcode(zipcode)) {
             showError('zipcode-error');
-            return false;
+            isValid = false;
         }
     }
-    return true;
+    
+    return isValid;
+}
+
+// Clear error states for form inputs
+function clearErrorStates(fieldIds) {
+    fieldIds.forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + '-error');
+        
+        if (input) {
+            input.removeAttribute('aria-invalid');
+        }
+        if (errorElement) {
+            errorElement.classList.add('hidden');
+        }
+    });
 }
 
 // Validate name fields
@@ -365,15 +554,41 @@ function validateZipcode(zipcode) {
     return isValid;
 }
 
-// Show error message
-function showError(errorId) {
-    const errorElement = document.getElementById(errorId);
-    errorElement?.classList.remove('hidden');
+// Show error message with accessibility enhancements
+function showError(errorId, customMessage) {
+    let errorElement;
     
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-        errorElement?.classList.add('hidden');
-    }, 3000);
+    // Handle different error ID formats
+    if (errorId.endsWith('-error')) {
+        errorElement = document.getElementById(errorId);
+    } else {
+        errorElement = document.getElementById(errorId + '-error');
+    }
+    
+    if (errorElement) {
+        // Update message if provided
+        if (customMessage) {
+            errorElement.textContent = customMessage;
+        }
+        
+        errorElement.classList.remove('hidden');
+        
+        // Focus the related input for keyboard users
+        const inputId = errorId.replace('-error', '');
+        const inputElement = document.getElementById(inputId);
+        if (inputElement) {
+            inputElement.focus();
+            inputElement.setAttribute('aria-invalid', 'true');
+        }
+        
+        // Auto-hide after 5 seconds (increased for accessibility)
+        setTimeout(() => {
+            errorElement.classList.add('hidden');
+            if (inputElement) {
+                inputElement.removeAttribute('aria-invalid');
+            }
+        }, 5000);
+    }
 }
 
 // Save current step data
@@ -397,7 +612,123 @@ function saveStepData() {
     }
 }
 
-// Show specific step
+// Save form data to sessionStorage to prevent data loss
+function saveToSessionStorage() {
+    try {
+        // Always capture all field values, regardless of current step
+        const phoneInput = document.getElementById('phone');
+        const phoneValue = phoneInput ? phoneInput.value.replace(/\D/g, '') : (formData.phone || '');
+        
+        const allFormData = {
+            firstName: document.getElementById('firstName')?.value || formData.firstName || '',
+            lastName: document.getElementById('lastName')?.value || formData.lastName || '',
+            email: document.getElementById('email')?.value || formData.email || '',
+            phone: phoneValue,
+            zipcode: document.getElementById('zipcode')?.value || formData.zipcode || '',
+            preferences: Array.from(document.querySelectorAll('input[name="preferences"]:checked'))
+                .map(cb => cb.value) || formData.preferences || [],
+            referralSource: document.getElementById('referral-source')?.value || formData.referralSource || '',
+            restaurantSuggestion: document.getElementById('restaurant-suggestion')?.value || formData.restaurantSuggestion || '',
+            currentStep: currentStep
+        };
+        
+        sessionStorage.setItem('waitlist_form_data', JSON.stringify(allFormData));
+        trace('[sessionStorage] Form data saved', { step: currentStep, email: allFormData.email });
+    } catch (error) {
+        console.warn('Failed to save form data to sessionStorage:', error);
+    }
+}
+
+// Restore form data from sessionStorage on page load
+function restoreFormData() {
+    try {
+        const savedData = sessionStorage.getItem('waitlist_form_data');
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            
+            // Restore form data object
+            Object.assign(formData, parsedData);
+            
+            // Restore current step if available
+            if (parsedData.currentStep && parsedData.currentStep > 1) {
+                currentStep = parsedData.currentStep;
+                showStep(currentStep);
+                updateStepIndicators();
+            }
+            
+            // Restore form field values
+            restoreFormFields();
+            
+            trace('[sessionStorage] Form data restored', { step: currentStep, email: formData.email });
+        }
+    } catch (error) {
+        console.warn('Failed to restore form data from sessionStorage:', error);
+    }
+}
+
+// Restore form field values from formData object
+function restoreFormFields() {
+    // Step 1 fields
+    const firstNameInput = document.getElementById('firstName');
+    if (firstNameInput && formData.firstName) {
+        firstNameInput.value = formData.firstName;
+    }
+    
+    const lastNameInput = document.getElementById('lastName');
+    if (lastNameInput && formData.lastName) {
+        lastNameInput.value = formData.lastName;
+    }
+    
+    const emailInput = document.getElementById('email');
+    if (emailInput && formData.email) {
+        emailInput.value = formData.email;
+    }
+    
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput && formData.phone) {
+        // Format phone number for display
+        phoneInput.value = formatPhoneNumber(formData.phone);
+    }
+    
+    // Step 2 fields
+    const zipcodeInput = document.getElementById('zipcode');
+    if (zipcodeInput && formData.zipcode) {
+        zipcodeInput.value = formData.zipcode;
+    }
+    
+    // Restore dietary preferences checkboxes
+    if (formData.preferences && formData.preferences.length > 0) {
+        formData.preferences.forEach(preference => {
+            const checkbox = document.querySelector(`input[name="preferences"][value="${preference}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    }
+    
+    // Step 3 fields
+    const referralSourceInput = document.getElementById('referral-source');
+    if (referralSourceInput && formData.referralSource) {
+        referralSourceInput.value = formData.referralSource;
+    }
+    
+    const restaurantSuggestionInput = document.getElementById('restaurant-suggestion');
+    if (restaurantSuggestionInput && formData.restaurantSuggestion) {
+        restaurantSuggestionInput.value = formData.restaurantSuggestion;
+    }
+}
+
+// Clear sessionStorage (called after successful submission)
+function clearSessionStorage() {
+    try {
+        sessionStorage.removeItem('waitlist_form_data');
+        trace('[sessionStorage] Form data cleared');
+    } catch (error) {
+        console.warn('Failed to clear sessionStorage:', error);
+    }
+}
+
+// Show specific step with accessibility enhancements
 function showStep(step) {
     // Hide all steps
     document.querySelectorAll('.form-step').forEach(stepEl => {
@@ -406,45 +737,376 @@ function showStep(step) {
     
     // Show current step with fade effect
     setTimeout(() => {
-        document.getElementById(`step-${step}`)?.classList.add('active');
+        const currentStepElement = document.getElementById(`step-${step}`);
+        if (currentStepElement) {
+            currentStepElement.classList.add('active');
+            
+            // Announce step change to screen readers
+            announceStepChange(step);
+            
+            // Focus the first input of the new step for keyboard navigation
+            setTimeout(() => {
+                const firstInput = currentStepElement.querySelector('input:not([type="hidden"]), select, textarea');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        }
     }, 50);
 }
 
-// Update step indicators
+// Announce step changes to screen readers
+function announceStepChange(step) {
+    const stepNames = {
+        1: 'Personal Information',
+        2: 'Location and Preferences', 
+        3: 'Final Details'
+    };
+    
+    // Create a temporary announcement element
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'assertive');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = `Now on step ${step} of ${totalSteps}: ${stepNames[step]}`;
+    
+    // Add to DOM, then remove after announcement
+    document.body.appendChild(announcement);
+    setTimeout(() => {
+        if (announcement.parentNode) {
+            announcement.parentNode.removeChild(announcement);
+        }
+    }, 1000);
+}
+
+// Update step indicators with accessibility enhancements
 function updateStepIndicators() {
+    const progressIndicator = document.getElementById('progress-indicator');
+    if (progressIndicator) {
+        // Update progress bar ARIA attributes
+        progressIndicator.setAttribute('aria-valuenow', currentStep);
+        progressIndicator.setAttribute('aria-valuetext', `Step ${currentStep} of ${totalSteps}`);
+    }
+    
     document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
         const stepNum = index + 1;
+        
+        // Remove aria-current from all steps first
+        indicator.removeAttribute('aria-current');
         
         if (stepNum < currentStep) {
             indicator.classList.add('completed');
             indicator.classList.remove('active');
+            indicator.setAttribute('aria-label', `Step ${stepNum}: Completed`);
         } else if (stepNum === currentStep) {
             indicator.classList.add('active');
             indicator.classList.remove('completed');
+            indicator.setAttribute('aria-current', 'step');
+            indicator.setAttribute('aria-label', `Step ${stepNum}: Current`);
         } else {
             indicator.classList.remove('active', 'completed');
+            indicator.setAttribute('aria-label', `Step ${stepNum}: Not completed`);
         }
     });
 }
 
-// Show inline error helper
+// Show inline error helper with accessibility
 function showInlineError(message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+    errorDiv.setAttribute('role', 'alert');
+    errorDiv.setAttribute('aria-live', 'assertive');
     errorDiv.textContent = `ERROR: ${message}`;
-    document.querySelector('.form-step.active').prepend(errorDiv);
+    
+    const activeStep = document.querySelector('.form-step.active');
+    if (activeStep) {
+        activeStep.prepend(errorDiv);
+        
+        // Focus the error for screen readers
+        errorDiv.setAttribute('tabindex', '-1');
+        errorDiv.focus();
+    }
     
     // Auto-remove after 10 seconds
-    setTimeout(() => errorDiv.remove(), 10000);
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 10000);
 }
 
-// Show inline success helper  
+// Show inline success helper with accessibility
 function showInlineSuccess(message) {
     const successDiv = document.createElement('div');
     successDiv.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4';
+    successDiv.setAttribute('role', 'alert');
+    successDiv.setAttribute('aria-live', 'polite');
     successDiv.textContent = `SUCCESS: ${message}`;
-    document.querySelector('.form-step.active').prepend(successDiv);
+    
+    const activeStep = document.querySelector('.form-step.active');
+    if (activeStep) {
+        activeStep.prepend(successDiv);
+    }
 }
+
+// Add retry button for recoverable errors
+function addRetryButton() {
+    // Remove any existing retry button first
+    const existingRetry = document.getElementById('retry-submit-btn');
+    if (existingRetry) {
+        existingRetry.remove();
+    }
+    
+    const retryButton = document.createElement('button');
+    retryButton.id = 'retry-submit-btn';
+    retryButton.type = 'button';
+    retryButton.className = 'w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 mt-3';
+    retryButton.innerHTML = `
+        <span class="flex items-center justify-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Try Again
+        </span>
+    `;
+    
+    // Add click handler to retry the form submission
+    retryButton.addEventListener('click', async () => {
+        // Remove the retry button and error message
+        retryButton.remove();
+        const errorDiv = document.querySelector('.form-step.active .bg-red-100');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+        
+        // Trigger the form submission again
+        const form = document.getElementById('waitlist-form');
+        if (form) {
+            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+            form.dispatchEvent(submitEvent);
+        }
+    });
+    
+    // Insert the retry button after the submit button
+    const submitButton = document.getElementById('submit-btn');
+    if (submitButton && submitButton.parentNode) {
+        submitButton.parentNode.insertBefore(retryButton, submitButton.nextSibling);
+    }
+}
+
+// Enhanced retry mechanism with exponential backoff
+class RetryManager {
+    constructor() {
+        this.retryCount = 0;
+        this.maxRetries = 3;
+        this.baseDelay = 1000; // 1 second
+    }
+    
+    async retry(operation, isRetriableError = () => true) {
+        this.retryCount = 0;
+        
+        while (this.retryCount <= this.maxRetries) {
+            try {
+                return await operation();
+            } catch (error) {
+                if (this.retryCount >= this.maxRetries || !isRetriableError(error)) {
+                    throw error;
+                }
+                
+                const delay = this.baseDelay * Math.pow(2, this.retryCount);
+                trace(`[retry] Attempt ${this.retryCount + 1} failed, retrying in ${delay}ms...`);
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+                this.retryCount++;
+            }
+        }
+    }
+    
+    reset() {
+        this.retryCount = 0;
+    }
+}
+
+// Global retry manager instance
+const retryManager = new RetryManager();
+
+// Network error detection utility
+function isNetworkError(error) {
+    if (!error) return false;
+    
+    const errorMessage = error.message?.toLowerCase() || '';
+    const errorName = error.name?.toLowerCase() || '';
+    
+    return (
+        errorMessage.includes('network') ||
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('connection') ||
+        errorMessage.includes('cors') ||
+        errorName === 'networkerror' ||
+        errorName === 'typeerror' ||
+        error.code === 'NETWORK_ERROR' ||
+        !navigator.onLine
+    );
+}
+
+// Check if error is retriable
+function isRetriableError(error) {
+    if (!error) return false;
+    
+    // Network errors are retriable
+    if (isNetworkError(error)) return true;
+    
+    // Timeout errors are retriable
+    if (error.message?.includes('timeout')) return true;
+    
+    // 5xx server errors are retriable
+    if (error.status >= 500 && error.status < 600) return true;
+    
+    // 429 rate limiting is retriable
+    if (error.status === 429) return true;
+    
+    // Service unavailable
+    if (error.message?.includes('service unavailable')) return true;
+    
+    // Specific Supabase transient errors
+    if (error.code === 'PGRST301' || error.code === 'PGRST302') return true;
+    
+    return false;
+}
+
+// Enhanced error reporting
+function reportError(context, error, userMessage) {
+    const errorReport = {
+        timestamp: new Date().toISOString(),
+        context: context,
+        error: {
+            message: error.message,
+            name: error.name,
+            code: error.code,
+            stack: error.stack
+        },
+        userMessage: userMessage,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        online: navigator.onLine
+    };
+    
+    // Store for debugging
+    const errorLog = JSON.parse(localStorage.getItem('localplate:errorLog') || '[]');
+    errorLog.push(errorReport);
+    
+    // Keep only last 10 errors
+    if (errorLog.length > 10) {
+        errorLog.splice(0, errorLog.length - 10);
+    }
+    
+    localStorage.setItem('localplate:errorLog', JSON.stringify(errorLog));
+    
+    console.error(`[${context}] Error:`, errorReport);
+}
+
+// Connection status monitoring
+class ConnectionMonitor {
+    constructor() {
+        this.isOnline = navigator.onLine;
+        this.callbacks = [];
+        
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            this.notifyCallbacks('online');
+        });
+        
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            this.notifyCallbacks('offline');
+        });
+    }
+    
+    onStatusChange(callback) {
+        this.callbacks.push(callback);
+    }
+    
+    notifyCallbacks(status) {
+        this.callbacks.forEach(cb => {
+            try {
+                cb(status);
+            } catch (error) {
+                console.error('Connection callback error:', error);
+            }
+        });
+    }
+    
+    showOfflineMessage() {
+        if (!this.isOnline) {
+            showInlineError('You appear to be offline. Please check your internet connection.');
+        }
+    }
+}
+
+// Global connection monitor
+const connectionMonitor = new ConnectionMonitor();
+
+// Diagnostic function for troubleshooting
+function runDiagnostics() {
+    const diagnostics = {
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        online: navigator.onLine,
+        url: window.location.href,
+        errors: [],
+        config: {
+            hasSupabase: !!window.supabase,
+            hasConfig: !!window.LOCALPLATE_CONFIG,
+            configKeys: window.LOCALPLATE_CONFIG ? Object.keys(window.LOCALPLATE_CONFIG) : []
+        }
+    };
+    
+    // Check for recent errors
+    try {
+        const errorLog = JSON.parse(localStorage.getItem('localplate:errorLog') || '[]');
+        diagnostics.errors = errorLog.slice(-5); // Last 5 errors
+    } catch (e) {
+        diagnostics.errors.push({ type: 'localStorage_error', message: e.message });
+    }
+    
+    // Test Supabase client creation
+    try {
+        const client = getSupabaseClient();
+        diagnostics.supabaseClient = 'OK';
+    } catch (error) {
+        diagnostics.supabaseClient = error.message;
+        diagnostics.errors.push({
+            type: 'supabase_client_error',
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+    
+    // Check DOM elements
+    const requiredElements = ['waitlist-form', 'submit-btn', 'waitlist-count'];
+    diagnostics.domElements = {};
+    requiredElements.forEach(id => {
+        diagnostics.domElements[id] = !!document.getElementById(id);
+    });
+    
+    console.group('LocalPlate Waitlist Diagnostics');
+    console.log('Full Report:', diagnostics);
+    console.log('Connection Status:', diagnostics.online ? 'Online' : 'Offline');
+    console.log('Recent Errors:', diagnostics.errors.length);
+    console.log('Supabase Client:', diagnostics.supabaseClient);
+    console.log('Required DOM Elements:', 
+        Object.entries(diagnostics.domElements)
+            .map(([id, exists]) => `${id}: ${exists ? '✓' : '✗'}`)
+            .join(', ')
+    );
+    console.groupEnd();
+    
+    return diagnostics;
+}
+
+// Make diagnostics available globally for debugging
+window.localplateDiagnostics = runDiagnostics;
 
 // Handle form submission - Simple and direct with Supabase
 window.handleFormSubmit = async function(e) {
@@ -465,9 +1127,16 @@ window.handleFormSubmit = async function(e) {
     const submitText = document.getElementById('submit-text');
     const submitLoader = document.getElementById('submit-loader');
     
-    submitButton.disabled = true;
-    submitText.classList.add('hidden');
-    submitLoader.classList.remove('hidden');
+    // Add null checking before manipulating elements
+    if (submitButton) {
+        submitButton.disabled = true;
+    }
+    if (submitText) {
+        submitText.classList.add('hidden');
+    }
+    if (submitLoader) {
+        submitLoader.classList.remove('hidden');
+    }
     
     try {
         // Generate referral code
@@ -521,11 +1190,20 @@ window.handleFormSubmit = async function(e) {
         };
         window.addEventListener('beforeunload', beforeUnload);
         
-        // Submit directly to Supabase (with RLS this is fine)
+        // Submit directly to Supabase with timeout handling
         trace('[submit] starting database insert...');
-        const { error } = await supabase
+        
+        // Create timeout promise
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout')), 30000)
+        );
+        
+        // Race the insert operation against timeout
+        const insertPromise = supabase
             .from('waitlist')
             .insert([submissionData]);
+        
+        const { error } = await Promise.race([insertPromise, timeoutPromise]);
         // Note: Removed .select() because RLS blocks SELECT for anon users
         
         // Clear navigation block immediately
@@ -551,14 +1229,34 @@ window.handleFormSubmit = async function(e) {
         // Update referrer count if applicable
         if (referredBy) {
             trace('[submit] updating referrer count...');
-            // Note: Removed supabase.raw() - doesn't exist in v2
-            // This should be handled by a server-side function or RPC
-            // For now, skipping referral count update
+            try {
+                const { data: referralResult, error: referralError } = await supabase
+                    .rpc('record_referral', { referral_code: referredBy });
+                
+                if (referralError) {
+                    console.error('Failed to record referral:', referralError);
+                    trace('[submit] referral error:', referralError.message);
+                    // Don't fail the whole submission for this
+                } else if (referralResult?.success) {
+                    trace('[submit] referral recorded successfully');
+                    console.log('Referral recorded for code:', referredBy);
+                } else {
+                    trace('[submit] referral failed:', referralResult?.message || 'unknown error');
+                    console.warn('Referral recording failed:', referralResult?.message);
+                }
+            } catch (err) {
+                console.error('Referral tracking error:', err);
+                trace('[submit] referral exception:', err.message);
+                // Don't fail the whole submission for this
+            }
         }
         
         // Store success data
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
+        
+        // Clear form data from sessionStorage since submission was successful
+        clearSessionStorage();
         
         // Note: Can't get position without SELECT, which RLS blocks
         // Success page will need to show a generic message
@@ -573,17 +1271,66 @@ window.handleFormSubmit = async function(e) {
         trace('[submit] exception caught', error.message);
         console.error('Submission error:', error);
         
-        showInlineError(error.message || 'Something went wrong. Please try again.');
-        localStorage.setItem('localplate:lastError', JSON.stringify({ 
-            at: Date.now(), 
-            error: String(error) 
-        }));
+        let userMessage = 'Something went wrong. Please try again.';
+        let shouldShowRetry = false;
+        
+        // Provide specific error messages based on error type
+        if (error.code === '23505' || error.message?.includes('duplicate')) {
+            userMessage = 'This email is already on the waitlist!';
+        } else if (error.message?.includes('network') || error.message?.includes('NetworkError')) {
+            userMessage = 'Network error. Please check your connection and try again.';
+            shouldShowRetry = true;
+        } else if (error.message?.includes('timeout') || error.message?.includes('Request timeout')) {
+            userMessage = 'Request timed out. Please try again.';
+            shouldShowRetry = true;
+        } else if (error.code === '23502' || error.message?.includes('null value')) {
+            userMessage = 'Please fill in all required fields.';
+        } else if (error.message?.includes('CORS')) {
+            userMessage = 'Configuration error. Please try again later.';
+        } else if (error.message?.includes('unauthorized') || error.message?.includes('401')) {
+            userMessage = 'Authentication error. Please refresh the page and try again.';
+            shouldShowRetry = true;
+        } else if (error.message?.includes('service unavailable') || error.message?.includes('503')) {
+            userMessage = 'Service temporarily unavailable. Please try again in a moment.';
+            shouldShowRetry = true;
+        } else if (error.message && error.message !== 'Something went wrong. Please try again.') {
+            // Use the specific error message if it's informative
+            userMessage = error.message;
+        }
+        
+        showInlineError(userMessage);
+        
+        // Add retry button for recoverable errors
+        if (shouldShowRetry || isRetriableError(error)) {
+            addRetryButton();
+        }
+        
+        // Enhanced error reporting
+        reportError('form_submission', error, userMessage);
+        
+        // Check if user is offline
+        connectionMonitor.showOfflineMessage();
     } finally {
-        // Always restore UI state
-        submitButton.disabled = false;
-        submitText.classList.remove('hidden');
-        submitLoader.classList.add('hidden');
-        trace('[submit] UI state restored');
+        // Always restore UI state with null checking and error handling
+        try {
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
+            if (submitText) {
+                submitText.classList.remove('hidden');
+            }
+            if (submitLoader) {
+                submitLoader.classList.add('hidden');
+            }
+            trace('[submit] UI state restored');
+        } catch (uiError) {
+            console.error('Error restoring UI state:', uiError);
+            // Try to at least enable the button so user isn't completely stuck
+            const fallbackButton = document.getElementById('submit-btn');
+            if (fallbackButton) {
+                fallbackButton.disabled = false;
+            }
+        }
     }
 }
 
@@ -616,31 +1363,66 @@ function checkReferral() {
 // Update waitlist count with animation
 async function updateWaitlistCount() {
     const countElement = document.getElementById('waitlist-count');
-    if (!countElement) return;
+    if (!countElement) {
+        trace('[updateWaitlistCount] count element not found');
+        return;
+    }
     
-    let targetCount = 1247; // Default
+    let targetCount = 1247; // Fallback default
     
     try {
         const supabase = getSupabaseClient();
         if (supabase) {
-            const { count, error } = await supabase
-                .from('waitlist')
-                .select('*', { count: 'exact', head: true });
+            // Add timeout for count query
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Count query timeout')), 10000)
+            );
             
-            if (!error && count) {
-                targetCount = count;
+            const countPromise = supabase
+                .from('waitlist_stats')
+                .select('total_signups')
+                .single();
+            
+            const { data, error } = await Promise.race([countPromise, timeoutPromise]);
+            
+            if (error) {
+                console.warn('Count query error:', error.message);
+                trace('[updateWaitlistCount] using fallback count due to error:', error.message);
+                // Fall through to use default count
+            } else if (data && data.total_signups) {
+                targetCount = data.total_signups;
+                trace('[updateWaitlistCount] retrieved count:', data.total_signups);
+            } else {
+                trace('[updateWaitlistCount] no data returned, using default');
             }
         } else {
-            // Use localStorage count
+            // Use localStorage count as fallback
             const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
             targetCount = 1247 + waitlist.length;
+            trace('[updateWaitlistCount] using localStorage fallback count:', targetCount);
         }
     } catch (error) {
-        console.error('Error fetching count:', error);
+        console.warn('Error fetching waitlist count:', error.message);
+        trace('[updateWaitlistCount] exception caught, using fallback:', error.message);
+        
+        // Try localStorage as final fallback
+        try {
+            const waitlist = JSON.parse(localStorage.getItem('localplate_waitlist') || '[]');
+            targetCount = 1247 + waitlist.length;
+        } catch (storageError) {
+            console.warn('localStorage fallback also failed:', storageError.message);
+            // Keep the default count of 1247
+        }
     }
     
-    // Animate the count
-    animateCount(countElement, targetCount);
+    // Animate the count (this should always work)
+    try {
+        animateCount(countElement, targetCount);
+    } catch (animationError) {
+        console.error('Count animation failed:', animationError.message);
+        // Fallback: set count directly without animation
+        countElement.textContent = targetCount.toLocaleString();
+    }
 }
 
 // Animate number counting up

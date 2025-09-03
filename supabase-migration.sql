@@ -202,3 +202,36 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql;
+
+-- Simple function to just record/increment referral count
+-- This is used when a user signs up with a referral code
+CREATE OR REPLACE FUNCTION record_referral(referral_code VARCHAR)
+RETURNS JSONB AS $$
+DECLARE
+    rows_updated INTEGER;
+BEGIN
+    -- Update referrer's count
+    UPDATE waitlist 
+    SET referral_count = referral_count + 1
+    WHERE referral_code = record_referral.referral_code;
+    
+    GET DIAGNOSTICS rows_updated = ROW_COUNT;
+    
+    IF rows_updated = 0 THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'message', 'Invalid referral code'
+        );
+    ELSE
+        RETURN jsonb_build_object(
+            'success', true,
+            'message', 'Referral recorded successfully'
+        );
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permissions on RPC functions to anonymous users
+GRANT EXECUTE ON FUNCTION get_waitlist_position(VARCHAR) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION record_referral(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, JSONB, VARCHAR, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION record_referral(VARCHAR) TO anon, authenticated;

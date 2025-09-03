@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Persistence Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input, select { padding: 5px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Form Persistence Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Open the main waitlist page (index.html) in another tab</li>
+            <li>Fill out some form fields and move between steps</li>
+            <li>Refresh the page or close/reopen the tab</li>
+            <li>Verify that your data persists</li>
+            <li>Use the buttons below to inspect sessionStorage</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>SessionStorage Inspector:</h3>
+        <button onclick="inspectSessionStorage()">Inspect SessionStorage</button>
+        <button onclick="clearTestData()">Clear SessionStorage</button>
+        <button onclick="simulateFormData()">Simulate Form Data</button>
+        
+        <div id="storage-content" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Form Data Test:</h3>
+        <p>Enter some test data below to simulate the waitlist form:</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+            <div>
+                <label>First Name:</label><br>
+                <input type="text" id="test-firstName" placeholder="John">
+            </div>
+            <div>
+                <label>Last Name:</label><br>
+                <input type="text" id="test-lastName" placeholder="Doe">
+            </div>
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label>Email:</label><br>
+            <input type="email" id="test-email" placeholder="john@example.com" style="width: 300px;">
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label>Phone:</label><br>
+            <input type="tel" id="test-phone" placeholder="(555) 123-4567" style="width: 200px;">
+        </div>
+        
+        <div style="margin: 10px 0;">
+            <label>ZIP Code:</label><br>
+            <input type="text" id="test-zipcode" placeholder="12345" maxlength="5" style="width: 100px;">
+        </div>
+        
+        <button onclick="saveTestData()">Save Test Data</button>
+        <button onclick="restoreTestData()">Restore Test Data</button>
+    </div>
+
+    <script>
+        function inspectSessionStorage() {
+            const content = document.getElementById('storage-content');
+            const waitlistData = sessionStorage.getItem('waitlist_form_data');
+            
+            if (waitlistData) {
+                try {
+                    const parsed = JSON.parse(waitlistData);
+                    content.textContent = 'Found waitlist form data:\n\n' + JSON.stringify(parsed, null, 2);
+                    content.parentElement.className = 'test-section success';
+                } catch (e) {
+                    content.textContent = 'Error parsing sessionStorage data: ' + e.message;
+                    content.parentElement.className = 'test-section error';
+                }
+            } else {
+                content.textContent = 'No waitlist form data found in sessionStorage.';
+                content.parentElement.className = 'test-section';
+            }
+        }
+
+        function clearTestData() {
+            sessionStorage.removeItem('waitlist_form_data');
+            document.getElementById('storage-content').textContent = 'SessionStorage cleared.';
+            
+            // Clear form fields
+            ['test-firstName', 'test-lastName', 'test-email', 'test-phone', 'test-zipcode'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        }
+
+        function simulateFormData() {
+            const testData = {
+                firstName: 'John',
+                lastName: 'Doe', 
+                email: 'john.doe@example.com',
+                phone: '5551234567',
+                zipcode: '12345',
+                preferences: ['vegetarian'],
+                referralSource: 'friend',
+                restaurantSuggestion: 'Local Bistro',
+                currentStep: 2
+            };
+            
+            sessionStorage.setItem('waitlist_form_data', JSON.stringify(testData));
+            document.getElementById('storage-content').textContent = 'Simulated form data saved:\n\n' + JSON.stringify(testData, null, 2);
+            document.getElementById('storage-content').parentElement.className = 'test-section success';
+        }
+
+        function saveTestData() {
+            const testData = {
+                firstName: document.getElementById('test-firstName').value,
+                lastName: document.getElementById('test-lastName').value,
+                email: document.getElementById('test-email').value,
+                phone: document.getElementById('test-phone').value.replace(/\D/g, ''),
+                zipcode: document.getElementById('test-zipcode').value,
+                preferences: [],
+                referralSource: '',
+                restaurantSuggestion: '',
+                currentStep: 1
+            };
+            
+            sessionStorage.setItem('waitlist_form_data', JSON.stringify(testData));
+            document.getElementById('storage-content').textContent = 'Test data saved:\n\n' + JSON.stringify(testData, null, 2);
+            document.getElementById('storage-content').parentElement.className = 'test-section success';
+        }
+
+        function restoreTestData() {
+            const savedData = sessionStorage.getItem('waitlist_form_data');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    document.getElementById('test-firstName').value = parsed.firstName || '';
+                    document.getElementById('test-lastName').value = parsed.lastName || '';
+                    document.getElementById('test-email').value = parsed.email || '';
+                    document.getElementById('test-phone').value = parsed.phone ? formatPhoneNumber(parsed.phone) : '';
+                    document.getElementById('test-zipcode').value = parsed.zipcode || '';
+                    
+                    document.getElementById('storage-content').textContent = 'Test data restored from sessionStorage.';
+                    document.getElementById('storage-content').parentElement.className = 'test-section success';
+                } catch (e) {
+                    document.getElementById('storage-content').textContent = 'Error restoring data: ' + e.message;
+                    document.getElementById('storage-content').parentElement.className = 'test-section error';
+                }
+            } else {
+                document.getElementById('storage-content').textContent = 'No data to restore.';
+            }
+        }
+
+        function formatPhoneNumber(value) {
+            const cleaned = value.replace(/\D/g, '');
+            let formatted = cleaned;
+            
+            if (cleaned.length >= 6) {
+                formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+            } else if (cleaned.length >= 3) {
+                formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+            }
+            
+            return formatted;
+        }
+
+        // Auto-inspect on page load
+        window.addEventListener('load', inspectSessionStorage);
+    </script>
+</body>
+</html>

@@ -193,8 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const initFunctions = [
                 { fn: initScrollReveal, name: 'scroll reveal' },
                 { fn: initMarquee, name: 'marquee' },
-                // DISABLED: Using rotating social proof messages instead of real count
-                // { fn: updateWaitlistCount, name: 'waitlist count' },
+                { fn: updateWaitlistCount, name: 'waitlist count' },
                 { fn: checkReferral, name: 'referral check' }
             ];
             

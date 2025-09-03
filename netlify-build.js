@@ -34,9 +34,17 @@ window.LOCALPLATE_CONFIG = {
 fs.writeFileSync('config.js', configContent, 'utf8');
 console.log('✅ config.js created successfully');
 
-// Verify the file was created
+// Verify the file was created and doesn't contain placeholders
 if (fs.existsSync('config.js')) {
-    console.log('✅ config.js file exists');
+    const generatedContent = fs.readFileSync('config.js', 'utf8');
+    if (generatedContent.includes('YOUR_SUPABASE_URL') || generatedContent.includes('YOUR_SUPABASE_ANON_KEY')) {
+        console.error('❌ CRITICAL: config.js still contains placeholders!');
+        console.error('❌ This means environment variables are not set in Netlify');
+        console.error('❌ Please set SUPABASE_URL and SUPABASE_ANON_KEY in Netlify dashboard');
+        process.exit(1);
+    }
+    console.log('✅ config.js file exists and contains real values');
+    console.log('📋 Config preview (first 150 chars):', configContent.substring(0, 150) + '...');
 } else {
     console.error('❌ Failed to create config.js');
     process.exit(1);

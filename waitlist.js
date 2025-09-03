@@ -1865,70 +1865,7 @@ function initMobilePerformanceMonitoring() {
     }
 }
 
-// Mobile Menu Functionality
-function initMobileMenu() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const hamburgerIcon = document.getElementById('hamburger-icon');
-    const closeIcon = document.getElementById('close-icon');
-    const body = document.body;
-    
-    if (!mobileMenuButton || !mobileMenu) return;
-    
-    let isMenuOpen = false;
-    
-    // Toggle mobile menu
-    mobileMenuButton.addEventListener('click', () => {
-        isMenuOpen = !isMenuOpen;
-        
-        if (isMenuOpen) {
-            mobileMenu.classList.add('mobile-menu-open');
-            hamburgerIcon.classList.add('hidden');
-            closeIcon.classList.remove('hidden');
-            body.classList.add('mobile-menu-active');
-            mobileMenuButton.setAttribute('aria-expanded', 'true');
-            
-            // Focus first menu item
-            const firstLink = mobileMenu.querySelector('a');
-            if (firstLink) firstLink.focus();
-        } else {
-            closeMobileMenu();
-        }
-    });
-    
-    // Close menu function
-    function closeMobileMenu() {
-        mobileMenu.classList.remove('mobile-menu-open');
-        hamburgerIcon.classList.remove('hidden');
-        closeIcon.classList.add('hidden');
-        body.classList.remove('mobile-menu-active');
-        mobileMenuButton.setAttribute('aria-expanded', 'false');
-        isMenuOpen = false;
-    }
-    
-    // Close menu when clicking links
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
-    });
-    
-    // Close menu on escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isMenuOpen) {
-            closeMobileMenu();
-            mobileMenuButton.focus();
-        }
-    });
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 640 && isMenuOpen) {
-            closeMobileMenu();
-        }
-    });
-}
 
-// Initialize mobile menu
-document.addEventListener('DOMContentLoaded', initMobileMenu);
 
 // Initialize performance monitoring
 initMobilePerformanceMonitoring();

@@ -59,31 +59,7 @@
                     </span>
                 </div>
                 
-                <!-- Nav Links -->
-                <div class="hidden sm:flex items-center space-x-8">
-                    <a href="#features" class="nav-link">Features</a>
-                    <a href="#restaurants" class="nav-link">Partners</a>
-                    <a href="#testimonials" class="nav-link">Reviews</a>
-                </div>
-                
-                <!-- Mobile Menu & Theme Toggle -->
-                <div class="flex items-center space-x-2">
-                    <!-- Hamburger Menu Button -->
-                    <button 
-                        id="mobile-menu-button" 
-                        class="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
-                        aria-label="Open navigation menu"
-                        aria-expanded="false"
-                    >
-                        <svg id="hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                        <svg id="close-icon" class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                    
-                    <!-- Theme Toggle -->
+                <!-- Theme Toggle -->
                 <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
                     <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
@@ -92,23 +68,10 @@
                         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
                     </svg>
                 </button>
-                </div>
             </div>
         </div>
     </nav>
     
-    <!-- Mobile Menu Overlay -->
-    <div 
-        id="mobile-menu" 
-        class="sm:hidden fixed inset-0 z-40 bg-white dark:bg-gray-900 transform translate-x-full transition-transform duration-300 ease-in-out"
-        style="top: 64px;"
-    >
-        <div class="px-4 py-6 space-y-1">
-            <a href="#features" class="mobile-nav-link block py-3 px-4 text-lg font-medium rounded-lg transition-colors">Features</a>
-            <a href="#restaurants" class="mobile-nav-link block py-3 px-4 text-lg font-medium rounded-lg transition-colors">Partners</a>
-            <a href="#testimonials" class="mobile-nav-link block py-3 px-4 text-lg font-medium rounded-lg transition-colors">Reviews</a>
-        </div>
-    </div>
     
     <!-- Hero Section with Ken Burns Effect -->
     <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
@@ -607,12 +570,12 @@
     </section>
     
     <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-12">
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8 sm:py-12">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
                 <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <svg class="w-6 h-6" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center space-x-3 order-1 md:order-none">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="24" cy="24" r="20" fill="url(#gradient-footer)"/>
                         <defs>
                             <linearGradient id="gradient-footer" x1="0" y1="0" x2="48" y2="48">
@@ -625,14 +588,14 @@
                 </div>
                 
                 <!-- Links -->
-                <div class="flex space-x-6 text-sm text-gray-600 dark:text-gray-400">
-                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy</a>
-                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms</a>
-                    <a href="#" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</a>
+                <div class="flex flex-wrap justify-center gap-4 sm:gap-6 order-2 md:order-none">
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Privacy</a>
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Terms</a>
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Contact</a>
                 </div>
                 
                 <!-- Copyright -->
-                <p class="text-sm text-gray-500 dark:text-gray-500">
+                <p class="text-sm text-gray-500 dark:text-gray-500 text-center md:text-left order-3 md:order-none">
                     © 2025 LocalPlate. All rights reserved.
                 </p>
             </div>

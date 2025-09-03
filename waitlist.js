@@ -1284,8 +1284,8 @@ window._handleFormSubmitImpl = async function(e) {
         const referralCode = generateReferralCode(formData.email);
         trace('[submit] referral code generated:', referralCode);
         
-        // Get referrer if exists
-        const referredBy = getReferralFromURL();
+        // Get referrer if exists (from stored localStorage, not current URL)
+        const referredBy = localStorage.getItem('referrer_code');
         trace('[submit] referred by:', referredBy || 'none');
         
         // Prepare submission data
@@ -1594,6 +1594,14 @@ function checkReferral() {
     if (referralCode) {
         // Track referral visit
         console.log('Referred by:', referralCode);
+        
+        // Store referral code for form submission (first-touch attribution)
+        if (!localStorage.getItem('referrer_code')) {
+            localStorage.setItem('referrer_code', referralCode);
+            console.log('Stored referral code:', referralCode);
+        } else {
+            console.log('Referral code already stored (first-touch):', localStorage.getItem('referrer_code'));
+        }
         
         // Could show a welcome message
         // showReferralWelcome(referralCode);

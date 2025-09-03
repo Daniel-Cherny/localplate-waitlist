@@ -429,7 +429,7 @@
                             type="text" 
                             id="referral-link" 
                             readonly 
-                            value="https://localplate.com/waitlist?ref=ABC123"
+                            value="https://localplate.com/?ref=ABC123"
                             class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
                         >
                         <button 
@@ -1240,7 +1240,7 @@
         }
         
         if (referralCode) {
-            const referralLink = `${window.location.origin}/waitlist?ref=${referralCode}`;
+            const referralLink = `${window.location.origin}/?ref=${referralCode}`;
             document.getElementById('referral-link').value = referralLink;
         }
         // Confetti animation

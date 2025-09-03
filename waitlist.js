@@ -461,7 +461,7 @@ window.handleFormSubmit = async function(e) {
     trace('[submit] step data saved');
     
     // Show loading state
-    const submitButton = e.target.querySelector('button[type="submit"]');
+    const submitButton = document.getElementById('submit-btn');
     const submitText = document.getElementById('submit-text');
     const submitLoader = document.getElementById('submit-loader');
     

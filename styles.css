@@ -1214,10 +1214,6 @@ textarea:focus {
     background-color: #fef3c7;
 }
 
-/* Additional background tints for extended palette */
-.bg-purple-100 { background-color: #ede9fe; }
-.dark .dark\:bg-purple-900 { background-color: #4c1d95; }
-
 .dark .dark\:bg-gray-800 {
     background-color: var(--gray-800);
 }
@@ -1482,66 +1478,6 @@ textarea:focus {
 .hover\:scale-110:hover {
     transform: scale(1.1);
 }
-
-/* Display utilities for dark mode icon toggles */
-.dark .dark\:block { display: block !important; }
-.dark .dark\:hidden { display: none !important; }
-
-/* Shadow utilities referenced in success.html */
-.shadow-2xl {
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-}
-.hover\:shadow-lg:hover {
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-}
-.hover\:shadow-2xl:hover {
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-}
-.hover\:shadow-emerald-500\/25:hover {
-    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.25);
-}
-.group:hover .group-hover\:shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-}
-
-/* Text color utilities to broaden palette use */
-.text-amber-600 { color: var(--amber-600); }
-.text-blue-600 { color: var(--blue-600); }
-.dark .dark\:text-amber-400 { color: #fbbf24; }
-.dark .dark\:text-blue-400 { color: var(--blue-400); }
-
-/* Tinted button variants for brand colors */
-.btn-emerald-tint,
-.btn-amber-tint,
-.btn-blue-tint {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    transition: all var(--transition-base);
-    border: 1px solid transparent;
-}
-.btn-emerald-tint { background: rgba(16, 185, 129, 0.12); color: var(--emerald-700); }
-.btn-amber-tint { background: rgba(245, 158, 11, 0.12); color: var(--amber-600); }
-.btn-blue-tint { background: rgba(59, 130, 246, 0.12); color: var(--blue-600); }
-.btn-emerald-tint:hover { background: rgba(16, 185, 129, 0.18); transform: translateY(-1px); }
-.btn-amber-tint:hover { background: rgba(245, 158, 11, 0.18); transform: translateY(-1px); }
-.btn-blue-tint:hover { background: rgba(59, 130, 246, 0.18); transform: translateY(-1px); }
-.dark .btn-emerald-tint { background: rgba(5, 150, 105, 0.18); color: var(--emerald-300); border-color: rgba(5, 150, 105, 0.3); }
-.dark .btn-amber-tint { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border-color: rgba(217, 119, 6, 0.3); }
-.dark .btn-blue-tint { background: rgba(37, 99, 235, 0.18); color: var(--blue-400); border-color: rgba(37, 99, 235, 0.3); }
-
-/* Pulse for live counters (used in success) */
-@keyframes pulse-success {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.06); opacity: 0.9; }
-    100% { transform: scale(1); opacity: 1; }
-}
-.animate-pulse-success { animation: pulse-success 0.9s ease-in-out 1; }
 
 .hover\:translate-x-1:hover {
     transform: translateX(0.25rem);

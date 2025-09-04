@@ -483,7 +483,7 @@
 
                         <!-- Instagram (Copy to Clipboard) -->
                         <button
-                            onclick="shareInstagram()"
+                            onclick="shareInstagram(event)"
                             class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                             aria-label="Copy link for Instagram"
                             title="Copy link for Instagram"
@@ -1439,7 +1439,7 @@
             window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
         }
         
-        function shareInstagram() {
+        function shareInstagram(event) {
             // Instagram doesn't have direct URL sharing, so copy to clipboard
             const url = document.getElementById('referral-link').value;
             navigator.clipboard.writeText(url).then(() => {

@@ -1321,8 +1321,8 @@ window._handleFormSubmitImpl = async function(e) {
                 error: 'Supabase client unavailable',
                 phase: 'client_init'
             }));
-            showInlineError('Database connection failed. Please refresh the page and try again.');
-            throw new Error('Supabase client unavailable');
+            // Don't show error here - let the catch block handle it
+            throw new Error('Database connection failed. Please refresh the page and try again.');
         }
         
         // DEBUG ONLY: Connectivity sanity check - removed unnecessary GET request
@@ -1400,8 +1400,8 @@ window._handleFormSubmitImpl = async function(e) {
                 phase: 'insert_timeout',
                 timeoutMs
             }));
-            showInlineError('Request timed out. Please try again.');
-            throw new Error('Insert timed out');
+            // Don't show error here - let the catch block handle it
+            throw new Error('Request timed out. Please try again.');
         }
         
         const { data, error, status, statusText } = result || {};
@@ -1414,21 +1414,24 @@ window._handleFormSubmitImpl = async function(e) {
         trace('[submit] processing insert result', { error: error?.message || 'none', hasData: !!data });
         
         if (error) {
-            const errorMsg = error.message?.includes('duplicate') 
+            const errorMsg = error.message?.includes('duplicate')
                 ? 'This email is already on the waitlist.'
                 : error.message || 'Unknown database error';
-            
+
             console.error('[SUBMIT] Insert error', { error, status, statusText });
-            showInlineError(`Database error: ${errorMsg}`);
-            localStorage.setItem('localplate:lastError', JSON.stringify({ 
-                at: Date.now(), 
+            // Don't show error here - let the catch block handle it to avoid duplicates
+            localStorage.setItem('localplate:lastError', JSON.stringify({
+                at: Date.now(),
                 error: errorMsg,
                 phase: 'insert_error',
                 status,
                 statusText
             }));
-            
-            throw new Error(errorMsg);
+
+            // Pass the error message to the catch block
+            const customError = new Error(errorMsg);
+            customError.code = error.code;
+            throw customError;
         }
         
         // Update referrer count if applicable
@@ -1477,7 +1480,7 @@ window._handleFormSubmitImpl = async function(e) {
         
         if (!inserted) {
             console.error('[SUBMIT] Could not verify insert (no data returned)');
-            showInlineError('We could not confirm your submission was saved. Please try again.');
+            // Don't show error here - let the catch block handle it
             localStorage.setItem('localplate:lastError', JSON.stringify({
                 at: Date.now(),
                 error: 'Insert unverified (no data returned)',
@@ -1485,7 +1488,7 @@ window._handleFormSubmitImpl = async function(e) {
                 dataReceived: data
             }));
             // Do NOT redirect to success
-            throw new Error('Insert result not verifiable');
+            throw new Error('We could not confirm your submission was saved. Please try again.');
         }
         
         // Store success data for success.html - use formData which was populated by saveAllFormData

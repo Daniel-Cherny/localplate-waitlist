@@ -417,6 +417,17 @@ h1, h2, h3 {
     color: #fef3c7;
 }
 
+.no-underline {
+    text-decoration: none;
+    color: inherit;
+}
+
+.no-underline:hover,
+.no-underline:focus {
+    text-decoration: none;
+    color: inherit;
+}
+
 /* Ken Burns Effect - Optimized for Mobile */
 .ken-burns-container {
     position: absolute;

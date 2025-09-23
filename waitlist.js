@@ -1582,7 +1582,9 @@ function generateReferralCode(email) {
     const hash = email.split('').reduce((acc, char) => {
         return char.charCodeAt(0) + ((acc << 5) - acc);
     }, 0);
-    return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+    // Ensure we always get 8 characters by padding with zeros if needed
+    const code = Math.abs(hash).toString(36).toUpperCase();
+    return code.padStart(8, '0').substring(0, 8);
 }
 
 // Get referral code from URL
@@ -1611,79 +1613,74 @@ function checkReferral() {
     }
 }
 
-// Update waitlist count with animation
+// Update waitlist progress without surfacing raw counts
 async function updateWaitlistCount() {
-    const countElement = document.getElementById('waitlist-count');
-    if (!countElement) {
-        trace('[updateWaitlistCount] count element not found');
+    const statusElement = document.getElementById('waitlist-count');
+    const progressFill = document.getElementById('waitlist-progress-fill');
+    const messageElement = document.getElementById('waitlist-tier-message');
+
+    if (!statusElement || !progressFill || !messageElement) {
+        trace('[updateWaitlistCount] status elements not found');
         return;
     }
-    
-    let targetCount = null;
-    
+
+    const capacity = 500;
+    const setStatusCopy = (ratio) => {
+        let label = 'Spots are open';
+        let message = 'Invite a friend to jump into VIP faster.';
+
+        if (ratio >= 1) {
+            label = 'Founding cohort is full';
+            message = 'Golden tickets are the only way in—share yours when it unlocks.';
+        } else if (ratio >= 0.85) {
+            label = 'Final call for founding seats';
+            message = 'Secure your spot now and line up a golden ticket for friends.';
+        } else if (ratio >= 0.5) {
+            label = 'VIP wave in motion';
+            message = 'Founding seats are half claimed—referrals keep you ahead.';
+        } else if (ratio >= 0.25) {
+            label = 'Early insider momentum';
+            message = 'Stay in the top tiers by inviting a foodie friend today.';
+        }
+
+        statusElement.textContent = label;
+        messageElement.textContent = message;
+        progressFill.style.width = `${Math.max(6, Math.min(ratio, 1) * 100)}%`;
+    };
+
     try {
         const supabase = getSupabaseClient();
-        if (supabase) {
-            // Add timeout for count query
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Count query timeout')), 10000)
-            );
-            
-            // Legitimate GET request for reading count data
-            const countPromise = supabase
-                .from('waitlist_stats')
-                .select('total_signups')
-                .single();
-            
-            const { data, error } = await Promise.race([countPromise, timeoutPromise]);
-            
-            if (!error && data && data.total_signups) {
-                targetCount = data.total_signups;
-                trace('[updateWaitlistCount] retrieved count:', data.total_signups);
-            } else {
-                console.warn('Count query error or no data:', error?.message);
-                trace('[updateWaitlistCount] count unavailable:', error?.message || 'no data');
-                // Hide the count if we can't get real data
-                countElement.style.display = 'none';
-                return;
-            }
-        } else {
-            trace('[updateWaitlistCount] no supabase client, hiding count');
-            countElement.style.display = 'none';
+        if (!supabase) {
+            trace('[updateWaitlistCount] no supabase client; using default copy');
+            setStatusCopy(0);
             return;
+        }
+
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Count query timeout')), 10000)
+        );
+
+        const countPromise = supabase
+            .from('waitlist_stats')
+            .select('total_signups')
+            .single();
+
+        const { data, error } = await Promise.race([countPromise, timeoutPromise]);
+
+        if (!error && data && typeof data.total_signups === 'number') {
+            const ratio = Math.min(Math.max(data.total_signups / capacity, 0), 1.2);
+            trace('[updateWaitlistCount] retrieved ratio:', ratio.toFixed(2));
+            setStatusCopy(ratio);
+        } else {
+            console.warn('Count query error or no data:', error?.message);
+            trace('[updateWaitlistCount] count unavailable:', error?.message || 'no data');
+            setStatusCopy(0);
         }
     } catch (error) {
         console.warn('Error fetching waitlist count:', error.message);
-        trace('[updateWaitlistCount] exception caught, hiding count:', error.message);
-        countElement.style.display = 'none';
-        return;
+        trace('[updateWaitlistCount] exception caught, using default copy:', error.message);
+        setStatusCopy(0);
     }
-    
-    // Animate the count (this should always work)
-    try {
-        animateCount(countElement, targetCount);
-    } catch (animationError) {
-        console.error('Count animation failed:', animationError.message);
-        // Fallback: set count directly without animation
-        countElement.textContent = targetCount.toLocaleString();
-    }
-}
-
-// Animate number counting up
-function animateCount(element, target) {
-    const duration = 2000; // 2 seconds
-    const start = parseInt(element.textContent.replace(/,/g, '')) || 0;
-    const increment = (target - start) / (duration / 16);
-    let current = start;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.textContent = Math.floor(current).toLocaleString();
-    }, 16);
 }
 
 // Initialize marquee pause on hover and touch support

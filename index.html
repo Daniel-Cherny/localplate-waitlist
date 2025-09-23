@@ -90,7 +90,7 @@
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
-                    <span>Verified by Registered Dietitians</span>
+                    <span>Foodies in SF are already joining</span>
                 </div>
                 
                 <!-- Headline with Premium Typography -->
@@ -105,7 +105,7 @@
                 
                 <!-- Subheadline -->
                 <p class="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed reveal-on-scroll animation-delay-200">
-                    Track nutrition from your favorite local restaurants. Real data, real food, real results.
+                    Track nutrition from your favorite local restaurants. Real data, real food, real results&mdash;capped at just 500 founding spots.
                 </p>
                 
                 <!-- Multi-Step Form Container -->
@@ -319,13 +319,34 @@
                     </div>
                 </div>
                 
+                <!-- Waitlist Status Card -->
+                <div class="form-card waitlist-status-card mt-8 reveal-on-scroll animation-delay-300">
+                    <div class="waitlist-status-header">
+                        <span class="waitlist-status-eyebrow">Founding Cohort &middot; limited to 500 invites</span>
+                        <span id="waitlist-count" class="waitlist-status-tier">Spots are still open</span>
+                    </div>
+                    <div class="waitlist-status-progress" role="img" aria-label="Founding cohort progress">
+                        <div class="waitlist-progress-track">
+                            <div id="waitlist-progress-fill" class="waitlist-progress-fill"></div>
+                        </div>
+                        <div class="waitlist-progress-milestones">
+                            <span>On Deck</span>
+                            <span>Early Insider</span>
+                            <span>VIP Tier</span>
+                            <span>Founding</span>
+                        </div>
+                    </div>
+                    <p id="waitlist-tier-message" class="waitlist-status-message">Invite a friend to jump into VIP faster.</p>
+                    <p class="waitlist-status-footnote">Golden tickets unlock for VIPs once all 500 seats are claimed.</p>
+                </div>
+
                 <!-- Urgency Message -->
                 <div class="mt-6 mb-16 text-center reveal-on-scroll animation-delay-400">
                     <div class="inline-flex items-center space-x-2 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 px-4 py-2 rounded-full">
                         <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                         </svg>
-                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Get in now - waitlist closing soon</span>
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Only 500 founding spots &mdash; secure yours now</span>
                     </div>
                 </div>
             </div>

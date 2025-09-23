@@ -90,18 +90,35 @@
                 
                 <!-- Heading -->
                 <h1 class="font-serif text-5xl sm:text-6xl lg:text-6xl font-bold mb-4 text-gray-900 dark:text-white animate-fade-in-up animation-delay-100">
-                    You're on the List!
+                    Welcome to the Founding Cohort
                 </h1>
-                
+
                 <!-- Subheading -->
-                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 animate-fade-in-up animation-delay-200">
-                    Welcome to LocalPlate, <span id="user-name" class="font-medium text-gray-900 dark:text-white">friend</span>!
+                <p class="text-xl text-gray-600 dark:text-gray-300 animate-fade-in-up animation-delay-200">
+                    You've secured a limited early access spot, <span id="user-name" class="font-medium text-gray-900 dark:text-white">friend</span>.
                 </p>
+                <p class="text-sm sm:text-base text-emerald-700 dark:text-emerald-300 mb-8 animate-fade-in-up animation-delay-250">
+                    Foodies in SF are already joining &mdash; keep your lead by inviting them in.
+                </p>
+
+                <!-- Tier Status -->
+                <div class="form-card tier-status-card mb-8 reveal-on-scroll animation-delay-250">
+                    <span id="waitlist-tier-name" class="tier-status-badge">Early Insider</span>
+                    <p id="waitlist-tier-subtitle" class="tier-status-subtitle">You're already ahead of the curve.</p>
+                    <div class="tier-status-progress" role="img" aria-label="Progress to the next tier">
+                        <div class="tier-progress-track">
+                            <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
+                        </div>
+                        <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Invite one friend to reach VIP Tier</p>
+                    </div>
+                    <p id="waitlist-tier-cta" class="tier-status-cta">Stay in the VIP tier by inviting a friend.</p>
+                </div>
+
                 <!-- Referral Section -->
                 <div class="form-card pt-6 mb-8 reveal-on-scroll hover:shadow-2xl transition-shadow">
-                    <h2 class="font-serif text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Move Up the List!</h2>
+                    <h2 class="font-serif text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Keep Your VIP Lead</h2>
                     <p class="text-gray-600 dark:text-gray-400 mb-6">
-                        Share your unique referral link. Each friend who joins moves you up!
+                        Share your unique referral link. Every friend who joins locks in your tier and pushes you closer to Founding Member status.
                     </p>
                     
                     <!-- Referral Link -->
@@ -193,60 +210,77 @@
                             title="Share on Bluesky"
                         >
                             <!-- Bluesky butterfly logo -->
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                                <path d="M12 8.798c2.326-4.02 5.221-7.798 8-7.798 1.657 0 2 1.169 2 2.087 0 2.694-3.536 5.603-6 8 2.464 2.397 6 5.306 6 8 0 .918-.343 2.087-2 2.087-2.779 0-5.674-3.778-8-7.798-2.326 4.02-5.221 7.798-8 7.798-1.657 0-2-1.169-2-2.087 0-2.694 3.536-5.603 6-8-2.464-2.397-6-5.306-6-8 0-.918.343-2.087 2-2.087 2.779 0 5.674 3.778 8 7.798z"/>
+                            <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                                <path d="M3.468 1.948C5.303 3.325 7.276 6.118 8 7.616c.725-1.498 2.698-4.29 4.532-5.668C13.855.955 16 .186 16 2.632c0 .489-.28 4.105-.444 4.692-.572 2.04-2.653 2.561-4.504 2.246 3.236.551 4.06 2.375 2.281 4.2-3.376 3.464-4.852-.87-5.23-1.98-.07-.204-.103-.3-.103-.218 0-.081-.033.014-.102.218-.379 1.11-1.855 5.444-5.231 1.98-1.778-1.825-.955-3.65 2.28-4.2-1.85.315-3.932-.205-4.503-2.246C.28 6.737 0 3.12 0 2.632 0 .186 2.145.955 3.468 1.948"/>
                             </svg>
                         </a>
                     </div>
                 </div>
-                
+
+                <!-- Golden Ticket Card -->
+                <div id="golden-ticket-card" class="form-card golden-ticket-card mb-8 hidden reveal-on-scroll animation-delay-300">
+                    <div class="golden-ticket-header">
+                        <span class="golden-ticket-badge">Golden Ticket</span>
+                        <span class="golden-ticket-pill">One invite token</span>
+                    </div>
+                    <p id="golden-ticket-message" class="golden-ticket-message">
+                        Once the founding cohort fills, you'll be able to gift one guaranteed spot to a friend.
+                    </p>
+                    <button type="button" class="btn-secondary w-full sm:w-auto" onclick="copyLink()">
+                        Copy your invite link
+                    </button>
+                </div>
+
                 <!-- Referral Progress -->
                 <div class="form-card mb-8 reveal-on-scroll hover:shadow-2xl transition-shadow">
-                    <h3 class="font-serif text-xl font-bold mb-8 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Your Referral Rewards</h3>
+                    <h3 class="font-serif text-xl font-bold mb-8 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Unlock the Perks</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <!-- Tier 1 -->
                         <div id="tier-1" class="text-center group hover:scale-105 transition-all duration-500 tier-card">
                             <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
-                                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8l3 3-3 3-3-3 3-3z"/>
                                 </svg>
                             </div>
-                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">1 Referral</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Early Access Badge</div>
-                            <!-- Progress Bar -->
-                            <div id="progress-bar-1" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">VIP Tier</div>
+                            <div class="tier-tag text-sm text-emerald-600 dark:text-emerald-300 mb-2">Top 50% of early adopters</div>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Invite one friend to lock in VIP perks and early menu drops.</p>
+                            <div id="progress-bar-1" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                 <div class="progress-fill bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
+                            <p id="progress-label-1" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0% to VIP Tier</p>
                         </div>
                         
                         <!-- Tier 2 -->
                         <div id="tier-2" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
                             <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
                                 <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </div>
-                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">3 Referrals</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">One Month Free</div>
-                            <!-- Progress Bar -->
-                            <div id="progress-bar-2" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-                                <div class="progress-fill bg-gradient-to-r from-blue-400 to-blue-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
+                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Founding Member</div>
+                            <div class="tier-tag text-sm text-amber-600 dark:text-amber-300 mb-2">Top 25% of early adopters</div>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer three friends to unlock pre-launch tastings and earliest menu access.</p>
+                            <div id="progress-bar-2" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-fill bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
+                            <p id="progress-label-2" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0% to Founding Member</p>
                         </div>
                         
                         <!-- Tier 3 -->
                         <div id="tier-3" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
                             <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
-                                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                <svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6l2.09 4.243L18 11l-3 2.757L15.18 18 12 15.9 8.82 18 9 13.757 6 11l3.91-.757L12 6z"/>
                                 </svg>
                             </div>
-                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">5 Referrals</div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Swag Pack</div>
-                            <!-- Progress Bar -->
-                            <div id="progress-bar-3" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-                                <div class="progress-fill bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
+                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Golden Ticket</div>
+                            <div class="tier-tag text-sm text-rose-500 dark:text-rose-300 mb-2">Gift a spot when we're full</div>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Bring in five friends to earn a golden ticket you can hand to someone after we hit the 500-person cap.</p>
+                            <div id="progress-bar-3" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-fill bg-gradient-to-r from-rose-400 to-amber-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
+                            <p id="progress-label-3" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0% to Golden Ticket</p>
                         </div>
                     </div>
                 </div>
@@ -259,19 +293,19 @@
                             <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Check your email for confirmation and updates</span>
+                            <span>Check your email for a tier recap and your referral kit</span>
                         </div>
                         <div class="flex items-start space-x-3">
                             <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span>We'll notify you when early access opens</span>
+                            <span>Watch for weekly nudges showing progress to the next milestone</span>
                         </div>
                         <div class="flex items-start space-x-3">
                             <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Share to move up and get rewards!</span>
+                            <span>Golden ticket instructions drop the moment the cohort hits 500</span>
                         </div>
                     </div>
                 </div>
@@ -370,34 +404,68 @@
                 this.totalCommunitySize = 0;
                 this.supabaseClient = null;
                 this.realTimeSubscription = null;
-                
-                // Tier definitions
-                    this.tiers = [
-                        {
-                            id: 1,
-                            referralsRequired: 1,
-                            title: 'Early Access Badge',
-                            icon: 'badge',
-                            reward: 'Jump ahead in line',
-                            color: 'emerald'
-                        },
-                        {
-                            id: 2,
-                            referralsRequired: 3,
-                            title: 'One Month Free',
-                            icon: 'gift',
-                            reward: 'Free premium subscription',
-                            color: 'blue'
-                        },
-                        {
-                            id: 3,
-                            referralsRequired: 5,
-                            title: 'Swag Pack',
-                            icon: 'star',
-                            reward: 'Exclusive merchandise',
-                            color: 'purple'
-                        }
-                    ];
+
+                this.waitlistCap = 500;
+                this.statusLevels = [
+                    {
+                        slug: 'golden',
+                        minReferrals: 5,
+                        title: 'Golden Ticket Holder',
+                        subtitle: 'Invite-only circle once we're at capacity.',
+                        cta: 'Gift your golden ticket to one foodie when we're maxed.',
+                        progressLabel: 'You unlocked every perk – keep the momentum going.'
+                    },
+                    {
+                        slug: 'founding',
+                        minReferrals: 3,
+                        title: 'Founding Member',
+                        subtitle: 'Top 25% of early adopters.',
+                        cta: 'Bring two more friends to help them unlock VIP status.',
+                        progressLabel: 'Progress to Golden Ticket'
+                    },
+                    {
+                        slug: 'vip',
+                        minReferrals: 1,
+                        title: 'VIP Tier',
+                        subtitle: 'Top 50% of the waitlist.',
+                        cta: 'Stay in the VIP tier by inviting a friend.',
+                        progressLabel: 'Progress to Founding Member'
+                    },
+                    {
+                        slug: 'early',
+                        minReferrals: 0,
+                        title: 'Early Insider',
+                        subtitle: 'You're in the first wave.',
+                        cta: 'Invite one friend to jump straight into VIP tier.',
+                        progressLabel: 'Progress to VIP Tier'
+                    }
+                ];
+
+                this.tiers = [
+                    {
+                        id: 1,
+                        referralsRequired: 1,
+                        title: 'VIP Tier',
+                        reward: 'Priority access & early menu drops',
+                        tag: 'Top 50% of early adopters'
+                    },
+                    {
+                        id: 2,
+                        referralsRequired: 3,
+                        title: 'Founding Member',
+                        reward: 'Pre-launch tastings & first invites',
+                        tag: 'Top 25% of early adopters'
+                    },
+                    {
+                        id: 3,
+                        referralsRequired: 5,
+                        title: 'Golden Ticket',
+                        reward: 'Gift a spot when we hit capacity',
+                        tag: 'Share with five food lovers'
+                    }
+                ];
+
+                this.goldenTicketActive = false;
             }
             
             async init() {
@@ -449,7 +517,7 @@
                         
                         this.updateReferralDisplay();
                         this.updateTierProgress();
-                        this.updateWaitlistPosition();
+                        this.updateTierStatus();
                     }
                 } catch (error) {
                     console.error('Error loading user stats:', error);
@@ -472,6 +540,7 @@
                         this.dailyReferrals = data.daily_referrals || 0;
                         
                         this.updateCommunityDisplay();
+                        this.evaluateGoldenTicket();
                     }
                 } catch (error) {
                     console.error('Error loading community stats:', error);
@@ -511,6 +580,8 @@
                 // Update displays with animation
                 this.animateCounterUpdate();
                 this.updateTierProgress();
+                this.updateTierStatus();
+                this.evaluateGoldenTicket();
                 
                 // Check if user unlocked a new tier
                 this.checkTierUnlock();
@@ -547,20 +618,13 @@
                 this.tiers.forEach(tier => {
                     const progress = Math.min(this.userReferralCount / tier.referralsRequired, 1);
                     const isUnlocked = this.userReferralCount >= tier.referralsRequired;
-                    
-                    // Update tier display
-                    this.updateTierCard(tier.id, progress, isUnlocked);
-                    
-                    // Update progress bar
-                    this.updateProgressBar(tier.id, progress);
-                    
-                    // Update tier count
-                    this.updateTierCount(tier.id, this.userReferralCount, tier.referralsRequired);
+
+                    this.updateTierCard(tier, progress, isUnlocked);
                 });
             }
-            
-            updateTierCard(tierId, progress, isUnlocked) {
-                const tierElement = document.getElementById(`tier-${tierId}`);
+
+            updateTierCard(tier, progress, isUnlocked) {
+                const tierElement = document.getElementById(`tier-${tier.id}`);
                 if (!tierElement) return;
                 
                 const iconWrapper = tierElement.querySelector('.tier-icon-wrapper');
@@ -570,19 +634,21 @@
                     // Tier is unlocked
                     tierElement.classList.remove('tier-locked');
                     tierElement.classList.add('tier-unlocked');
-                    
-                    // Keep icon and title styling static; only toggle unlocked state
                 } else {
                     // Tier is locked
                     tierElement.classList.add('tier-locked');
                     tierElement.classList.remove('tier-unlocked');
-                    
-                    // Keep icon and title styling static; only toggle locked state
                 }
+
+                if (titleElement && tier.title) {
+                    titleElement.textContent = tier.title;
+                }
+
+                this.updateProgressBar(tier, progress, isUnlocked);
             }
             
-            updateProgressBar(tierId, progress) {
-                const progressBar = document.getElementById(`progress-bar-${tierId}`);
+            updateProgressBar(tier, progress, isUnlocked) {
+                const progressBar = document.getElementById(`progress-bar-${tier.id}`);
                 if (progressBar) {
                     const progressFill = progressBar.querySelector('.progress-fill');
                     if (progressFill) {
@@ -590,27 +656,79 @@
                         progressFill.style.width = `${percentage}%`;
                         progressFill.style.transition = 'width 0.8s ease-out';
                     }
-                    
-                    const progressText = progressBar.querySelector('.progress-text');
-                    if (progressText) {
-                        progressText.textContent = `${Math.round(progress * 100)}%`;
+                }
+
+                const progressLabel = document.getElementById(`progress-label-${tier.id}`);
+                if (!progressLabel) return;
+
+                if (isUnlocked) {
+                    progressLabel.textContent = `${tier.title} unlocked`;
+                    return;
+                }
+
+                const percent = Math.round(progress * 100);
+                if (percent <= 0) {
+                    progressLabel.textContent = `On deck -> ${tier.title}`;
+                } else {
+                    progressLabel.textContent = `${percent}% to ${tier.title}`;
+                }
+            }
+            
+            updateTierStatus() {
+                const nameEl = document.getElementById('waitlist-tier-name');
+                const subtitleEl = document.getElementById('waitlist-tier-subtitle');
+                const ctaEl = document.getElementById('waitlist-tier-cta');
+                const progressFill = document.getElementById('waitlist-tier-progress-fill');
+                const progressCopy = document.getElementById('waitlist-tier-progress-copy');
+
+                if (!nameEl || !subtitleEl || !ctaEl || !progressFill || !progressCopy) {
+                    return;
+                }
+
+                let currentLevel = this.statusLevels[this.statusLevels.length - 1];
+                let currentIndex = this.statusLevels.length - 1;
+
+                for (let i = 0; i < this.statusLevels.length; i++) {
+                    const level = this.statusLevels[i];
+                    if (this.userReferralCount >= level.minReferrals) {
+                        currentLevel = level;
+                        currentIndex = i;
+                        break;
                     }
                 }
-            }
-            
-            updateTierCount(tierId, current, required) {
-                const countElement = document.getElementById(`referral-${required}`);
-                if (countElement) {
-                    countElement.textContent = `${current}/${required}`;
+
+                const nextLevel = currentIndex > 0 ? this.statusLevels[currentIndex - 1] : null;
+
+                nameEl.textContent = currentLevel.title;
+                subtitleEl.textContent = currentLevel.subtitle;
+                ctaEl.textContent = currentLevel.cta;
+
+                let progressRatio = 1;
+                let progressText = currentLevel.progressLabel;
+
+                if (nextLevel) {
+                    const denominator = nextLevel.minReferrals - currentLevel.minReferrals;
+                    const numerator = this.userReferralCount - currentLevel.minReferrals;
+                    progressRatio = denominator > 0 ? Math.min(Math.max(numerator / denominator, 0), 1) : 0;
+                    const percent = Math.round(progressRatio * 100);
+                    progressText = percent > 0 ? `${percent}% to ${nextLevel.title}` : `On deck -> ${nextLevel.title}`;
+                } else {
+                    progressRatio = 1;
                 }
-            }
-            
-            updateWaitlistPosition() {
-                const positionElement = document.getElementById('waitlist-position');
-                if (positionElement && this.userWaitlistPosition) {
-                    positionElement.textContent = `#${this.userWaitlistPosition.toLocaleString()}`;
-                    positionElement.parentElement.classList.remove('hidden');
-                }
+
+                const gradientMap = {
+                    golden: 'linear-gradient(90deg,#f59e0b,#f97316)',
+                    founding: 'linear-gradient(90deg,#f59e0b,#f97316)',
+                    vip: 'linear-gradient(90deg,#10b981,#0ea5e9)',
+                    early: 'linear-gradient(90deg,#10b981,#0ea5e9)'
+                };
+
+                const width = Math.max(progressRatio * 100, nextLevel ? 6 : 100);
+                progressFill.style.width = `${Math.min(width, 100)}%`;
+                progressFill.style.background = gradientMap[nextLevel?.slug || currentLevel.slug] || gradientMap.vip;
+                progressCopy.textContent = progressText;
+
+                this.goldenTicketActive = currentLevel.slug === 'golden' || this.userReferralCount >= 5;
             }
             
             updateCommunityDisplay() {
@@ -623,6 +741,34 @@
                 if (dailyReferralsElement && this.dailyReferrals) {
                     dailyReferralsElement.textContent = this.dailyReferrals;
                     dailyReferralsElement.parentElement.classList.remove('hidden');
+                }
+            }
+
+            evaluateGoldenTicket() {
+                const card = document.getElementById('golden-ticket-card');
+                const message = document.getElementById('golden-ticket-message');
+
+                if (!card || !message) {
+                    return;
+                }
+
+                if (this.totalCommunitySize < this.waitlistCap) {
+                    card.classList.add('hidden');
+                    card.classList.remove('golden-ticket-locked');
+                    return;
+                }
+
+                const hasFoundingStatus = this.userReferralCount >= 3;
+
+                card.classList.remove('hidden');
+                card.classList.toggle('golden-ticket-locked', !hasFoundingStatus);
+
+                if (!hasFoundingStatus) {
+                    message.textContent = 'The cohort is full! Refer three friends to earn a golden ticket and bring one more foodie in.';
+                } else if (this.goldenTicketActive) {
+                    message.textContent = 'We're at capacity &mdash; use your golden ticket to invite one guaranteed friend right now.';
+                } else {
+                    message.textContent = 'Golden ticket unlocks the moment your next friend joins &mdash; keep sharing your link.';
                 }
             }
             
@@ -924,17 +1070,6 @@
         const email = sessionStorage.getItem('waitlist_email');
         const referralCode = sessionStorage.getItem('waitlist_referral_code');
         
-        // Position handling - disable fake positions in debug mode
-        let position;
-        if (DEBUG) {
-            position = sessionStorage.getItem('waitlist_position') || 'UNKNOWN';
-            if (position === 'UNKNOWN') {
-                console.warn('[DEBUG] No real position found - fake position disabled');
-            }
-        } else {
-            position = sessionStorage.getItem('waitlist_position') || Math.floor(Math.random() * 500) + 1000;
-        }
-        
         // Update page with user data
         if (email) {
             const v = sessionStorage.getItem('waitlist_first_name');
@@ -1086,8 +1221,8 @@
 // Simple share functionality - GPT-5 minimal approach
         (function () {
             const url = document.getElementById('referral-link').value;
-            const title = 'Join the LocalPlate waitlist!';
-            const text = 'I just joined the LocalPlate waitlist! Get verified nutrition data from your favorite local restaurants. Join me:';
+            const title = 'LocalPlate Founding Cohort';
+            const text = "I just locked a VIP spot in LocalPlate's 500-seat founding cohort. Grab an invite before it fills:";
 
             const enc = encodeURIComponent;
             const encodedUrl = enc(url);

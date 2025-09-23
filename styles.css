@@ -161,6 +161,262 @@ h1, h2, h3 {
     mix-blend-mode: screen;
 }
 
+/* Waitlist status banner */
+.waitlist-status-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+}
+
+.waitlist-status-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .waitlist-status-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.waitlist-status-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #047857;
+}
+
+.dark .waitlist-status-eyebrow {
+    color: #34d399;
+}
+
+.waitlist-status-tier {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dark .waitlist-status-tier {
+    color: #f9fafb;
+}
+
+.waitlist-status-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.waitlist-progress-track {
+    position: relative;
+    width: 100%;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.12);
+    overflow: hidden;
+}
+
+.dark .waitlist-progress-track {
+    background: rgba(16, 185, 129, 0.25);
+}
+
+.waitlist-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 18%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #10b981, #0ea5e9);
+    transition: width 0.8s ease, background 0.4s ease;
+}
+
+.waitlist-progress-milestones {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b7280;
+}
+
+.dark .waitlist-progress-milestones {
+    color: #9ca3af;
+}
+
+.waitlist-status-message {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.dark .waitlist-status-message {
+    color: #e5e7eb;
+}
+
+.waitlist-status-footnote {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.dark .waitlist-status-footnote {
+    color: #9ca3af;
+}
+
+/* Success tier status */
+.tier-status-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tier-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #10b981, #0ea5e9);
+    color: #f9fafb;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tier-status-subtitle {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dark .tier-status-subtitle {
+    color: #e5e7eb;
+}
+
+.tier-status-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tier-progress-track {
+    width: 100%;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.14);
+    overflow: hidden;
+}
+
+.dark .tier-progress-track {
+    background: rgba(16, 185, 129, 0.28);
+}
+
+.tier-progress-fill {
+    height: 100%;
+    width: 10%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #10b981, #0ea5e9);
+    transition: width 0.6s ease, background 0.4s ease;
+}
+
+.tier-progress-copy {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.dark .tier-progress-copy {
+    color: #d1d5db;
+}
+
+.tier-status-cta {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #065f46;
+}
+
+.dark .tier-status-cta {
+    color: #34d399;
+}
+
+.tier-tag {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.tier-description {
+    line-height: 1.5;
+}
+
+.tier-progress-caption {
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.golden-ticket-card {
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: linear-gradient(120deg, rgba(251, 191, 36, 0.18), rgba(249, 115, 22, 0.12));
+}
+
+.dark .golden-ticket-card {
+    border-color: rgba(251, 191, 36, 0.45);
+    background: linear-gradient(120deg, rgba(251, 191, 36, 0.22), rgba(249, 115, 22, 0.18));
+}
+
+.golden-ticket-card.golden-ticket-locked {
+    border-style: dashed;
+    opacity: 0.9;
+}
+
+.golden-ticket-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.golden-ticket-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.95rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #fbbf24, #f97316);
+    color: #1f2937;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.golden-ticket-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.dark .golden-ticket-pill {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fcd34d;
+}
+
+.golden-ticket-message {
+    font-size: 0.95rem;
+    color: #92400e;
+}
+
+.dark .golden-ticket-message {
+    color: #fef3c7;
+}
+
 /* Ken Burns Effect - Optimized for Mobile */
 .ken-burns-container {
     position: absolute;

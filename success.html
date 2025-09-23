@@ -408,36 +408,36 @@
                 this.waitlistCap = 500;
                 this.statusLevels = [
                     {
-                        slug: 'golden',
+                        slug: "golden",
                         minReferrals: 5,
-                        title: 'Golden Ticket Holder',
-                        subtitle: 'Invite-only circle once we're at capacity.',
-                        cta: 'Gift your golden ticket to one foodie when we're maxed.',
-                        progressLabel: 'You unlocked every perk – keep the momentum going.'
+                        title: "Golden Ticket Holder",
+                        subtitle: "Invite-only circle once we're at capacity.",
+                        cta: "Gift your golden ticket to one foodie when we're maxed.",
+                        progressLabel: "You unlocked every perk – keep the momentum going."
                     },
                     {
-                        slug: 'founding',
+                        slug: "founding",
                         minReferrals: 3,
-                        title: 'Founding Member',
-                        subtitle: 'Top 25% of early adopters.',
-                        cta: 'Bring two more friends to help them unlock VIP status.',
-                        progressLabel: 'Progress to Golden Ticket'
+                        title: "Founding Member",
+                        subtitle: "Top 25% of early adopters.",
+                        cta: "Bring two more friends to help them unlock VIP status.",
+                        progressLabel: "Progress to Golden Ticket"
                     },
                     {
-                        slug: 'vip',
+                        slug: "vip",
                         minReferrals: 1,
-                        title: 'VIP Tier',
-                        subtitle: 'Top 50% of the waitlist.',
-                        cta: 'Stay in the VIP tier by inviting a friend.',
-                        progressLabel: 'Progress to Founding Member'
+                        title: "VIP Tier",
+                        subtitle: "Top 50% of the waitlist.",
+                        cta: "Stay in the VIP tier by inviting a friend.",
+                        progressLabel: "Progress to Founding Member"
                     },
                     {
-                        slug: 'early',
+                        slug: "early",
                         minReferrals: 0,
-                        title: 'Early Insider',
-                        subtitle: 'You're in the first wave.',
-                        cta: 'Invite one friend to jump straight into VIP tier.',
-                        progressLabel: 'Progress to VIP Tier'
+                        title: "Early Insider",
+                        subtitle: "You're in the first wave.",
+                        cta: "Invite one friend to jump straight into VIP tier.",
+                        progressLabel: "Progress to VIP Tier"
                     }
                 ];
 
@@ -445,23 +445,23 @@
                     {
                         id: 1,
                         referralsRequired: 1,
-                        title: 'VIP Tier',
-                        reward: 'Priority access & early menu drops',
-                        tag: 'Top 50% of early adopters'
+                        title: "VIP Tier",
+                        reward: "Priority access & early menu drops",
+                        tag: "Top 50% of early adopters"
                     },
                     {
                         id: 2,
                         referralsRequired: 3,
-                        title: 'Founding Member',
-                        reward: 'Pre-launch tastings & first invites',
-                        tag: 'Top 25% of early adopters'
+                        title: "Founding Member",
+                        reward: "Pre-launch tastings & first invites",
+                        tag: "Top 25% of early adopters"
                     },
                     {
                         id: 3,
                         referralsRequired: 5,
-                        title: 'Golden Ticket',
-                        reward: 'Gift a spot when we hit capacity',
-                        tag: 'Share with five food lovers'
+                        title: "Golden Ticket",
+                        reward: "Gift a spot when we hit capacity",
+                        tag: "Share with five food lovers"
                     }
                 ];
 
@@ -766,7 +766,7 @@
                 if (!hasFoundingStatus) {
                     message.textContent = 'The cohort is full! Refer three friends to earn a golden ticket and bring one more foodie in.';
                 } else if (this.goldenTicketActive) {
-                    message.textContent = 'We're at capacity &mdash; use your golden ticket to invite one guaranteed friend right now.';
+                    message.textContent = "We're at capacity &mdash; use your golden ticket to invite one guaranteed friend right now.";
                 } else {
                     message.textContent = 'Golden ticket unlocks the moment your next friend joins &mdash; keep sharing your link.';
                 }

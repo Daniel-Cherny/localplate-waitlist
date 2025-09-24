@@ -253,57 +253,214 @@
                     </button>
                 </div>
 
-                <!-- Referral Progress -->
-                <div class="form-card mb-8 reveal-on-scroll hover:shadow-2xl transition-shadow">
-                    <h3 class="font-serif text-xl font-bold mb-8 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Unlock the Perks</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <!-- Tier 1 -->
-                        <div id="tier-1" class="text-center group hover:scale-105 transition-all duration-500 tier-card">
-                            <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
-                                <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8l3 3-3 3-3-3 3-3z"/>
-                                </svg>
+                <!-- Referral Progress - Enhanced Premium Design -->
+                <div class="form-card mb-8 reveal-on-scroll hover:shadow-2xl transition-shadow relative overflow-hidden">
+                    <!-- Background Gradient Effect -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/20 via-transparent to-rose-50/20 dark:from-emerald-900/10 dark:to-rose-900/10 pointer-events-none"></div>
+
+                    <!-- Header Section -->
+                    <div class="relative mb-10">
+                        <h3 class="font-serif text-3xl font-bold mb-3 text-center">
+                            <span class="bg-gradient-to-r from-emerald-600 via-amber-600 to-rose-600 bg-clip-text text-transparent animate-gradient-x">
+                                Unlock the Perks
+                            </span>
+                        </h3>
+                        <p class="text-center text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                            Each friend you bring multiplies your rewards. Track your journey to premium perks.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 relative">
+                        <!-- Tier 1 - Fresh Start Friend -->
+                        <div id="tier-1" class="tier-card-premium group relative">
+                            <!-- Card Background & Border -->
+                            <div class="tier-card-body relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border-2 border-emerald-200 dark:border-emerald-800 transition-all duration-300 group-hover:border-emerald-400 dark:group-hover:border-emerald-600 group-hover:shadow-emerald-200/50 dark:group-hover:shadow-emerald-900/50">
+                                <!-- Status Badge -->
+                                <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
+                                    <span class="text-white text-xs font-bold">1</span>
+                                </div>
+
+                                <!-- Icon Container with Animation -->
+                                <div class="tier-icon-premium relative mx-auto mb-4 w-20 h-20">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full animate-pulse-slow"></div>
+                                    <div class="relative w-full h-full bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                        <!-- Leaf/Smoothie Icon -->
+                                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7c0 2.21-1.79 4-4 4S12 9.21 12 7c0-2.21 1.79-4 4-4s4 1.79 4 4zM12 7c0 2.21-1.79 4-4 4S4 9.21 4 7c0-2.21 1.79-4 4-4s4 1.79 4 4z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 11v10M8 21h8"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="text-center">
+                                    <h4 class="tier-title text-lg font-bold text-gray-900 dark:text-white mb-1">Fresh Start Friend</h4>
+                                    <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-3">
+                                        <svg class="w-3 h-3 mr-1 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="tier-tag text-xs font-medium text-emerald-700 dark:text-emerald-300">Smoothie Spark</span>
+                                    </div>
+
+                                    <!-- Reward Display -->
+                                    <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg">
+                                        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">50% OFF</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400">First Month</div>
+                                    </div>
+
+                                    <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                                        Invite one wellness warrior to unlock your starter discount
+                                    </p>
+
+                                    <!-- Progress Section -->
+                                    <div class="tier-progress-section">
+                                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                            <span>Progress</span>
+                                            <span id="progress-count-1">0/1</span>
+                                        </div>
+                                        <div id="progress-bar-1" class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-emerald-200/30 to-teal-200/30 dark:from-emerald-800/30 dark:to-teal-800/30"></div>
+                                            <div class="progress-fill relative h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full transition-all duration-1000 ease-out shadow-sm" style="width: 0%">
+                                                <div class="absolute inset-0 bg-white/20 animate-shimmer"></div>
+                                            </div>
+                                        </div>
+                                        <p id="progress-label-1" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">Ready to unlock</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Fresh Start Friend</div>
-                            <div class="tier-tag text-sm text-emerald-600 dark:text-emerald-300 mb-2">Smoothie Spark Badge · 1 referral</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Bring 1 health-conscious friend and score 50% off your first month.</p>
-                            <div id="progress-bar-1" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="progress-fill bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
-                            </div>
-                            <p id="progress-label-1" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0/1 referrals · 1 referral to go</p>
                         </div>
-                        
-                        <!-- Tier 2 -->
-                        <div id="tier-2" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
-                            <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
-                                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+
+                        <!-- Tier 2 - Superfood Sidekick -->
+                        <div id="tier-2" class="tier-card-premium group relative tier-locked">
+                            <div class="tier-card-body relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-amber-400 dark:group-hover:border-amber-600 opacity-75 group-hover:opacity-100">
+                                <!-- Lock Indicator -->
+                                <div class="tier-lock-indicator absolute -top-3 -right-3 w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-amber-400 group-hover:to-orange-500 shadow-lg">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+
+                                <!-- Icon Container -->
+                                <div class="tier-icon-premium relative mx-auto mb-4 w-20 h-20">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-orange-400/20 rounded-full"></div>
+                                    <div class="relative w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                        <!-- Trophy Icon -->
+                                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15l-2 5h4l-2-5zM7 7h10l1.5 4.5a2 2 0 01-1.9 2.5H7.4a2 2 0 01-1.9-2.5L7 7zM5 7V4a1 1 0 011-1h12a1 1 0 011 1v3"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="text-center">
+                                    <h4 class="tier-title text-lg font-bold text-gray-900 dark:text-white mb-1">Superfood Sidekick</h4>
+                                    <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 mb-3">
+                                        <svg class="w-3 h-3 mr-1 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="tier-tag text-xs font-medium text-amber-700 dark:text-amber-300">Harvest Hero</span>
+                                    </div>
+
+                                    <!-- Reward Display -->
+                                    <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg">
+                                        <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">100% OFF</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400">First Month Free</div>
+                                    </div>
+
+                                    <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                                        Rally three friends for a completely free first month
+                                    </p>
+
+                                    <!-- Progress Section -->
+                                    <div class="tier-progress-section">
+                                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                            <span>Progress</span>
+                                            <span id="progress-count-2">0/3</span>
+                                        </div>
+                                        <div id="progress-bar-2" class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-amber-200/30 to-orange-200/30 dark:from-amber-800/30 dark:to-orange-800/30"></div>
+                                            <div class="progress-fill relative h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-1000 ease-out shadow-sm" style="width: 0%">
+                                                <div class="absolute inset-0 bg-white/20"></div>
+                                            </div>
+                                        </div>
+                                        <p id="progress-label-2" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">3 referrals needed</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Superfood Sidekick</div>
-                            <div class="tier-tag text-sm text-amber-600 dark:text-amber-300 mb-2">Harvest Hero Badge · 3 referrals</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer 3 health-conscious friends and take 100% off your first month.</p>
-                            <div id="progress-bar-2" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="progress-fill bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
-                            </div>
-                            <p id="progress-label-2" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0/3 referrals · 3 referrals to go</p>
                         </div>
-                        
-                        <!-- Tier 3 -->
-                        <div id="tier-3" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
-                            <div class="tier-icon-wrapper w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
-                                <svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6l2.09 4.243L18 11l-3 2.757L15.18 18 12 15.9 8.82 18 9 13.757 6 11l3.91-.757L12 6z"/>
-                                </svg>
+
+                        <!-- Tier 3 - Glow Guide -->
+                        <div id="tier-3" class="tier-card-premium group relative tier-locked">
+                            <div class="tier-card-body relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-rose-400 dark:group-hover:border-rose-600 opacity-75 group-hover:opacity-100">
+                                <!-- Premium Badge -->
+                                <div class="tier-premium-badge absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-rose-500 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    PREMIUM
+                                </div>
+
+                                <!-- Lock Indicator -->
+                                <div class="tier-lock-indicator absolute -top-3 -right-3 w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-rose-400 group-hover:to-purple-500 shadow-lg">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+
+                                <!-- Icon Container with Glow Effect -->
+                                <div class="tier-icon-premium relative mx-auto mb-4 w-20 h-20">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-rose-400/30 to-purple-400/30 rounded-full animate-pulse-slow"></div>
+                                    <div class="absolute inset-0 bg-gradient-to-br from-rose-400/20 to-purple-400/20 rounded-full scale-125 blur-xl"></div>
+                                    <div class="relative w-full h-full bg-gradient-to-br from-rose-400 via-pink-500 to-purple-600 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                        <!-- Crown/Star Icon -->
+                                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm2.86-2h8.28l.57-4L14 8l-2-3-2 3-2.71 2L7.86 14z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <!-- Content -->
+                                <div class="text-center">
+                                    <h4 class="tier-title text-lg font-bold text-gray-900 dark:text-white mb-1">Glow Guide</h4>
+                                    <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-rose-100 to-purple-100 dark:from-rose-900/30 dark:to-purple-900/30 mb-3">
+                                        <svg class="w-3 h-3 mr-1 text-rose-600 dark:text-rose-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span class="tier-tag text-xs font-medium bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">Vitality Vanguard</span>
+                                    </div>
+
+                                    <!-- Reward Display with Glow -->
+                                    <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-rose-50 via-pink-50 to-purple-50 dark:from-rose-900/20 dark:via-pink-900/20 dark:to-purple-900/20 rounded-lg relative overflow-hidden">
+                                        <div class="absolute inset-0 bg-gradient-to-r from-rose-400/10 to-purple-400/10 animate-shimmer"></div>
+                                        <div class="relative text-2xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">3 MONTHS</div>
+                                        <div class="relative text-xs text-gray-600 dark:text-gray-400">Completely Free</div>
+                                    </div>
+
+                                    <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                                        Unite five wellness warriors for the ultimate reward
+                                    </p>
+
+                                    <!-- Progress Section -->
+                                    <div class="tier-progress-section">
+                                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                            <span>Progress</span>
+                                            <span id="progress-count-3">0/5</span>
+                                        </div>
+                                        <div id="progress-bar-3" class="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-rose-200/30 via-pink-200/30 to-purple-200/30 dark:from-rose-800/30 dark:via-pink-800/30 dark:to-purple-800/30"></div>
+                                            <div class="progress-fill relative h-full bg-gradient-to-r from-rose-400 via-pink-500 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-sm" style="width: 0%">
+                                                <div class="absolute inset-0 bg-white/20 animate-shimmer"></div>
+                                            </div>
+                                        </div>
+                                        <p id="progress-label-3" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">5 referrals needed</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Glow Guide</div>
-                            <div class="tier-tag text-sm text-rose-500 dark:text-rose-300 mb-2">Vitality Vanguard Badge · 5 referrals</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Bring 5 health-conscious friends and enjoy 3 full months on us.</p>
-                            <div id="progress-bar-3" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="progress-fill bg-gradient-to-r from-rose-400 to-amber-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
-                            </div>
-                            <p id="progress-label-3" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0/5 referrals · 5 referrals to go</p>
                         </div>
+                    </div>
+
+                    <!-- Motivational Footer -->
+                    <div class="mt-8 text-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                            🌟 Every friend you invite jumps straight to the front with you
+                        </p>
                     </div>
                 </div>
                 
@@ -643,9 +800,9 @@
             updateTierCard(tier, progress, isUnlocked) {
                 const tierElement = document.getElementById(`tier-${tier.id}`);
                 if (!tierElement) return;
-                
+
                 const titleElement = tierElement.querySelector('.tier-title');
-                
+
                 if (isUnlocked) {
                     // Tier is unlocked
                     tierElement.classList.remove('tier-locked');
@@ -662,17 +819,27 @@
 
                 const badgeElement = tierElement.querySelector('.tier-tag');
                 if (badgeElement) {
-                    const referralLabel = tier.referralsRequired === 1 ? '1 referral' : `${tier.referralsRequired} referrals`;
                     if (tier.badge) {
-                        badgeElement.textContent = `${tier.badge} · ${referralLabel}`;
-                    } else {
-                        badgeElement.textContent = referralLabel;
+                        badgeElement.textContent = tier.badge;
                     }
                 }
 
                 const descriptionElement = tierElement.querySelector('.tier-description');
                 if (descriptionElement && tier.description) {
-                    descriptionElement.textContent = tier.description;
+                    // Use shortened versions for the new design
+                    const shortDescriptions = {
+                        1: "Invite one wellness warrior to unlock your starter discount",
+                        2: "Rally three friends for a completely free first month",
+                        3: "Unite five wellness warriors for the ultimate reward"
+                    };
+                    descriptionElement.textContent = shortDescriptions[tier.id] || tier.description;
+                }
+
+                // Update progress count display
+                const progressCount = document.getElementById(`progress-count-${tier.id}`);
+                if (progressCount) {
+                    const current = Math.min(this.userReferralCount, tier.referralsRequired);
+                    progressCount.textContent = `${current}/${tier.referralsRequired}`;
                 }
 
                 this.updateProgressBar(tier, progress, isUnlocked);
@@ -693,15 +860,19 @@
                 if (!progressLabel) return;
 
                 if (isUnlocked) {
-                    const badgeName = tier.badge || tier.title;
-                    progressLabel.textContent = `${badgeName} unlocked`;
+                    progressLabel.textContent = `✨ Unlocked!`;
+                    progressLabel.classList.add('text-emerald-600', 'dark:text-emerald-400', 'font-bold');
                     return;
                 }
 
-                const currentReferrals = Math.max(0, Math.min(this.userReferralCount, tier.referralsRequired));
-                const remaining = Math.max(tier.referralsRequired - this.userReferralCount, 1);
-                const referralWord = remaining === 1 ? 'referral' : 'referrals';
-                progressLabel.textContent = `${currentReferrals}/${tier.referralsRequired} referrals · ${remaining} ${referralWord} to go`;
+                const remaining = Math.max(tier.referralsRequired - this.userReferralCount, 0);
+                if (remaining === 0) {
+                    progressLabel.textContent = `Ready to unlock`;
+                } else if (remaining === 1) {
+                    progressLabel.textContent = `1 friend away`;
+                } else {
+                    progressLabel.textContent = `${remaining} friends to unlock`;
+                }
             }
 
             computePercentile() {

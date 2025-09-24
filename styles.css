@@ -2376,3 +2376,222 @@ textarea:focus {
         display: none;
     }
 }
+
+/* Enhanced Tier Cards - Premium Design */
+.tier-card-premium {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.tier-card-premium:hover {
+    transform: translateY(-4px);
+}
+
+.tier-card-body {
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        var(--emerald-400) 0%,
+        var(--teal-500) 50%,
+        var(--emerald-500) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tier-card-premium:hover .tier-card-body::before {
+    opacity: 1;
+}
+
+/* Tier 2 gradient bar */
+#tier-2 .tier-card-body::before {
+    background: linear-gradient(90deg,
+        var(--amber-400) 0%,
+        #f97316 50%,
+        var(--amber-500) 100%);
+}
+
+/* Tier 3 gradient bar */
+#tier-3 .tier-card-body::before {
+    background: linear-gradient(90deg,
+        #ec4899 0%,
+        var(--purple-500) 50%,
+        #e11d48 100%);
+}
+
+/* Icon animations */
+.tier-icon-premium {
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+}
+
+.tier-icon-premium:hover {
+    animation-play-state: paused;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s linear infinite;
+}
+
+/* Gradient animation for title */
+@keyframes gradient-x {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
+}
+
+/* Pulse animation for icons */
+.animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animation-delay-100 {
+    animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+    animation-delay: 0.2s;
+}
+
+.animation-delay-250 {
+    animation-delay: 0.25s;
+}
+
+.animation-delay-300 {
+    animation-delay: 0.3s;
+}
+
+/* Enhanced progress bars */
+.tier-progress-section {
+    position: relative;
+}
+
+.tier-card-premium.tier-locked .tier-card-body {
+    filter: grayscale(10%);
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.tier-card-premium.tier-locked:hover .tier-card-body {
+    filter: grayscale(0);
+}
+
+/* Premium badge glow */
+.tier-premium-badge {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 10px rgba(236, 72, 153, 0.3); }
+    to { box-shadow: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 30px rgba(139, 92, 246, 0.3); }
+}
+
+/* Lock indicator hover effect */
+.tier-lock-indicator {
+    transition: all 0.3s ease;
+}
+
+.tier-card-premium:hover .tier-lock-indicator {
+    transform: scale(1.1) rotate(10deg);
+}
+
+/* Tier unlocked state enhancements */
+.tier-card-premium.tier-unlocked .tier-card-body {
+    border-color: var(--emerald-400) !important;
+    box-shadow: 0 0 30px rgba(52, 211, 153, 0.2);
+}
+
+.tier-card-premium.tier-unlocked .tier-lock-indicator {
+    background: linear-gradient(135deg, var(--emerald-400), var(--teal-500)) !important;
+}
+
+.tier-card-premium.tier-unlocked .tier-lock-indicator svg {
+    transform: scale(0);
+}
+
+.tier-card-premium.tier-unlocked .tier-lock-indicator::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* Reward display enhancements */
+.tier-reward {
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-reward::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent);
+    transform: translateY(-50%);
+    animation: sweep 3s ease-in-out infinite;
+}
+
+@keyframes sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Dark mode specific enhancements */
+.dark .tier-card-premium .tier-card-body {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark .tier-card-premium:hover .tier-card-body {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile responsiveness for enhanced cards */
+@media (max-width: 1024px) {
+    .tier-card-premium .tier-card-body {
+        padding: 1.25rem;
+    }
+
+    .tier-icon-premium {
+        width: 4rem !important;
+        height: 4rem !important;
+    }
+
+    .tier-icon-premium svg {
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+}

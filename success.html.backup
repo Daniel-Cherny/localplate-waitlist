@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to LocalPlate! - You're on the List</title>
+    <meta name="description" content="Success! You're on the LocalPlate waitlist. Get ready for verified nutrition data from your favorite local restaurants.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2310b981'/%3E%3C/svg%3E">
+    
+    <!-- Fonts - Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    </noscript>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Gamification Styles -->
+    <style>
+        /* Tier Card Animations */
+        .tier-locked {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+        }
+        
+        .tier-unlocked {
+            opacity: 1;
+            filter: none;
+        }
+        
+        .tier-unlocked-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            animation: pulse-glow 2s infinite alternate;
+        }
+        
+        .tier-unlock-glow {
+            animation: unlock-glow 1s ease-in-out;
+        }
+        
+        /* Success Pulse Animation */
+        .animate-pulse-success {
+            animation: pulse-success 1s ease-in-out;
+        }
+        
+        /* Slide Animations */
+        .animate-slide-in-right {
+            animation: slide-in-right 0.3s ease-out;
+        }
+        
+        .animate-slide-out-right {
+            animation: slide-out-right 0.3s ease-in;
+        }
+        
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+        }
+        
+        .animate-scale-in {
+            animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Loading Pulse */
+        .loading-pulse {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+        
+        .dark .loading-pulse {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+        }
+        
+        /* Progress Bar Glow */
+        .progress-fill {
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shine 2s infinite;
+            border-radius: inherit;
+        }
+        
+        /* Keyframe Animations */
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+            }
+        }
+        
+        @keyframes unlock-glow {
+            0% {
+                box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(16, 185, 129, 0.8);
+                transform: scale(1.1);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse-success {
+            0% {
+                transform: scale(1);
+                color: #059669;
+            }
+            50% {
+                transform: scale(1.2);
+                color: #10b981;
+                text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            }
+            100% {
+                transform: scale(1);
+                color: #059669;
+            }
+        }
+        
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slide-out-right {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes scale-in {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes loading-shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        @keyframes progress-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* Copy Link Enhanced Feedback */
+        .copy-success {
+            animation: copy-feedback 0.6s ease-out;
+        }
+        
+        @keyframes copy-feedback {
+            0% {
+                background-color: #10b981;
+                transform: scale(1);
+            }
+            50% {
+                background-color: #059669;
+                transform: scale(1.05);
+            }
+            100% {
+                background-color: #10b981;
+                transform: scale(1);
+            }
+        }
+        
+        /* Responsive Enhancements */
+        @media (max-width: 640px) {
+            .tier-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .tier-icon-wrapper {
+                width: 3rem;
+                height: 3rem;
+            }
+            
+            .tier-icon-wrapper svg {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+        }
+        
+        /* Loading States */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+        
+        .dark .loading-skeleton {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+        }
+        
+        /* Enhanced Hover Effects */
+        .tier-card:hover .tier-icon-wrapper {
+            transform: translateY(-2px);
+        }
+        
+        .tier-unlocked:hover .tier-icon-wrapper {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Celebration Animations */
+        .celebration-bounce {
+            animation: celebration-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes celebration-bounce {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3) rotate(5deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        /* Notification Styles */
+        .notification-enter {
+            animation: notification-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .notification-exit {
+            animation: notification-slide-out 0.3s ease-in-out;
+        }
+        
+        @keyframes notification-slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(100%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+        }
+        
+        @keyframes notification-slide-out {
+            from {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%) translateY(-20px);
+            }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">
+    
+    <!-- Noise Texture Overlay -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg z-50 border-b border-gray-100 dark:border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 logo-spin" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444" class="animate-pulse-slow"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b" class="animate-pulse-slow animation-delay-100"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16" class="animate-pulse-slow animation-delay-200"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                        LocalPlate
+                    </span>
+                </a>
+                
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                    </svg>
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50" style="pointer-events: none !important;"></canvas>
+    
+    <!-- Hero Section with Ken Burns Effect -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <!-- Background Image with Ken Burns -->
+        <div class="absolute inset-0 ken-burns-container">
+            <div class="ken-burns-image"></div>
+        </div>
+        
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90 dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/90"></div>
+        
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-2xl mx-auto">
+            
+            <!-- Success Card -->
+                <!-- Success Card -->
+                <div class="form-card text-center animate-fade-in-up">
+                
+                <!-- Success Icon -->
+                <div class="success-icon-wrapper">
+                    <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-success-pulse relative z-10 shadow-2xl hover:shadow-emerald-500/25 transition-all hover:scale-110 group">
+                        <svg class="w-10 h-10 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Heading -->
+                <h1 class="font-serif text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent animate-fade-in-up animation-delay-100 animate-gradient">
+                    You're on the List!
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-4 animate-fade-in-up animation-delay-200">
+                    Welcome to LocalPlate, <span id="user-name" class="font-medium text-gray-900 dark:text-white">friend</span>!
+                </p>
+                
+                <!-- Live Stats Display -->
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 mb-8 animate-fade-in-up animation-delay-300">
+                    <!-- Waitlist Position -->
+                    <div class="hidden bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700" id="position-display">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Your position: </span>
+                        <span id="waitlist-position" class="font-bold text-emerald-600 dark:text-emerald-400">#---</span>
+                    </div>
+                    
+                    <!-- Community Size -->
+                    <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Community: </span>
+                        <span id="community-size" class="font-bold text-emerald-600 dark:text-emerald-400">Loading...</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400"> members</span>
+                    </div>
+                    
+                    <!-- Your Referrals -->
+                    <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-700/50">
+                        <span class="text-sm text-emerald-700 dark:text-emerald-300">Your referrals: </span>
+                        <span id="live-referral-count" class="font-bold text-emerald-600 dark:text-emerald-400 text-lg">0</span>
+                    </div>
+                </div>
+                
+                <!-- Friends Joined Message -->
+                <div id="friends-joined-message" class="hidden text-center text-emerald-600 dark:text-emerald-400 font-medium mb-6 animate-fade-in-up animation-delay-400"></div>
+                
+                <!-- Social Proof -->
+                <div id="social-proof" class="hidden text-center text-gray-600 dark:text-gray-400 text-sm mb-6 animate-fade-in-up animation-delay-500">
+                    <span id="daily-referrals">0</span> friends referred today by our community!
+                </div>
+                <!-- Referral Section -->
+                <div class="form-card mb-8 animate-fade-in-up animation-delay-100 hover:shadow-2xl transition-shadow">
+                    <h2 class="font-serif text-2xl font-bold mb-3 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Move Up the List!</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        Share your unique referral link. Each friend who joins moves you up!
+                    </p>
+                    
+                    <!-- Referral Link -->
+                    <div class="flex items-center space-x-2 mb-4">
+                        <input 
+                            type="text" 
+                            id="referral-link" 
+                            readonly 
+                            value="https://localplate.com/?ref=ABC123"
+                            class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
+                        >
+                        <button 
+                            onclick="copyLink()" 
+                            class="btn-primary group hover:scale-105 transition-all"
+                        >
+                            <span>Copy</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Share Buttons -->
+                    <div class="flex flex-wrap justify-center gap-3" role="group" aria-label="Share your referral link">
+                        <!-- X/Twitter -->
+                        <button
+                            onclick="shareX()"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on X"
+                            title="Share on X"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Facebook -->
+                        <button
+                            onclick="shareFacebook()"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on Facebook"
+                            title="Share on Facebook"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </button>
+
+                        <!-- LinkedIn -->
+                        <button
+                            onclick="shareLinkedIn()"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on LinkedIn"
+                            title="Share on LinkedIn"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Instagram (Copy to Clipboard) -->
+                        <button
+                            onclick="shareInstagram(event)"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Copy link for Instagram"
+                            title="Copy link for Instagram"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Bluesky -->
+                        <button
+                            onclick="shareBluesky()"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on Bluesky"
+                            title="Share on Bluesky"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 2.104.139 3.25.139 5.048.139 5.048s.278 1.518.647 3.646c.647 3.646 1.295 6.545 2.591 8.803 1.297 2.258 4.046 2.258 4.046 2.258S9.176 18.24 12 13.154c2.824 5.086 4.577 6.601 4.577 6.601s2.749 0 4.046-2.258c1.296-2.258 1.944-5.157 2.591-8.803.369-2.128.647-3.646.647-3.646s0-1.798-.763-2.944C22.439 1.266 21.434.944 18.798 2.805 16.046 4.747 13.087 8.686 12 10.8z"/>
+                            </svg>
+                        </button>
+
+                        <!-- WhatsApp -->
+                        <button
+                            onclick="shareWhatsApp()"
+                            class="btn-secondary flex items-center justify-center w-11 h-11 p-0 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on WhatsApp"
+                            title="Share on WhatsApp"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Referral Progress -->
+                <div class="form-card mb-8 animate-fade-in-up animation-delay-200 hover:shadow-2xl transition-shadow">
+                    <h3 class="font-serif text-xl font-bold mb-8 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Your Referral Rewards</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- Tier 1 -->
+                        <div id="tier-1" class="text-center group hover:scale-105 transition-all duration-500 tier-card">
+                            <div class="tier-icon-wrapper w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                </svg>
+                            </div>
+                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">1 Referral</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Early Access Badge</div>
+                            <div class="text-xs font-medium text-gray-500 mb-2" id="referral-1">0/1</div>
+                            
+                            <!-- Progress Bar -->
+                            <div id="progress-bar-1" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                                <div class="progress-fill bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text text-xs text-gray-500">0%</div>
+                        </div>
+                        
+                        <!-- Tier 2 -->
+                        <div id="tier-2" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
+                            <div class="tier-icon-wrapper w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                </svg>
+                            </div>
+                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">3 Referrals</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">One Month Free</div>
+                            <div class="text-xs font-medium text-gray-500 mb-2" id="referral-3">0/3</div>
+                            
+                            <!-- Progress Bar -->
+                            <div id="progress-bar-2" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                                <div class="progress-fill bg-gradient-to-r from-blue-400 to-blue-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text text-xs text-gray-500">0%</div>
+                        </div>
+                        
+                        <!-- Tier 3 -->
+                        <div id="tier-3" class="text-center group hover:scale-105 transition-all duration-500 tier-card tier-locked">
+                            <div class="tier-icon-wrapper w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:shadow-lg transition-all duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                            </div>
+                            <div class="tier-title font-bold text-gray-600 dark:text-gray-400 mb-1">5 Referrals</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Swag Pack</div>
+                            <div class="text-xs font-medium text-gray-500 mb-2" id="referral-5">0/5</div>
+                            
+                            <!-- Progress Bar -->
+                            <div id="progress-bar-3" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                                <div class="progress-fill bg-gradient-to-r from-purple-400 to-purple-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text text-xs text-gray-500">0%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- What's Next -->
+                <div class="form-card mt-8 animate-fade-in-up animation-delay-300 hover:shadow-2xl transition-shadow">
+                    <h3 class="font-serif text-xl font-bold mb-6 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">What Happens Next?</h3>
+                    <div class="text-left space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <div class="flex items-start space-x-3">
+                            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Check your email for confirmation and updates</span>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>We'll notify you when early access opens</span>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Share to move up and get rewards!</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Back to Home -->
+                <div class="mt-8">
+                    <a href="index.html" class="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-all hover:scale-105 group">
+                        <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span>Back to Home</span>
+                    </a>
+                </div>
+            </div>
+            
+                <!-- Follow Us -->
+                <div class="text-center mt-8 animate-fade-in-up animation-delay-200">
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Follow us for updates</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8 sm:py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 order-1 md:order-none">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate-footer)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate-footer" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-lg font-semibold text-gray-900 dark:text-white">LocalPlate</span>
+                </div>
+                
+                <!-- Links -->
+                <div class="flex flex-wrap justify-center gap-4 sm:gap-6 order-2 md:order-none">
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Privacy</a>
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Terms</a>
+                    <a href="#" class="text-base sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-1 min-h-[44px] flex items-center">Contact</a>
+                </div>
+                
+                <!-- Copyright -->
+                <p class="text-sm text-gray-500 dark:text-gray-500 text-center md:text-left order-3 md:order-none">
+                    © 2025 LocalPlate. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Copy Toast -->
+    <div id="copy-toast" class="hidden fixed bottom-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg animate-slide-up">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span>Link copied to clipboard!</span>
+        </div>
+    </div>
+    
+    <script>
+        // Real-time gamification system
+        class ReferralGamificationSystem {
+            constructor() {
+                this.userEmail = null;
+                this.userReferralCode = null;
+                this.userReferralCount = 0;
+                this.userWaitlistPosition = null;
+                this.totalCommunitySize = 0;
+                this.supabaseClient = null;
+                this.realTimeSubscription = null;
+                
+                // Tier definitions
+                this.tiers = [
+                    {
+                        id: 1,
+                        referralsRequired: 1,
+                        title: 'Early Access Badge',
+                        icon: 'badge',
+                        reward: 'Jump ahead in line',
+                        color: 'emerald'
+                    },
+                    {
+                        id: 2,
+                        referralsRequired: 3,
+                        title: 'One Month Free',
+                        icon: 'gift',
+                        reward: 'Free premium subscription',
+                        color: 'blue'
+                    },
+                    {
+                        id: 3,
+                        referralsRequired: 5,
+                        title: 'Swag Pack',
+                        icon: 'star',
+                        reward: 'Exclusive merchandise',
+                        color: 'purple'
+                    }
+                ];
+            }
+            
+            async init() {
+                try {
+                    // Initialize Supabase client
+                    this.supabaseClient = window.getSupabaseClient();
+                    
+                    // Get user data from session
+                    this.userEmail = sessionStorage.getItem('waitlist_email');
+                    this.userReferralCode = sessionStorage.getItem('waitlist_referral_code');
+                    
+                    if (!this.userEmail || !this.userReferralCode) {
+                        throw new Error('User data not found');
+                    }
+                    
+                    // Load initial data
+                    await this.loadUserStats();
+                    await this.loadCommunityStats();
+                    
+                    // Set up real-time subscriptions
+                    this.setupRealTimeUpdates();
+                    
+                    // Start periodic updates for community stats
+                    this.startPeriodicUpdates();
+                    
+                    console.log('[GAMIFICATION] System initialized successfully');
+                } catch (error) {
+                    console.error('[GAMIFICATION] Initialization failed:', error);
+                    this.showError('Failed to load referral data. Some features may not work.');
+                }
+            }
+            
+            async loadUserStats() {
+                try {
+                    // Get user's referral count and position
+                    const { data, error } = await this.supabaseClient
+                        .rpc('get_user_referral_stats', { 
+                            user_referral_code: this.userReferralCode 
+                        });
+                    
+                    if (error) {
+                        console.error('Failed to load user stats:', error);
+                        return;
+                    }
+                    
+                    if (data) {
+                        this.userReferralCount = data.referral_count || 0;
+                        this.userWaitlistPosition = data.waitlist_position || null;
+                        
+                        this.updateReferralDisplay();
+                        this.updateTierProgress();
+                        this.updateWaitlistPosition();
+                    }
+                } catch (error) {
+                    console.error('Error loading user stats:', error);
+                }
+            }
+            
+            async loadCommunityStats() {
+                try {
+                    // Get total community size and daily referrals
+                    const { data, error } = await this.supabaseClient
+                        .rpc('get_community_stats');
+                    
+                    if (error) {
+                        console.error('Failed to load community stats:', error);
+                        return;
+                    }
+                    
+                    if (data) {
+                        this.totalCommunitySize = data.total_members || 0;
+                        this.dailyReferrals = data.daily_referrals || 0;
+                        
+                        this.updateCommunityDisplay();
+                    }
+                } catch (error) {
+                    console.error('Error loading community stats:', error);
+                }
+            }
+            
+            setupRealTimeUpdates() {
+                try {
+                    // Subscribe to referral updates for this user
+                    this.realTimeSubscription = this.supabaseClient
+                        .channel('referral-updates')
+                        .on(
+                            'postgres_changes',
+                            {
+                                event: 'INSERT',
+                                schema: 'public',
+                                table: 'waitlist',
+                                filter: `referred_by=eq.${this.userReferralCode}`
+                            },
+                            (payload) => {
+                                console.log('[REAL-TIME] New referral detected:', payload);
+                                this.handleNewReferral(payload.new);
+                            }
+                        )
+                        .subscribe();
+                    
+                    console.log('[REAL-TIME] Subscription active');
+                } catch (error) {
+                    console.error('Failed to setup real-time updates:', error);
+                }
+            }
+            
+            handleNewReferral(newReferral) {
+                // Increment user's referral count
+                this.userReferralCount++;
+                
+                // Update displays with animation
+                this.animateCounterUpdate();
+                this.updateTierProgress();
+                
+                // Check if user unlocked a new tier
+                this.checkTierUnlock();
+                
+                // Show celebration
+                this.showReferralCelebration(newReferral.email);
+            }
+            
+            checkTierUnlock() {
+                const newlyUnlockedTiers = this.tiers.filter(tier => 
+                    tier.referralsRequired === this.userReferralCount
+                );
+                
+                newlyUnlockedTiers.forEach(tier => {
+                    this.showTierUnlockCelebration(tier);
+                });
+            }
+            
+            updateReferralDisplay() {
+                const countElement = document.getElementById('live-referral-count');
+                if (countElement) {
+                    countElement.textContent = this.userReferralCount;
+                }
+                
+                // Update friends joined message
+                const friendsMessage = document.getElementById('friends-joined-message');
+                if (friendsMessage && this.userReferralCount > 0) {
+                    friendsMessage.textContent = `${this.userReferralCount} friend${this.userReferralCount !== 1 ? 's' : ''} joined through your link!`;
+                    friendsMessage.classList.remove('hidden');
+                }
+            }
+            
+            updateTierProgress() {
+                this.tiers.forEach(tier => {
+                    const progress = Math.min(this.userReferralCount / tier.referralsRequired, 1);
+                    const isUnlocked = this.userReferralCount >= tier.referralsRequired;
+                    
+                    // Update tier display
+                    this.updateTierCard(tier.id, progress, isUnlocked);
+                    
+                    // Update progress bar
+                    this.updateProgressBar(tier.id, progress);
+                    
+                    // Update tier count
+                    this.updateTierCount(tier.id, this.userReferralCount, tier.referralsRequired);
+                });
+            }
+            
+            updateTierCard(tierId, progress, isUnlocked) {
+                const tierElement = document.getElementById(`tier-${tierId}`);
+                if (!tierElement) return;
+                
+                const iconWrapper = tierElement.querySelector('.tier-icon-wrapper');
+                const titleElement = tierElement.querySelector('.tier-title');
+                
+                if (isUnlocked) {
+                    // Tier is unlocked
+                    tierElement.classList.remove('tier-locked');
+                    tierElement.classList.add('tier-unlocked');
+                    
+                    if (iconWrapper) {
+                        iconWrapper.className = `tier-icon-wrapper w-16 h-16 bg-gradient-to-br from-${this.tiers[tierId-1].color}-400 to-${this.tiers[tierId-1].color}-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg tier-unlocked-glow`;
+                    }
+                    
+                    if (titleElement) {
+                        titleElement.className = `font-bold text-${this.tiers[tierId-1].color}-600 dark:text-${this.tiers[tierId-1].color}-400 mb-1`;
+                    }
+                } else {
+                    // Tier is locked
+                    tierElement.classList.add('tier-locked');
+                    tierElement.classList.remove('tier-unlocked');
+                    
+                    if (iconWrapper) {
+                        iconWrapper.className = 'tier-icon-wrapper w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3';
+                    }
+                    
+                    if (titleElement) {
+                        titleElement.className = 'font-bold text-gray-600 dark:text-gray-400 mb-1';
+                    }
+                }
+            }
+            
+            updateProgressBar(tierId, progress) {
+                const progressBar = document.getElementById(`progress-bar-${tierId}`);
+                if (progressBar) {
+                    const progressFill = progressBar.querySelector('.progress-fill');
+                    if (progressFill) {
+                        const percentage = Math.round(progress * 100);
+                        progressFill.style.width = `${percentage}%`;
+                        progressFill.style.transition = 'width 0.8s ease-out';
+                    }
+                    
+                    const progressText = progressBar.querySelector('.progress-text');
+                    if (progressText) {
+                        progressText.textContent = `${Math.round(progress * 100)}%`;
+                    }
+                }
+            }
+            
+            updateTierCount(tierId, current, required) {
+                const countElement = document.getElementById(`referral-${required}`);
+                if (countElement) {
+                    countElement.textContent = `${current}/${required}`;
+                }
+            }
+            
+            updateWaitlistPosition() {
+                const positionElement = document.getElementById('waitlist-position');
+                if (positionElement && this.userWaitlistPosition) {
+                    positionElement.textContent = `#${this.userWaitlistPosition.toLocaleString()}`;
+                    positionElement.parentElement.classList.remove('hidden');
+                }
+            }
+            
+            updateCommunityDisplay() {
+                const communitySizeElement = document.getElementById('community-size');
+                if (communitySizeElement) {
+                    communitySizeElement.textContent = this.totalCommunitySize.toLocaleString();
+                }
+                
+                const dailyReferralsElement = document.getElementById('daily-referrals');
+                if (dailyReferralsElement && this.dailyReferrals) {
+                    dailyReferralsElement.textContent = this.dailyReferrals;
+                    dailyReferralsElement.parentElement.classList.remove('hidden');
+                }
+            }
+            
+            animateCounterUpdate() {
+                const countElement = document.getElementById('live-referral-count');
+                if (countElement) {
+                    // Add pulse animation
+                    countElement.classList.add('animate-pulse-success');
+                    setTimeout(() => {
+                        countElement.classList.remove('animate-pulse-success');
+                    }, 1000);
+                }
+            }
+            
+            showReferralCelebration(referralEmail) {
+                // Create celebration notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 animate-slide-in-right';
+                notification.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <div class="font-bold">New referral!</div>
+                            <div class="text-sm opacity-90">Someone just joined through your link</div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.add('animate-slide-out-right');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+                
+                // Trigger confetti
+                this.launchMiniConfetti();
+            }
+            
+            showTierUnlockCelebration(tier) {
+                // Create tier unlock modal/celebration
+                const celebration = document.createElement('div');
+                celebration.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in';
+                celebration.innerHTML = `
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 text-center animate-scale-in">
+                        <div class="w-20 h-20 bg-gradient-to-br from-${tier.color}-400 to-${tier.color}-500 rounded-full flex items-center justify-center mx-auto mb-4 tier-unlock-glow">
+                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Tier Unlocked!</h3>
+                        <h4 class="text-xl font-semibold text-${tier.color}-600 dark:text-${tier.color}-400 mb-2">${tier.title}</h4>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">${tier.reward}</p>
+                        <button onclick="this.parentElement.parentElement.remove()" class="bg-${tier.color}-600 hover:bg-${tier.color}-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                            Awesome!
+                        </button>
+                    </div>
+                `;
+                
+                document.body.appendChild(celebration);
+                
+                // Launch celebration confetti
+                this.launchCelebrationConfetti();
+            }
+            
+            launchMiniConfetti() {
+                // Mini confetti burst for referral notifications
+                this.createConfetti(50, 1500);
+            }
+            
+            launchCelebrationConfetti() {
+                // Big confetti burst for tier unlocks
+                this.createConfetti(200, 3000);
+            }
+            
+            createConfetti(particleCount, duration) {
+                const canvas = document.getElementById('confetti-canvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                
+                const confetti = [];
+                const colors = ['#10b981', '#059669', '#0d9488', '#0891b2', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
+                
+                for (let i = 0; i < particleCount; i++) {
+                    confetti.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        w: Math.random() * 12 + 4,
+                        h: Math.random() * 8 + 2,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: Math.random() * 4 + 3,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        angle: Math.random() * 360,
+                        rotationSpeed: (Math.random() - 0.5) * 10,
+                        opacity: Math.random() * 0.8 + 0.2,
+                        shape: Math.random() > 0.5 ? 'rect' : 'circle'
+                    });
+                }
+                
+                const startTime = Date.now();
+                
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    if (elapsed > duration) return;
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    confetti.forEach((c, index) => {
+                        c.y += c.vy;
+                        c.x += c.vx;
+                        c.angle += c.rotationSpeed;
+                        c.vy += 0.2; // gravity
+                        
+                        ctx.save();
+                        ctx.globalAlpha = c.opacity;
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.angle * Math.PI / 180);
+                        ctx.fillStyle = c.color;
+                        
+                        if (c.shape === 'circle') {
+                            ctx.beginPath();
+                            ctx.arc(0, 0, c.w / 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                        }
+                        
+                        ctx.restore();
+                        
+                        if (c.y > canvas.height + 100) {
+                            confetti.splice(index, 1);
+                        }
+                    });
+                    
+                    if (confetti.length > 0) {
+                        requestAnimationFrame(animate);
+                    }
+                }
+                
+                animate();
+            }
+            
+            startPeriodicUpdates() {
+                // Update community stats every 30 seconds
+                setInterval(async () => {
+                    await this.loadCommunityStats();
+                }, 30000);
+                
+                // Update user stats every 60 seconds
+                setInterval(async () => {
+                    await this.loadUserStats();
+                }, 60000);
+            }
+            
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-20 left-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+                errorDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(errorDiv);
+                
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+            
+            destroy() {
+                if (this.realTimeSubscription) {
+                    this.realTimeSubscription.unsubscribe();
+                }
+            }
+        }
+
+        // CRITICAL: Guard against false positives - verify user actually submitted form
+        (function validateSuccessPage() {
+            const email = sessionStorage.getItem('waitlist_email');
+            const referralCode = sessionStorage.getItem('waitlist_referral_code');
+            const timestamp = sessionStorage.getItem('waitlist_timestamp');
+            
+            // Check if required data exists
+            if (!email || !referralCode || !timestamp) {
+                console.error('[SUCCESS GUARD] Missing required session data', {
+                    hasEmail: !!email,
+                    hasReferralCode: !!referralCode,
+                    hasTimestamp: !!timestamp
+                });
+                // Store error for debugging
+                localStorage.setItem('localplate:successError', JSON.stringify({
+                    at: Date.now(),
+                    error: 'Missing session data',
+                    hasEmail: !!email,
+                    hasReferralCode: !!referralCode,
+                    hasTimestamp: !!timestamp
+                }));
+                // Redirect to home
+                window.location.replace('index.html');
+                return;
+            }
+            
+            // Validate timestamp is recent (within 60 seconds)
+            const submittedAt = parseInt(timestamp, 10);
+            const now = Date.now();
+            const ageMs = now - submittedAt;
+            
+            if (isNaN(submittedAt) || ageMs > 60000 || ageMs < 0) {
+                console.error('[SUCCESS GUARD] Invalid or expired timestamp', {
+                    timestamp,
+                    ageMs,
+                    maxAge: 60000
+                });
+                // Store error for debugging
+                localStorage.setItem('localplate:successError', JSON.stringify({
+                    at: now,
+                    error: 'Expired or invalid timestamp',
+                    ageMs,
+                    timestamp
+                }));
+                // Clear stale data
+                sessionStorage.removeItem('waitlist_email');
+                sessionStorage.removeItem('waitlist_referral_code');
+                sessionStorage.removeItem('waitlist_timestamp');
+                sessionStorage.removeItem('waitlist_inserted_id');
+                // Redirect to home
+                window.location.replace('index.html');
+                return;
+            }
+            
+            console.log('[SUCCESS GUARD] Validation passed', {
+                email,
+                referralCode,
+                ageMs: ageMs + 'ms'
+            });
+        })();
+        
+        // Debug mode check
+        const DEBUG = new URLSearchParams(location.search).has('debug');
+        
+        // Initialize Supabase client when needed
+        window.getSupabaseClient = function() {
+            if (DEBUG) console.log('[getSupabaseClient] called');
+            
+            try {
+                // Check if supabase library is loaded
+                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    throw new Error('Supabase library not loaded. Please check your internet connection and try refreshing the page.');
+                }
+                
+                // Assert config is loaded
+                if (!window.LOCALPLATE_CONFIG) {
+                    throw new Error('Configuration not loaded. Please refresh the page and try again.');
+                }
+                
+                // Get configuration from config.js
+                const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+                const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+                
+                // Validate credentials
+                if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || !SUPABASE_URL) {
+                    throw new Error('Supabase URL not configured properly');
+                }
+                if (SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' || !SUPABASE_ANON_KEY) {
+                    throw new Error('Supabase API key not configured properly');
+                }
+                
+                // Validate URL format
+                if (!SUPABASE_URL.startsWith('https://') || !SUPABASE_URL.includes('supabase.co')) {
+                    throw new Error('Invalid Supabase URL format');
+                }
+                
+                if (DEBUG) console.log('[getSupabaseClient] Creating client...');
+                
+                // Create client
+                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                if (!client) {
+                    throw new Error('Failed to create Supabase client');
+                }
+                
+                if (DEBUG) console.log('[getSupabaseClient] Client created successfully');
+                return client;
+                
+            } catch (error) {
+                console.error('Failed to initialize Supabase client:', error.message);
+                throw new Error(`Database connection failed: ${error.message}`);
+            }
+        }
+        
+        // Get user data from session storage (already validated above)
+        const email = sessionStorage.getItem('waitlist_email');
+        const referralCode = sessionStorage.getItem('waitlist_referral_code');
+        
+        // Position handling - disable fake positions in debug mode
+        let position;
+        if (DEBUG) {
+            position = sessionStorage.getItem('waitlist_position') || 'UNKNOWN';
+            if (position === 'UNKNOWN') {
+                console.warn('[DEBUG] No real position found - fake position disabled');
+            }
+        } else {
+            position = sessionStorage.getItem('waitlist_position') || Math.floor(Math.random() * 500) + 1000;
+        }
+        
+        // Update page with user data
+        if (email) {
+            const v = sessionStorage.getItem('waitlist_first_name');
+            console.log('[success] read first_name:', v, 'at', performance.now(), 'on', location.origin);
+            console.log('[success] all sessionStorage keys:', Object.keys(sessionStorage));
+            const firstName = v || 'friend';
+            document.addEventListener('DOMContentLoaded', () => {
+                const el = document.getElementById('user-name');
+                if (el) {
+                    el.textContent = firstName;
+                    console.log('[success] set user-name to:', firstName);
+                }
+            });
+        }
+        
+        if (referralCode) {
+            const referralLink = `${window.location.origin}/?ref=${referralCode}`;
+            document.getElementById('referral-link').value = referralLink;
+        }
+        // Confetti animation
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const confetti = [];
+            const colors = ['#10b981', '#059669', '#0d9488', '#0891b2', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
+            
+            for (let i = 0; i < 200; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 12 + 4,
+                    h: Math.random() * 8 + 2,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    angle: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 8,
+                    opacity: Math.random() * 0.8 + 0.2,
+                    shape: Math.random() > 0.5 ? 'rect' : 'circle'
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                confetti.forEach((c, index) => {
+                    c.y += c.vy;
+                    c.x += c.vx;
+                    c.angle += c.rotationSpeed;
+                    c.vy += 0.1; // gravity
+                    
+                    ctx.save();
+                    ctx.globalAlpha = c.opacity;
+                    ctx.translate(c.x, c.y);
+                    ctx.rotate(c.angle * Math.PI / 180);
+                    ctx.fillStyle = c.color;
+                    
+                    if (c.shape === 'circle') {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, c.w / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                    }
+                    
+                    ctx.restore();
+                    
+                    if (c.y > canvas.height + 100) {
+                        confetti.splice(index, 1);
+                    }
+                });
+                
+                if (confetti.length > 0) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            
+            animate();
+        }
+        
+        // Launch confetti on load
+        setTimeout(launchConfetti, 500);
+        
+        // Enhanced copy link function with better feedback
+        function copyLink() {
+            const input = document.getElementById('referral-link');
+            const button = event.target;
+            
+            // Modern clipboard API with fallback
+            const copyText = async () => {
+                if (navigator.clipboard) {
+                    try {
+                        await navigator.clipboard.writeText(input.value);
+                        return true;
+                    } catch (err) {
+                        console.warn('Clipboard API failed, falling back to execCommand');
+                    }
+                }
+                
+                // Fallback for older browsers
+                input.select();
+                input.setSelectionRange(0, 99999); // For mobile devices
+                return document.execCommand('copy');
+            };
+            
+            copyText().then(success => {
+                if (success) {
+                    // Button feedback
+                    const originalText = button.innerHTML;
+                    button.innerHTML = `
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Copied!
+                    `;
+                    button.classList.add('copy-success');
+                    
+                    // Show toast
+                    const toast = document.getElementById('copy-toast');
+                    toast.classList.remove('hidden');
+                    
+                    // Reset after delay
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('copy-success');
+                        toast.classList.add('hidden');
+                    }, 3000);
+                    
+                    // Track copy event
+                    if (window.gamificationSystem) {
+                        console.log('[GAMIFICATION] Referral link copied');
+                    }
+                } else {
+                    // Show error feedback
+                    console.error('Failed to copy to clipboard');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded-lg z-50';
+                    errorDiv.textContent = 'Failed to copy link';
+                    document.body.appendChild(errorDiv);
+                    setTimeout(() => errorDiv.remove(), 3000);
+                }
+            });
+        }
+        
+        // Share functions for all 6 platforms
+        function shareX() {
+            const url = document.getElementById('referral-link').value;
+            const text = "I just joined the @LocalPlate waitlist! Get verified nutrition data from your favorite local restaurants. Join me:";
+            window.open(`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareFacebook() {
+            const url = document.getElementById('referral-link').value;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareLinkedIn() {
+            const url = document.getElementById('referral-link').value;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        }
+        
+        function shareInstagram(event) {
+            // Instagram doesn't have direct URL sharing, so copy to clipboard
+            const url = document.getElementById('referral-link').value;
+            navigator.clipboard.writeText(url).then(() => {
+                // Show success feedback
+                const button = event.target.closest('button');
+                const originalTitle = button.title;
+                button.title = "Copied! Paste in Instagram";
+                setTimeout(() => {
+                    button.title = originalTitle;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+        
+        function shareBluesky() {
+            const url = document.getElementById('referral-link').value;
+            const text = "I just joined the LocalPlate waitlist! Get verified nutrition data from your favorite local restaurants. Join me:";
+            window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+        }
+        
+        function shareWhatsApp() {
+            const url = document.getElementById('referral-link').value;
+            const text = "I just joined the LocalPlate waitlist! Get verified nutrition data from your favorite local restaurants. Join me:";
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+        }
+        
+        // Dark mode toggle functionality - Enhanced version matching waitlist.js
+        function initDarkMode() {
+            try {
+                const themeToggle = document.getElementById('theme-toggle');
+                const html = document.documentElement;
+                
+                if (!themeToggle) {
+                    console.warn('[DarkMode] Theme toggle button not found');
+                    return;
+                }
+                
+                // Check for saved theme or system preference - improved logic
+                const savedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+                
+                // Apply initial theme
+                if (currentTheme === 'dark') {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+                
+                // Add click event listener with error handling
+                themeToggle.addEventListener('click', () => {
+                    try {
+                        if (html.classList.contains('dark')) {
+                            html.classList.remove('dark');
+                            localStorage.setItem('theme', 'light');
+                            console.log('[DarkMode] Switched to light mode');
+                        } else {
+                            html.classList.add('dark');
+                            localStorage.setItem('theme', 'dark');
+                            console.log('[DarkMode] Switched to dark mode');
+                        }
+                    } catch (error) {
+                        console.error('[DarkMode] Error toggling theme:', error);
+                    }
+                });
+                
+                console.log('[DarkMode] Initialized successfully with theme:', currentTheme);
+                
+            } catch (error) {
+                console.error('[DarkMode] Initialization failed:', error);
+                // Fallback: try to at least set up basic theme detection
+                try {
+                    const html = document.documentElement;
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'dark') {
+                        html.classList.add('dark');
+                    }
+                } catch (fallbackError) {
+                    console.error('[DarkMode] Fallback initialization failed:', fallbackError);
+                }
+            }
+        }
+        
+        // Initialize dark mode early to prevent FOUC
+        initDarkMode();
+        
+        // Additional initialization after DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure dark mode is still properly initialized after DOM is ready
+            // This handles edge cases where the initial call might have failed
+            if (!document.getElementById('theme-toggle')?.onclick) {
+                console.log('[DarkMode] Re-initializing after DOM ready');
+                initDarkMode();
+            }
+        });
+        
+        // Debug function for testing dark mode functionality
+        window.testDarkMode = function() {
+            console.log('=== DARK MODE DEBUG TEST ===');
+            
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const currentTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const hasDarkClass = html.classList.contains('dark');
+            
+            console.log('Theme toggle button:', themeToggle ? '✓ Found' : '✗ Missing');
+            console.log('Current theme setting:', currentTheme || 'None (using system preference)');
+            console.log('System prefers dark:', systemPrefersDark);
+            console.log('HTML has dark class:', hasDarkClass);
+            console.log('Event listeners attached:', !!themeToggle?.onclick || themeToggle?.addEventListener ? '✓ Yes' : '✗ No');
+            
+            // Test toggle functionality
+            if (themeToggle) {
+                console.log('Testing toggle...');
+                const beforeToggle = html.classList.contains('dark');
+                themeToggle.click();
+                const afterToggle = html.classList.contains('dark');
+                console.log('Toggle test:', beforeToggle !== afterToggle ? '✓ Working' : '✗ Failed');
+                
+                // Restore original state
+                themeToggle.click();
+                console.log('State restored');
+            }
+            
+            console.log('=== TEST COMPLETE ===');
+        };
+        
+        // Initialize gamification system
+        window.gamificationSystem = new ReferralGamificationSystem();
+        
+        // Start gamification system after page is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[GAMIFICATION] Starting initialization...');
+            
+            try {
+                // Add loading states while initializing
+                const loadingElements = document.querySelectorAll('#community-size, #live-referral-count');
+                loadingElements.forEach(el => {
+                    if (el) {
+                        el.classList.add('loading-pulse');
+                        el.textContent = 'Loading...';
+                    }
+                });
+                
+                // Initialize the system
+                await window.gamificationSystem.init();
+                
+                // Remove loading states
+                loadingElements.forEach(el => {
+                    if (el) {
+                        el.classList.remove('loading-pulse');
+                    }
+                });
+                
+                console.log('[GAMIFICATION] System ready!');
+            } catch (error) {
+                console.error('[GAMIFICATION] Failed to initialize:', error);
+                
+                // Remove loading states and show fallback
+                const loadingElements = document.querySelectorAll('#community-size, #live-referral-count');
+                loadingElements.forEach(el => {
+                    if (el) {
+                        el.classList.remove('loading-pulse');
+                        if (el.id === 'community-size') el.textContent = '1000+';
+                        if (el.id === 'live-referral-count') el.textContent = '0';
+                    }
+                });
+                
+                // Hide social proof if data loading failed
+                const socialProof = document.getElementById('social-proof');
+                if (socialProof) socialProof.classList.add('hidden');
+            }
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (window.gamificationSystem) {
+                window.gamificationSystem.destroy();
+            }
+        });
+    </script>
+</body>
+</html>

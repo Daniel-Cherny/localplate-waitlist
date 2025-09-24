@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPlate Flyer - Eat Out With Confidence</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+            --emerald-700: #047857;
+            --amber-500: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: 8.5in 11in;
+            margin: 0.5in;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: white;
+            color: var(--gray-900);
+            line-height: 1.4;
+            width: 8.5in;
+            height: 11in;
+            padding: 0.5in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flyer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            width: 3rem;
+            height: 3rem;
+            margin-right: 0.75rem;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--gray-50);
+            color: var(--emerald-700);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 2px solid var(--emerald-500);
+        }
+
+        .trust-badge svg {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .main-headline {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .headline-part1 {
+            color: var(--gray-900);
+        }
+
+        .headline-part2 {
+            background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subheadline {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 1rem;
+            border: 1px solid var(--gray-100);
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+        }
+
+        .feature-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: white;
+        }
+
+        .feature h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+
+        .feature p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            line-height: 1.3;
+        }
+
+        /* Restaurant Partners */
+        .partners {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--gray-50);
+            border-radius: 1rem;
+        }
+
+        .partners h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gray-900);
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .restaurant-logo {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+            color: white;
+            border-radius: 1rem;
+        }
+
+        .qr-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .qr-text {
+            flex: 1;
+        }
+
+        .qr-text h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-text p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Tear-off Tabs */
+        .tear-tabs {
+            border-top: 2px dashed var(--gray-300);
+            padding-top: 1rem;
+            margin-top: auto;
+        }
+
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.25rem;
+        }
+
+        .tab {
+            text-align: center;
+            padding: 0.75rem 0.25rem;
+            border: 1px dashed var(--gray-300);
+            background: var(--gray-50);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            transform: rotate(90deg);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .tab-qr {
+            width: 1rem;
+            height: 1rem;
+            background: var(--gray-800);
+            margin: 0.25rem auto;
+            border-radius: 0.125rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .qr-section {
+                background: var(--emerald-500) !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flyer-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <svg class="logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="20" fill="url(#gradient-plate)"/>
+                    <circle cx="14" cy="20" r="3" fill="#ef4444"/>
+                    <circle cx="24" cy="18" r="3" fill="#f59e0b"/>
+                    <circle cx="34" cy="20" r="3" fill="#84cc16"/>
+                    <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                    <defs>
+                        <linearGradient id="gradient-plate" x1="0" y1="0" x2="48" y2="48">
+                            <stop stop-color="#10b981"/>
+                            <stop offset="1" stop-color="#059669"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">LocalPlate</span>
+            </div>
+
+            <div class="trust-badge">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Verified by Registered Dietitians
+            </div>
+
+            <h1 class="main-headline">
+                <div class="headline-part1">Eat Out With</div>
+                <div class="headline-part2">Confidence</div>
+            </h1>
+
+            <p class="subheadline">
+                Track nutrition from your favorite local restaurants.<br>
+                Real data, real food, real results.
+            </p>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <h3>Verified Data</h3>
+                <p>Every meal verified by registered dietitians for accuracy you can trust.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h3>Local Focus</h3>
+                <p>Support neighborhood restaurants while tracking your nutrition.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <h3>Track Progress</h3>
+                <p>Set goals and watch your nutrition journey unfold with detailed insights.</p>
+            </div>
+        </div>
+
+        <!-- Restaurant Partners -->
+        <div class="partners">
+            <h3>Trusted by Local Favorites</h3>
+            <div class="restaurant-grid">
+                <div class="restaurant-logo">Souvla</div>
+                <div class="restaurant-logo">Mixt</div>
+                <div class="restaurant-logo">Gott's</div>
+                <div class="restaurant-logo">Asian Box</div>
+                <div class="restaurant-logo">Koja Kitchen</div>
+            </div>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="qr-section">
+            <div class="qr-container">
+                <div class="qr-text">
+                    <h3>Join the Waitlist</h3>
+                    <p>Get early access to nutrition data from San Francisco restaurants</p>
+                </div>
+                <div class="qr-code">
+                    <div>
+                        <strong>QR CODE</strong><br>
+                        <small>Replace with your<br>waitlist URL QR</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tear-off Tabs -->
+        <div class="tear-tabs">
+            <div class="tabs-grid">
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+                <div class="tab">
+                    <div class="tab-qr"></div>
+                    LocalPlate Early Access
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

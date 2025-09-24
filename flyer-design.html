@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPlate Flyer Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .flyer-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><rect fill="%23333" width="800" height="800"/><text x="400" y="400" font-family="Arial" font-size="24" fill="%23666" text-anchor="middle">Food Background Image</text></svg>') center/cover;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Subtle gradient overlay to ensure text readability */
+        .flyer-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+
+        /* Phone mockup in center */
+        .phone-mockup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px;
+            height: 480px;
+            background: #000;
+            border-radius: 35px;
+            padding: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle gradient on phone screen */
+        .phone-screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            opacity: 0.05;
+        }
+
+        .logo {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: #10b981;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .qr-code {
+            width: 140px;
+            height: 140px;
+            background:
+                repeating-linear-gradient(
+                    45deg,
+                    #000,
+                    #000 3px,
+                    #fff 3px,
+                    #fff 6px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    #000,
+                    #000 3px,
+                    #fff 3px,
+                    #fff 6px
+                );
+            background-blend-mode: multiply;
+            border-radius: 8px;
+        }
+
+        /* Minimal bottom text */
+        .bottom-text {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+        }
+
+        .website {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        /* Corner badge (optional) */
+        .badge {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Version without badge - cleaner */
+        .no-badge .badge {
+            display: none;
+        }
+
+        /* Alternative: Just QR on phone */
+        .minimal .phone-screen {
+            padding: 30px;
+        }
+
+        .minimal .logo,
+        .minimal .tagline {
+            display: none;
+        }
+
+        .minimal .qr-container {
+            transform: scale(1.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .phone-mockup {
+                width: 200px;
+                height: 400px;
+            }
+
+            .qr-code {
+                width: 100px;
+                height: 100px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Version 1: With logo and text -->
+    <div class="flyer-container">
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="logo">Local<span>Plate</span></div>
+                <div class="tagline">Scan to Join</div>
+                <div class="qr-container">
+                    <div class="qr-code"></div>
+                </div>
+            </div>
+        </div>
+        <div class="badge">Join Waitlist</div>
+        <div class="bottom-text">
+            <div class="website">localplate.com</div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between versions
+        let currentVersion = 1;
+        const container = document.querySelector('.flyer-container');
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === '1') {
+                container.classList.remove('minimal', 'no-badge');
+            } else if (e.key === '2') {
+                container.classList.add('no-badge');
+                container.classList.remove('minimal');
+            } else if (e.key === '3') {
+                container.classList.add('minimal', 'no-badge');
+            }
+        });
+
+        // Add instructions
+        const instructions = document.createElement('div');
+        instructions.style.cssText = 'position: fixed; top: 20px; left: 20px; color: #666; font-size: 12px;';
+        instructions.innerHTML = 'Press 1: Full | 2: No Badge | 3: Minimal';
+        document.body.appendChild(instructions);
+    </script>
+</body>
+</html>

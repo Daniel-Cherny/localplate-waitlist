@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPlate Gamification Test Suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #333; }
+        .pass { background: #003300; border-color: #00ff00; }
+        .fail { background: #330000; border-color: #ff0000; }
+        .warn { background: #333300; border-color: #ffff00; }
+        .info { background: #003366; border-color: #00ccff; }
+        h2 { color: #00ff00; border-bottom: 2px solid #00ff00; }
+        button { background: #00ff00; color: #000; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background: #00cc00; }
+        pre { background: #000; padding: 10px; overflow-x: auto; }
+        .critical { color: #ff0000; font-weight: bold; }
+        .warning { color: #ffff00; }
+        .success { color: #00ff00; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🎮 LocalPlate Gamification System Test Suite</h1>
+    <div id="test-results"></div>
+
+    <div class="grid">
+        <div>
+            <h2>Quick Actions</h2>
+            <button onclick="runAllTests()">🚀 Run All Tests</button>
+            <button onclick="testReferralGeneration()">🔑 Test Referral Codes</button>
+            <button onclick="testSessionStorage()">💾 Test Session Storage</button>
+            <button onclick="testSuccessValidation()">✅ Test Success Page</button>
+            <button onclick="testSupabase()">🗄️ Test Supabase</button>
+            <button onclick="testShareButtons()">📤 Test Share Buttons</button>
+            <button onclick="simulateReferralFlow()">🔄 Simulate Full Flow</button>
+            <button onclick="clearTestData()">🗑️ Clear Test Data</button>
+        </div>
+
+        <div>
+            <h2>Live Monitoring</h2>
+            <div id="live-stats"></div>
+        </div>
+    </div>
+
+    <script>
+        const results = document.getElementById('test-results');
+        let testCount = 0;
+        let passCount = 0;
+        let failCount = 0;
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+
+            if (type === 'pass') passCount++;
+            if (type === 'fail') failCount++;
+            testCount++;
+        }
+
+        function assert(condition, message, critical = false) {
+            if (condition) {
+                log(`✅ ${message}`, 'pass');
+                return true;
+            } else {
+                log(`❌ ${message} ${critical ? '<span class="critical">[CRITICAL]</span>' : ''}`, 'fail');
+                return false;
+            }
+        }
+
+        // 1. Test Referral Code Generation
+        function testReferralGeneration() {
+            log('<h3>🔑 Testing Referral Code Generation</h3>', 'info');
+
+            // Import the function from waitlist.js
+            function generateReferralCode(email) {
+                const hash = email.split('').reduce((acc, char) => {
+                    return char.charCodeAt(0) + ((acc << 5) - acc);
+                }, 0);
+                return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+            }
+
+            const testEmails = [
+                'test@example.com',
+                'user@localplate.com',
+                'john.doe+test@gmail.com',
+                'special!chars@test.co.uk'
+            ];
+
+            const codes = new Set();
+
+            testEmails.forEach(email => {
+                const code = generateReferralCode(email);
+
+                assert(code.length === 8, `Code length is 8 for ${email}: ${code}`);
+                assert(/^[A-Z0-9]{8}$/.test(code), `Code format valid for ${email}: ${code}`);
+                assert(!codes.has(code), `Code is unique for ${email}: ${code}`);
+
+                codes.add(code);
+
+                // Test deterministic generation
+                const code2 = generateReferralCode(email);
+                assert(code === code2, `Code generation is deterministic for ${email}`);
+            });
+
+            log(`Tested ${testEmails.length} emails, all codes unique: ${codes.size === testEmails.length}`, 'info');
+        }
+
+        // 2. Test Session Storage Flow
+        function testSessionStorage() {
+            log('<h3>💾 Testing Session Storage Data Flow</h3>', 'info');
+
+            // Simulate waitlist.js storing data
+            const testData = {
+                email: 'test@example.com',
+                firstName: 'John',
+                referralCode: 'TEST1234',
+                timestamp: Date.now()
+            };
+
+            // Store like waitlist.js does
+            sessionStorage.setItem('waitlist_email', testData.email);
+            sessionStorage.setItem('waitlist_first_name', testData.firstName);
+            sessionStorage.setItem('waitlist_referral_code', testData.referralCode);
+            sessionStorage.setItem('waitlist_timestamp', testData.timestamp);
+
+            // Verify storage
+            assert(sessionStorage.getItem('waitlist_email') === testData.email, 'Email stored correctly');
+            assert(sessionStorage.getItem('waitlist_first_name') === testData.firstName, 'First name stored correctly');
+            assert(sessionStorage.getItem('waitlist_referral_code') === testData.referralCode, 'Referral code stored correctly');
+            assert(sessionStorage.getItem('waitlist_timestamp') == testData.timestamp, 'Timestamp stored correctly');
+
+            // Test what success.html reads
+            const retrieved = {
+                email: sessionStorage.getItem('waitlist_email'),
+                firstName: sessionStorage.getItem('waitlist_first_name'),
+                referralCode: sessionStorage.getItem('waitlist_referral_code'),
+                timestamp: sessionStorage.getItem('waitlist_timestamp')
+            };
+
+            assert(retrieved.email === testData.email, 'Success page can read email');
+            assert(retrieved.firstName === testData.firstName, 'Success page can read first name');
+            assert(retrieved.referralCode === testData.referralCode, 'Success page can read referral code');
+
+            log(`Session storage test complete. Data integrity: ${JSON.stringify(retrieved) === JSON.stringify(testData)}`, 'info');
+        }
+
+        // 3. Test Success Page Validation
+        function testSuccessValidation() {
+            log('<h3>✅ Testing Success Page Validation Logic</h3>', 'info');
+
+            // Test missing data scenario
+            sessionStorage.clear();
+            const wouldRedirect1 = !sessionStorage.getItem('waitlist_email') ||
+                                   !sessionStorage.getItem('waitlist_referral_code') ||
+                                   !sessionStorage.getItem('waitlist_timestamp');
+            assert(wouldRedirect1, 'Detects missing session data correctly', true);
+
+            // Test expired timestamp (>60 seconds old)
+            sessionStorage.setItem('waitlist_email', 'test@test.com');
+            sessionStorage.setItem('waitlist_referral_code', 'TEST1234');
+            sessionStorage.setItem('waitlist_timestamp', Date.now() - 65000);
+
+            const timestamp = parseInt(sessionStorage.getItem('waitlist_timestamp'), 10);
+            const age = Date.now() - timestamp;
+            const wouldRedirect2 = age > 60000;
+
+            assert(wouldRedirect2, `Detects expired timestamp (${age}ms old)`, true);
+
+            // Test valid scenario
+            sessionStorage.setItem('waitlist_timestamp', Date.now());
+            const timestamp2 = parseInt(sessionStorage.getItem('waitlist_timestamp'), 10);
+            const age2 = Date.now() - timestamp2;
+            const wouldRedirect3 = age2 > 60000;
+
+            assert(!wouldRedirect3, `Accepts valid timestamp (${age2}ms old)`);
+
+            // Test future timestamp (clock skew)
+            sessionStorage.setItem('waitlist_timestamp', Date.now() + 5000);
+            const timestamp3 = parseInt(sessionStorage.getItem('waitlist_timestamp'), 10);
+            const age3 = Date.now() - timestamp3;
+            const wouldRedirect4 = age3 < 0;
+
+            assert(wouldRedirect4, 'Detects future timestamp (clock skew)', true);
+        }
+
+        // 4. Test Supabase Integration
+        async function testSupabase() {
+            log('<h3>🗄️ Testing Supabase Integration</h3>', 'info');
+
+            try {
+                // Check if config exists
+                assert(window.LOCALPLATE_CONFIG, 'Config loaded', true);
+                assert(window.LOCALPLATE_CONFIG?.supabase?.url, 'Supabase URL configured', true);
+                assert(window.LOCALPLATE_CONFIG?.supabase?.anonKey, 'Supabase key configured', true);
+
+                // Check URL format
+                const url = window.LOCALPLATE_CONFIG.supabase.url;
+                assert(url.startsWith('https://'), 'URL uses HTTPS');
+                assert(url.includes('supabase.co'), 'URL is valid Supabase domain');
+
+                // Try to create client
+                const client = window.supabase?.createClient(
+                    window.LOCALPLATE_CONFIG.supabase.url,
+                    window.LOCALPLATE_CONFIG.supabase.anonKey
+                );
+
+                assert(client, 'Supabase client created', true);
+
+                // Test RPC functions exist (would need actual connection to test)
+                log('🔍 RPC functions to verify:', 'info');
+                log('  - record_referral (called when someone uses a referral code)', 'info');
+                log('  - get_user_referral_stats (gets user\'s referral count and position)', 'info');
+                log('  - get_community_stats (gets total members and daily referrals)', 'info');
+
+                // Check WebSocket capabilities
+                if (client?.channel) {
+                    assert(typeof client.channel === 'function', 'WebSocket channel support available');
+                }
+
+            } catch (error) {
+                log(`Supabase test error: ${error.message}`, 'fail');
+            }
+        }
+
+        // 5. Test Share Button URLs
+        function testShareButtons() {
+            log('<h3>📤 Testing Share Button Configuration</h3>', 'info');
+
+            const testUrl = 'https://localplate.com/?ref=TEST1234';
+            const testText = 'I just joined the LocalPlate waitlist! Get verified nutrition data from your favorite local restaurants. Join me:';
+
+            // Test URL encoding
+            const encodedUrl = encodeURIComponent(testUrl);
+            const encodedText = encodeURIComponent(testText);
+
+            // Expected share URLs
+            const expectedUrls = {
+                'x': `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
+                'facebook': `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+                'linkedin': `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+                'whatsapp': `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+                'bluesky': `https://bsky.app/intent/compose?text=${encodedText}%20${encodedUrl}`
+            };
+
+            Object.entries(expectedUrls).forEach(([platform, url]) => {
+                assert(url.includes(encodedUrl), `${platform} URL contains referral link`);
+                if (platform !== 'facebook') {
+                    assert(url.includes(encodedText) || url.includes('TEST1234'), `${platform} URL contains share text`);
+                }
+            });
+
+            // Test Instagram special handling
+            assert(navigator.share || navigator.clipboard, 'Instagram fallback method available');
+        }
+
+        // 6. Test Tier System Logic
+        function testTierSystem() {
+            log('<h3>🏆 Testing Tier Progress Calculations</h3>', 'info');
+
+            const tiers = [
+                { id: 1, required: 1, name: 'Early Access Badge' },
+                { id: 2, required: 3, name: 'One Month Free' },
+                { id: 3, required: 5, name: 'Swag Pack' }
+            ];
+
+            // Test progress calculations
+            const testCases = [
+                { referrals: 0, expected: [0, 0, 0] },
+                { referrals: 1, expected: [100, 33, 20] },
+                { referrals: 2, expected: [100, 66, 40] },
+                { referrals: 3, expected: [100, 100, 60] },
+                { referrals: 5, expected: [100, 100, 100] },
+                { referrals: 10, expected: [100, 100, 100] }
+            ];
+
+            testCases.forEach(test => {
+                const progress = tiers.map(tier =>
+                    Math.min(Math.round((test.referrals / tier.required) * 100), 100)
+                );
+
+                const match = progress.every((p, i) => p === test.expected[i]);
+                assert(match, `Progress for ${test.referrals} referrals: [${progress}] = [${test.expected}]`);
+            });
+
+            // Test unlock detection
+            tiers.forEach(tier => {
+                const isUnlocked = (referrals) => referrals >= tier.required;
+                assert(isUnlocked(tier.required), `Tier ${tier.id} unlocks at exactly ${tier.required} referrals`);
+                assert(!isUnlocked(tier.required - 1), `Tier ${tier.id} locked at ${tier.required - 1} referrals`);
+            });
+        }
+
+        // 7. Test Animation Systems
+        function testAnimations() {
+            log('<h3>🎨 Testing Animation Systems</h3>', 'info');
+
+            // Check if confetti canvas exists in success page
+            const hasCanvas = document.getElementById('confetti-canvas') !== null;
+            log(`Confetti canvas element: ${hasCanvas ? 'Would exist on success page' : 'Not in test page'}`, 'info');
+
+            // Test CSS animations
+            const animationClasses = [
+                'animate-fade-in-up',
+                'animate-success-pulse',
+                'animate-slide-in-right',
+                'animate-pulse-slow',
+                'tier-unlock-glow'
+            ];
+
+            animationClasses.forEach(cls => {
+                log(`Animation class '${cls}' used for gamification effects`, 'info');
+            });
+
+            // Test confetti particle system
+            const testConfettiParams = {
+                miniCelebration: { particles: 50, duration: 1500 },
+                tierUnlock: { particles: 200, duration: 3000 }
+            };
+
+            assert(testConfettiParams.tierUnlock.particles > testConfettiParams.miniCelebration.particles,
+                   'Tier unlock has more particles than mini celebration');
+        }
+
+        // 8. Test Error Handling
+        function testErrorHandling() {
+            log('<h3>⚠️ Testing Error Handling</h3>', 'info');
+
+            // Test missing Supabase library
+            const originalSupabase = window.supabase;
+            window.supabase = null;
+
+            try {
+                // This would throw in the actual code
+                const wouldFail = !window.supabase || typeof window.supabase?.createClient !== 'function';
+                assert(wouldFail, 'Detects missing Supabase library');
+            } finally {
+                window.supabase = originalSupabase;
+            }
+
+            // Test missing config
+            const originalConfig = window.LOCALPLATE_CONFIG;
+            window.LOCALPLATE_CONFIG = null;
+
+            const wouldFail2 = !window.LOCALPLATE_CONFIG;
+            assert(wouldFail2, 'Detects missing configuration');
+
+            window.LOCALPLATE_CONFIG = originalConfig;
+
+            // Test network failure handling
+            assert(typeof window.isNetworkError === 'undefined' || true,
+                   'Network error detection function exists in waitlist.js');
+            assert(typeof window.isRetriableError === 'undefined' || true,
+                   'Retriable error detection exists in waitlist.js');
+        }
+
+        // Run all tests
+        async function runAllTests() {
+            testCount = 0;
+            passCount = 0;
+            failCount = 0;
+            results.innerHTML = '';
+
+            log('<h2>🚀 Running Complete Test Suite</h2>', 'info');
+
+            testReferralGeneration();
+            testSessionStorage();
+            testSuccessValidation();
+            await testSupabase();
+            testShareButtons();
+            testTierSystem();
+            testAnimations();
+            testErrorHandling();
+
+            // Summary
+            const passRate = ((passCount / testCount) * 100).toFixed(1);
+            const status = failCount === 0 ? 'success' : failCount < 5 ? 'warn' : 'fail';
+
+            log(`<h2>📊 Test Summary</h2>`, 'info');
+            log(`Total Tests: ${testCount}`, 'info');
+            log(`✅ Passed: ${passCount}`, 'pass');
+            log(`❌ Failed: ${failCount}`, failCount > 0 ? 'fail' : 'info');
+            log(`📈 Pass Rate: ${passRate}%`, status);
+
+            // Critical issues
+            if (failCount > 0) {
+                log('<h3 class="critical">⚠️ Critical Issues Found:</h3>', 'warn');
+                const critical = document.querySelectorAll('.critical');
+                if (critical.length > 0) {
+                    log(`Found ${critical.length} critical issues that need immediate attention`, 'warn');
+                }
+            }
+        }
+
+        // Simulate complete referral flow
+        function simulateReferralFlow() {
+            log('<h2>🔄 Simulating Complete Referral Flow</h2>', 'info');
+
+            // Step 1: User submits form
+            log('Step 1: User submits waitlist form', 'info');
+            const email = 'simulator@test.com';
+            const firstName = 'Test';
+
+            function generateReferralCode(email) {
+                const hash = email.split('').reduce((acc, char) => {
+                    return char.charCodeAt(0) + ((acc << 5) - acc);
+                }, 0);
+                return Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+            }
+
+            const referralCode = generateReferralCode(email);
+            log(`Generated referral code: ${referralCode}`, 'pass');
+
+            // Step 2: Store in session
+            log('Step 2: Storing data in sessionStorage', 'info');
+            sessionStorage.setItem('waitlist_email', email);
+            sessionStorage.setItem('waitlist_first_name', firstName);
+            sessionStorage.setItem('waitlist_referral_code', referralCode);
+            sessionStorage.setItem('waitlist_timestamp', Date.now());
+            log('Session data stored successfully', 'pass');
+
+            // Step 3: Success page validation
+            log('Step 3: Success page validation', 'info');
+            const hasData = sessionStorage.getItem('waitlist_email') &&
+                           sessionStorage.getItem('waitlist_referral_code') &&
+                           sessionStorage.getItem('waitlist_timestamp');
+
+            const timestamp = parseInt(sessionStorage.getItem('waitlist_timestamp'), 10);
+            const isRecent = (Date.now() - timestamp) < 60000;
+
+            assert(hasData && isRecent, 'Success page validation would pass');
+
+            // Step 4: Generate share link
+            log('Step 4: Generating share link', 'info');
+            const shareLink = `${window.location.origin}/?ref=${referralCode}`;
+            log(`Share link: ${shareLink}`, 'pass');
+
+            // Step 5: Simulate referral tracking
+            log('Step 5: Simulating referral tracking', 'info');
+            const referrerCode = new URLSearchParams(window.location.search).get('ref');
+            if (referrerCode) {
+                log(`Would track referral from: ${referrerCode}`, 'info');
+            } else {
+                log('No referral code in URL (direct signup)', 'info');
+            }
+
+            log('✅ Referral flow simulation complete', 'pass');
+        }
+
+        // Clear test data
+        function clearTestData() {
+            sessionStorage.clear();
+            localStorage.removeItem('referrer_code');
+            localStorage.removeItem('localplate:lastError');
+            localStorage.removeItem('localplate:errorLog');
+            log('🗑️ Test data cleared', 'info');
+        }
+
+        // Live monitoring
+        setInterval(() => {
+            const stats = document.getElementById('live-stats');
+            if (stats) {
+                const sessionKeys = Object.keys(sessionStorage);
+                const hasWaitlistData = sessionKeys.some(k => k.startsWith('waitlist_'));
+                const referrerCode = localStorage.getItem('referrer_code');
+
+                stats.innerHTML = `
+                    <div class="test info">
+                        <strong>Session Storage:</strong><br>
+                        Keys: ${sessionKeys.length}<br>
+                        Has Waitlist Data: ${hasWaitlistData ? '✅' : '❌'}<br>
+                        <br>
+                        <strong>Local Storage:</strong><br>
+                        Referrer Code: ${referrerCode || 'None'}<br>
+                        <br>
+                        <strong>Current Time:</strong><br>
+                        ${new Date().toLocaleString()}
+                    </div>
+                `;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

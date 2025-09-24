@@ -161,6 +161,33 @@ h1, h2, h3 {
     mix-blend-mode: screen;
 }
 
+.form-card-glow {
+    z-index: 0;
+    opacity: 0.9;
+}
+
+.form-card .form-card-glow + * {
+    position: relative;
+    z-index: 1;
+}
+
+.tier-progress-glow {
+    background: linear-gradient(135deg,
+        rgba(167, 243, 208, 0.25) 0%,
+        rgba(20, 184, 166, 0.12) 45%,
+        rgba(253, 186, 116, 0.16) 70%,
+        rgba(251, 191, 217, 0.28) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.dark .tier-progress-glow {
+    background: linear-gradient(135deg,
+        rgba(6, 95, 70, 0.35) 0%,
+        rgba(4, 120, 87, 0.28) 40%,
+        rgba(120, 53, 15, 0.32) 70%,
+        rgba(131, 24, 67, 0.4) 100%);
+}
+
 /* Waitlist status banner */
 .waitlist-status-card {
     display: flex;
@@ -2600,6 +2627,30 @@ textarea:focus {
     height: 100%;
 }
 
+#tier-1 .tier-card-body {
+    background: linear-gradient(180deg, rgba(167, 243, 208, 0.45), rgba(255, 255, 255, 0.9));
+}
+
+#tier-2 .tier-card-body {
+    background: linear-gradient(180deg, rgba(253, 230, 138, 0.45), rgba(255, 255, 255, 0.92));
+}
+
+#tier-3 .tier-card-body {
+    background: linear-gradient(180deg, rgba(251, 191, 217, 0.45), rgba(255, 255, 255, 0.93));
+}
+
+.dark #tier-1 .tier-card-body {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(17, 24, 39, 0.85));
+}
+
+.dark #tier-2 .tier-card-body {
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.22), rgba(17, 24, 39, 0.85));
+}
+
+.dark #tier-3 .tier-card-body {
+    background: linear-gradient(180deg, rgba(236, 72, 153, 0.22), rgba(17, 24, 39, 0.88));
+}
+
 .tier-card-body .text-center {
     flex: 1 1 auto;
     display: flex;
@@ -2798,12 +2849,12 @@ textarea:focus {
 }
 
 .tier-card-premium.tier-locked .tier-card-body {
-    filter: grayscale(10%);
-    transition: filter 0.3s ease, opacity 0.3s ease;
+    filter: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tier-card-premium.tier-locked:hover .tier-card-body {
-    filter: grayscale(0);
+    transform: translateY(-2px);
 }
 
 /* Premium badge glow */

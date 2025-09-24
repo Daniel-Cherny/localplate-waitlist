@@ -17,6 +17,23 @@
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     </noscript>
     
+    <!-- Apply saved theme early to avoid flash -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (error) {
+                // Ignore theme hydration errors
+            }
+        })();
+    </script>
+
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css?v=20241009">
     
@@ -54,6 +71,15 @@
                     </span>
                 </a>
                 
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414z"/>
+                    </svg>
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
                 
             </div>
         </div>
@@ -1336,53 +1362,49 @@
         // Dark mode toggle functionality - Enhanced version matching waitlist.js
         function initDarkMode() {
             try {
-                const themeToggle = document.getElementById('theme-toggle');
                 const html = document.documentElement;
-                
-                if (!themeToggle) {
-                    console.warn('[DarkMode] Theme toggle button not found');
-                    return;
-                }
-                
-                // Check for saved theme or system preference - improved logic
+                const themeToggle = document.getElementById('theme-toggle');
+
                 const savedTheme = localStorage.getItem('theme');
                 const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-                
-                // Apply initial theme
+
                 if (currentTheme === 'dark') {
                     html.classList.add('dark');
                 } else {
                     html.classList.remove('dark');
                 }
-                
-                // Add click event listener with error handling
-                themeToggle.addEventListener('click', () => {
-                    try {
-                        if (html.classList.contains('dark')) {
-                            html.classList.remove('dark');
-                            localStorage.setItem('theme', 'light');
-                            console.log('[DarkMode] Switched to light mode');
-                        } else {
-                            html.classList.add('dark');
-                            localStorage.setItem('theme', 'dark');
-                            console.log('[DarkMode] Switched to dark mode');
+
+                if (themeToggle) {
+                    const handleToggle = () => {
+                        try {
+                            if (html.classList.contains('dark')) {
+                                html.classList.remove('dark');
+                                localStorage.setItem('theme', 'light');
+                                console.log('[DarkMode] Switched to light mode');
+                            } else {
+                                html.classList.add('dark');
+                                localStorage.setItem('theme', 'dark');
+                                console.log('[DarkMode] Switched to dark mode');
+                            }
+                        } catch (error) {
+                            console.error('[DarkMode] Error toggling theme:', error);
                         }
-                    } catch (error) {
-                        console.error('[DarkMode] Error toggling theme:', error);
-                    }
-                });
-                
+                    };
+
+                    themeToggle.addEventListener('click', handleToggle);
+                    themeToggle.dataset.darkModeInitialized = 'true';
+                } else {
+                    console.warn('[DarkMode] Theme toggle button not found; applied stored theme only');
+                }
+
                 console.log('[DarkMode] Initialized successfully with theme:', currentTheme);
-                
+
             } catch (error) {
                 console.error('[DarkMode] Initialization failed:', error);
-                // Fallback: try to at least set up basic theme detection
                 try {
-                    const html = document.documentElement;
-                    const savedTheme = localStorage.getItem('theme');
-                    if (savedTheme === 'dark') {
-                        html.classList.add('dark');
+                    if (localStorage.getItem('theme') === 'dark') {
+                        document.documentElement.classList.add('dark');
                     }
                 } catch (fallbackError) {
                     console.error('[DarkMode] Fallback initialization failed:', fallbackError);
@@ -1416,8 +1438,8 @@
                 }
             })();
             // Ensure dark mode is still properly initialized after DOM is ready
-            // This handles edge cases where the initial call might have failed
-            if (!document.getElementById('theme-toggle')?.onclick) {
+            const toggleEl = document.getElementById('theme-toggle');
+            if (toggleEl && !toggleEl.dataset.darkModeInitialized) {
                 console.log('[DarkMode] Re-initializing after DOM ready');
                 initDarkMode();
             }

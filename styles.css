@@ -358,6 +358,86 @@ h1, h2, h3 {
     text-transform: uppercase;
 }
 
+.tier-card {
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    background: rgba(240, 253, 250, 0.45);
+    backdrop-filter: blur(6px);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.dark .tier-card {
+    background: rgba(15, 118, 110, 0.08);
+    border-color: rgba(45, 212, 191, 0.18);
+}
+
+.tier-card:hover {
+    box-shadow: 0 20px 40px -20px rgba(16, 185, 129, 0.35);
+}
+
+.tier-card.tier-locked {
+    opacity: 0.85;
+    border-color: rgba(107, 114, 128, 0.25);
+    background: rgba(243, 244, 246, 0.55);
+}
+
+.dark .tier-card.tier-locked {
+    background: rgba(31, 41, 55, 0.55);
+    border-color: rgba(75, 85, 99, 0.35);
+}
+
+.tier-card.tier-unlocked {
+    opacity: 1;
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(209, 250, 229, 0.6);
+}
+
+.dark .tier-card.tier-unlocked {
+    background: rgba(6, 95, 70, 0.4);
+    border-color: rgba(16, 185, 129, 0.6);
+}
+
+.tier-card .tier-title,
+.tier-card .tier-tag,
+.tier-card .tier-description,
+.tier-card .tier-progress-caption {
+    color: #1f2937;
+}
+
+.dark .tier-card .tier-title,
+.dark .tier-card .tier-tag,
+.dark .tier-card .tier-description,
+.dark .tier-card .tier-progress-caption {
+    color: #e5e7eb;
+}
+
+.tier-card.tier-locked .tier-title,
+.tier-card.tier-locked .tier-tag,
+.tier-card.tier-locked .tier-description,
+.tier-card.tier-locked .tier-progress-caption {
+    color: rgba(55, 65, 81, 0.9);
+}
+
+.dark .tier-card.tier-locked .tier-title,
+.dark .tier-card.tier-locked .tier-tag,
+.dark .tier-card.tier-locked .tier-description,
+.dark .tier-card.tier-locked .tier-progress-caption {
+    color: rgba(229, 231, 235, 0.75);
+}
+
+.tier-card.tier-unlocked .tier-title,
+.tier-card.tier-unlocked .tier-tag,
+.tier-card.tier-unlocked .tier-description,
+.tier-card.tier-unlocked .tier-progress-caption {
+    color: #065f46;
+}
+
+.dark .tier-card.tier-unlocked .tier-title,
+.dark .tier-card.tier-unlocked .tier-tag,
+.dark .tier-card.tier-unlocked .tier-description,
+.dark .tier-card.tier-unlocked .tier-progress-caption {
+    color: #bbf7d0;
+}
+
 .golden-ticket-card {
     border: 1px solid rgba(245, 158, 11, 0.35);
     background: linear-gradient(120deg, rgba(251, 191, 36, 0.18), rgba(249, 115, 22, 0.12));

@@ -1627,7 +1627,7 @@ async function updateWaitlistCount() {
     const copyMap = {
         open: {
             label: 'Spots are open',
-            message: 'Early access still available—bring a foodie friend with you.'
+            message: ''
         },
         filling: {
             label: 'Momentum is building',
@@ -1652,9 +1652,15 @@ async function updateWaitlistCount() {
         const copy = copyMap[status] || copyMap.open;
 
         statusElement.textContent = copy.label;
-        messageElement.textContent = spotsLeft !== null && spotsLeft >= 0
-            ? `${copy.message} (${spotsLeft} spots left)`
-            : copy.message;
+
+        const baseMessage = copy.message || '';
+        if (baseMessage) {
+            messageElement.textContent = spotsLeft !== null && spotsLeft >= 0
+                ? `${baseMessage} (${spotsLeft} spots left)`
+                : baseMessage;
+        } else {
+            messageElement.textContent = '';
+        }
 
         progressFill.style.width = `${Math.max(6, Math.min(ratio, 1) * 100)}%`;
         progressFill.dataset.status = status;

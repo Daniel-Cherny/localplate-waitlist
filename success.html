@@ -127,45 +127,45 @@
                 <div class="grid gap-8 lg:grid-cols-2 items-start">
                     <!-- Tier Status -->
                     <div class="form-card tier-status-card reveal-on-scroll animation-delay-250">
-                    <span id="waitlist-tier-name" class="tier-status-badge">Early Insider</span>
-                    <p id="waitlist-tier-subtitle" class="tier-status-subtitle">You're already ahead of the curve.</p>
-                    <div class="tier-status-progress" role="img" aria-label="Progress to the next tier">
-                        <div class="tier-progress-track">
-                            <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
+                        <span id="waitlist-tier-name" class="tier-status-badge">Early Insider</span>
+                        <p id="waitlist-tier-subtitle" class="tier-status-subtitle">You're already ahead of the curve.</p>
+                        <div class="tier-status-progress" role="img" aria-label="Progress to the next tier">
+                            <div class="tier-progress-track">
+                                <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
+                            </div>
                         </div>
+                        <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                     </div>
-                    <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
-                </div>
 
                     <!-- Referral Section -->
                     <div class="form-card pt-6 reveal-on-scroll hover:shadow-2xl transition-shadow">
-                    <h2 class="font-serif text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Keep Your Wellness Lead</h2>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">
-                        Share your unique referral link. Every friend who joins leaps straight into early access with you—and bumps you closer to Superfood Sidekick perks.
-                    </p>
-                    
-                    <!-- Referral Link -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <input 
-                            type="text" 
-                            id="referral-link" 
-                            readonly 
-                            value="https://localplate.com/?ref=ABC123"
-                            class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
-                        >
-                        <button 
-                            onclick="copyLink()" 
-                            class="btn-primary group hover:scale-105 transition-all"
-                        >
-                            <span>Copy</span>
-                            <svg class="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Share Buttons -->
-                    <div class="flex flex-wrap justify-center gap-8 w-full max-w-3xl mx-auto" role="group" aria-label="Share your referral link">
+                        <h2 class="font-serif text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Keep Your Wellness Lead</h2>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">
+                            Share your unique referral link. Every friend who joins leaps straight into early access with you—and bumps you closer to Superfood Sidekick perks.
+                        </p>
+                        
+                        <!-- Referral Link -->
+                        <div class="flex items-center space-x-2 mb-6">
+                            <input 
+                                type="text" 
+                                id="referral-link" 
+                                readonly 
+                                value="https://localplate.com/?ref=ABC123"
+                                class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
+                            >
+                            <button 
+                                onclick="copyLink()" 
+                                class="btn-primary group hover:scale-105 transition-all"
+                            >
+                                <span>Copy</span>
+                                <svg class="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Share Buttons -->
+                        <div class="flex flex-wrap justify-center gap-8 w-full max-w-3xl mx-auto" role="group" aria-label="Share your referral link">
                         <!-- X/Twitter -->
                         <a id="share-x"
                             href="#" target="_blank" rel="noopener noreferrer"

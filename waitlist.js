@@ -1664,7 +1664,7 @@ async function updateWaitlistCount() {
         const supabase = getSupabaseClient();
         if (!supabase) {
             trace('[updateWaitlistCount] no supabase client; using default copy');
-            setStatusCopy(0);
+            setStatusCopy();
             return;
         }
 

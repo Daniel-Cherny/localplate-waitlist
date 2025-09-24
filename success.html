@@ -111,8 +111,6 @@
                         </div>
                         <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Crunching your spot in line...</p>
                     </div>
-                    <p id="waitlist-tier-position" class="text-sm text-gray-500 dark:text-gray-400 mt-3">Position loading...</p>
-                    <p id="waitlist-tier-percentile" class="text-sm text-gray-500 dark:text-gray-400">Crunching percentile...</p>
                     <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                 </div>
 
@@ -707,7 +705,6 @@
                 }
 
                 const percentile = typeof this.userPercentile === 'number' ? this.userPercentile : null;
-                const position = this.userWaitlistPosition ? Number(this.userWaitlistPosition) : null;
 
                 let activeBand = this.percentileBands[this.percentileBands.length - 1];
                 if (percentile !== null) {
@@ -746,32 +743,20 @@
                 progressFill.style.width = `${fillWidth}%`;
                 progressFill.style.background = gradient;
 
+                let progressMessage = 'Crunching your spot in line...';
                 if (aheadPercent !== null) {
-                    progressCopy.textContent = `Ahead of ${aheadPercent}% of the cohort`;
-                } else {
-                    progressCopy.textContent = 'Crunching your spot in line...';
-                }
-
-                const positionEl = document.getElementById('waitlist-tier-position');
-                const percentileEl = document.getElementById('waitlist-tier-percentile');
-
-                if (positionEl) {
-                    if (position) {
-                        positionEl.textContent = `Position #${position} of ${this.waitlistCap}`;
+                    if (percentile >= 0.9) {
+                        progressMessage = 'Lightning leads fade fast—drop your link to defend it.';
+                    } else if (percentile >= 0.75) {
+                        progressMessage = 'Founders are on your heels—share again to stay in the inner circle.';
+                    } else if (percentile >= 0.5) {
+                        progressMessage = 'You\'re ahead now, but the line can pass you overnight. Keep inviting.';
                     } else {
-                        positionEl.textContent = 'Position still loading...';
+                        progressMessage = 'You\'re in the pack—one share pushes you into VIP territory.';
                     }
                 }
 
-                if (percentileEl) {
-                    if (aheadPercent !== null) {
-                        percentileEl.textContent = aheadPercent === 0
-                            ? 'You just joined—pull a friend in to climb.'
-                            : `Ahead of ${aheadPercent}% of everyone waiting`;
-                    } else {
-                        percentileEl.textContent = 'Crunching percentile...';
-                    }
-                }
+                progressCopy.textContent = progressMessage;
 
                 this.goldenTicketActive = this.userReferralCount >= 5;
             }

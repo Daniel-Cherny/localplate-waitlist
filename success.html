@@ -214,14 +214,14 @@
                     </div>
                 </div>
 
-                <!-- Golden Ticket Card -->
-                <div id="golden-ticket-card" class="form-card golden-ticket-card mb-8 hidden reveal-on-scroll animation-delay-300">
-                    <div class="golden-ticket-header">
-                        <span class="golden-ticket-badge">Golden Ticket</span>
-                        <span class="golden-ticket-pill">One invite token</span>
+                <!-- Ambassador Reward Card (visible once cohort fills) -->
+                <div id="ambassador-card" class="form-card ambassador-card mb-8 hidden reveal-on-scroll animation-delay-300">
+                    <div class="ambassador-header">
+                        <span class="ambassador-badge">Ambassador Reward</span>
+                        <span class="ambassador-pill">Three free months</span>
                     </div>
-                    <p id="golden-ticket-message" class="golden-ticket-message">
-                        Once the founding cohort fills, you'll be able to gift one guaranteed spot to a friend.
+                    <p id="ambassador-message" class="ambassador-message">
+                        Once the founding cohort fills, five verified referrals lock three free months and a personal invite for one friend.
                     </p>
                     <button type="button" class="btn-secondary w-full sm:w-auto" onclick="copyLink()">
                         Copy your invite link
@@ -241,7 +241,7 @@
                             </div>
                             <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">VIP Tier</div>
                             <div class="tier-tag text-sm text-emerald-600 dark:text-emerald-300 mb-2">Top 50% of early adopters</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Invite one friend to lock in VIP perks and early menu drops.</p>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer one friend to unlock 50% off your first month.</p>
                             <div id="progress-bar-1" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                 <div class="progress-fill bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
@@ -257,7 +257,7 @@
                             </div>
                             <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Founding Member</div>
                             <div class="tier-tag text-sm text-amber-600 dark:text-amber-300 mb-2">Top 25% of early adopters</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer three friends to unlock pre-launch tastings and earliest menu access.</p>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer three friends to get your first month free.</p>
                             <div id="progress-bar-2" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                 <div class="progress-fill bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
@@ -271,13 +271,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6l2.09 4.243L18 11l-3 2.757L15.18 18 12 15.9 8.82 18 9 13.757 6 11l3.91-.757L12 6z"/>
                                 </svg>
                             </div>
-                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Golden Ticket</div>
-                            <div class="tier-tag text-sm text-rose-500 dark:text-rose-300 mb-2">Gift a spot when we're full</div>
-                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Bring in five friends to earn a golden ticket you can hand to someone after we hit the 500-person cap.</p>
+                            <div class="tier-title font-bold text-gray-700 dark:text-gray-200 mb-1">Ambassador Access</div>
+                            <div class="tier-tag text-sm text-rose-500 dark:text-rose-300 mb-2">Bring five friends along</div>
+                            <p class="tier-description text-sm text-gray-600 dark:text-gray-400 mb-3">Refer five friends to earn three free months and priority invites once Cohort 1 closes.</p>
                             <div id="progress-bar-3" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                 <div class="progress-fill bg-gradient-to-r from-rose-400 to-amber-500 h-2 rounded-full transition-all duration-800 ease-out" style="width: 0%"></div>
                             </div>
-                            <p id="progress-label-3" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0% to Golden Ticket</p>
+                            <p id="progress-label-3" class="tier-progress-caption text-xs text-gray-500 dark:text-gray-400 mt-2">0% to Ambassador Access</p>
                         </div>
                     </div>
                 </div>
@@ -434,26 +434,26 @@
                         id: 1,
                         referralsRequired: 1,
                         title: "VIP Tier",
-                        reward: "Priority access & early menu drops",
+                        reward: "50% off your first month",
                         tag: "Top 50% of early adopters"
                     },
                     {
                         id: 2,
                         referralsRequired: 3,
                         title: "Founding Member",
-                        reward: "Pre-launch tastings & first invites",
+                        reward: "First month free",
                         tag: "Top 25% of early adopters"
                     },
                     {
                         id: 3,
                         referralsRequired: 5,
-                        title: "Golden Ticket",
-                        reward: "Gift a spot when we hit capacity",
+                        title: "Ambassador Access",
+                        reward: "3 free months + priority invites",
                         tag: "Share with five food lovers"
                     }
                 ];
 
-                this.goldenTicketActive = false;
+                this.ambassadorRewardActive = false;
             }
             
             async init() {
@@ -529,7 +529,7 @@
                         
                         this.updateCommunityDisplay();
                         this.refreshStanding();
-                        this.evaluateGoldenTicket();
+                    this.evaluateAmbassadorReward();
                     }
                 } catch (error) {
                     console.error('Error loading community stats:', error);
@@ -570,7 +570,7 @@
                 this.animateCounterUpdate();
                 this.updateTierProgress();
                 this.refreshStanding();
-                this.evaluateGoldenTicket();
+                this.evaluateAmbassadorReward();
                 
                 // Check if user unlocked a new tier
                 this.checkTierUnlock();
@@ -749,7 +749,7 @@
 
                 progressCopy.textContent = progressMessage;
 
-                this.goldenTicketActive = this.userReferralCount >= 5;
+                this.ambassadorRewardActive = this.userReferralCount >= 5;
             }
             
             updateCommunityDisplay() {
@@ -765,9 +765,9 @@
                 }
             }
 
-            evaluateGoldenTicket() {
-                const card = document.getElementById('golden-ticket-card');
-                const message = document.getElementById('golden-ticket-message');
+            evaluateAmbassadorReward() {
+                const card = document.getElementById('ambassador-card');
+                const message = document.getElementById('ambassador-message');
 
                 if (!card || !message) {
                     return;
@@ -775,21 +775,21 @@
 
                 if (this.totalCommunitySize < this.waitlistCap) {
                     card.classList.add('hidden');
-                    card.classList.remove('golden-ticket-locked');
+                    card.classList.remove('ambassador-locked');
                     return;
                 }
 
-                const hasFoundingStatus = this.userReferralCount >= 3;
+                const hasAmbassadorStatus = this.userReferralCount >= 5;
 
                 card.classList.remove('hidden');
-                card.classList.toggle('golden-ticket-locked', !hasFoundingStatus);
+                card.classList.toggle('ambassador-locked', !hasAmbassadorStatus);
 
-                if (!hasFoundingStatus) {
-                    message.textContent = 'The cohort is full! Refer three friends to earn a golden ticket and bring one more foodie in.';
-                } else if (this.goldenTicketActive) {
-                    message.textContent = "We're at capacity &mdash; use your golden ticket to invite one guaranteed friend right now.";
+                if (!hasAmbassadorStatus) {
+                    message.textContent = 'Cohort 1 is almost sealed. Refer five friends to earn three free months and bring one more local in with you.';
+                } else if (this.ambassadorRewardActive) {
+                    message.textContent = "We're at capacity &mdash; three free months are locked. Watch your inbox for Ambassador invitations.";
                 } else {
-                    message.textContent = 'Golden ticket unlocks the moment your next friend joins &mdash; keep sharing your link.';
+                    message.textContent = 'One more referral cements your Ambassador invite—your free months are already locked.';
                 }
             }
             

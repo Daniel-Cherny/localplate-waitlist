@@ -111,6 +111,8 @@
                         </div>
                         <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Crunching your spot in line...</p>
                     </div>
+                    <p id="waitlist-tier-position" class="text-sm text-gray-500 dark:text-gray-400 mt-3">Position loading...</p>
+                    <p id="waitlist-tier-percentile" class="text-sm text-gray-500 dark:text-gray-400">Crunching percentile...</p>
                     <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                 </div>
 
@@ -409,25 +411,32 @@
                 this.waitlistCap = 500;
                 this.percentileBands = [
                     {
-                        slug: "founding",
-                        minPercentile: 0.75,
-                        title: "Top 25% · Founding Member",
-                        subtitle: "You're pacing ahead of most of the cohort.",
+                        slug: 'lightning',
+                        minPercentile: 0.9,
+                        title: 'Top 10% · Lightning Lead',
+                        subtitle: 'You just jumped ahead of almost everyone—keep pressing.',
                         gradient: 'linear-gradient(90deg,#f59e0b,#f97316)'
                     },
                     {
-                        slug: "vip",
+                        slug: 'founding',
+                        minPercentile: 0.75,
+                        title: 'Top 25% · Founding Member',
+                        subtitle: 'Only a quarter of the cohort is moving this fast.',
+                        gradient: 'linear-gradient(90deg,#fbbf24,#f97316)'
+                    },
+                    {
+                        slug: 'vip',
                         minPercentile: 0.5,
-                        title: "Top 50% · VIP Tier",
-                        subtitle: "Half the cohort is already behind you.",
+                        title: 'Top 50% · VIP Access',
+                        subtitle: 'You’re pacing ahead of most insiders—lock it in with another share.',
                         gradient: 'linear-gradient(90deg,#10b981,#0ea5e9)'
                     },
                     {
-                        slug: "early",
+                        slug: 'deck',
                         minPercentile: 0,
-                        title: "On Deck · Still early",
-                        subtitle: "You're in the door—one share puts you in the fast lane.",
-                        gradient: 'linear-gradient(90deg,#10b981,#0ea5e9)'
+                        title: 'On Deck · Move up fast',
+                        subtitle: 'You’re in the door. Invite a friend to break into VIP.',
+                        gradient: 'linear-gradient(90deg,#059669,#0ea5e9)'
                     }
                 ];
 
@@ -677,8 +686,7 @@
                 // Use the larger of current cohort size or the cap so early adopters
                 // get credit for how early they are relative to the 500-seat limit.
                 const denominator = Math.max(cap, totalMembers, position);
-                const ahead = Math.max(denominator - position, 0);
-                const percentile = ahead / denominator;
+                const percentile = 1 - (position / denominator);
                 return Math.max(0, Math.min(percentile, 0.9999));
             }
 
@@ -699,6 +707,7 @@
                 }
 
                 const percentile = typeof this.userPercentile === 'number' ? this.userPercentile : null;
+                const position = this.userWaitlistPosition ? Number(this.userWaitlistPosition) : null;
 
                 let activeBand = this.percentileBands[this.percentileBands.length - 1];
                 if (percentile !== null) {
@@ -728,19 +737,40 @@
                 }
 
                 const gradient = activeBand.gradient || 'linear-gradient(90deg,#10b981,#0ea5e9)';
-                const fillWidth = percentile === null ? 12 : Math.max(6, Math.min(Math.round(percentile * 100), 100));
+                const aheadPercent = percentile === null
+                    ? null
+                    : Math.max(0, Math.min(99, Math.round(percentile * 100)));
+                const fillWidth = percentile === null
+                    ? 12
+                    : Math.max(6, Math.min(Math.round(Math.max(percentile, 0.02) * 100), 100));
                 progressFill.style.width = `${fillWidth}%`;
                 progressFill.style.background = gradient;
 
-                if (percentile !== null) {
-                    const aheadPercent = Math.max(0, Math.round(percentile * 100));
-                    if (aheadPercent <= 5) {
-                        progressCopy.textContent = 'You just joined—invite a friend to leap ahead.';
-                    } else {
-                        progressCopy.textContent = `Ahead of ${aheadPercent}% of the cohort`;
-                    }
+                if (aheadPercent !== null) {
+                    progressCopy.textContent = `Ahead of ${aheadPercent}% of the cohort`;
                 } else {
                     progressCopy.textContent = 'Crunching your spot in line...';
+                }
+
+                const positionEl = document.getElementById('waitlist-tier-position');
+                const percentileEl = document.getElementById('waitlist-tier-percentile');
+
+                if (positionEl) {
+                    if (position) {
+                        positionEl.textContent = `Position #${position} of ${this.waitlistCap}`;
+                    } else {
+                        positionEl.textContent = 'Position still loading...';
+                    }
+                }
+
+                if (percentileEl) {
+                    if (aheadPercent !== null) {
+                        percentileEl.textContent = aheadPercent === 0
+                            ? 'You just joined—pull a friend in to climb.'
+                            : `Ahead of ${aheadPercent}% of everyone waiting`;
+                    } else {
+                        percentileEl.textContent = 'Crunching percentile...';
+                    }
                 }
 
                 this.goldenTicketActive = this.userReferralCount >= 5;

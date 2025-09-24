@@ -1624,28 +1624,40 @@ async function updateWaitlistCount() {
         return;
     }
 
-    const capacity = 500;
-    const setStatusCopy = (ratio) => {
-        let label = 'Spots are open';
-        let message = 'Invite a friend to jump into VIP faster.';
-
-        if (ratio >= 1) {
-            label = 'Founding cohort is full';
-            message = 'Members control the line now—ask a friend inside to fast-track you.';
-        } else if (ratio >= 0.85) {
-            label = 'Final call for founding seats';
-            message = 'Secure your spot now and line up a fast-pass for your crew.';
-        } else if (ratio >= 0.5) {
-            label = 'VIP wave in motion';
-            message = 'Founding seats are half claimed—referrals keep you ahead.';
-        } else if (ratio >= 0.25) {
-            label = 'Early insider momentum';
-            message = 'Stay in the top tiers by inviting a foodie friend today.';
+    const copyMap = {
+        open: {
+            label: 'Spots are open',
+            message: 'Early access still available—bring a foodie friend with you.'
+        },
+        filling: {
+            label: 'Momentum is building',
+            message: 'We\'re halfway home. Invite a friend before VIP closes up.'
+        },
+        urgent: {
+            label: 'Founding seats 75% claimed',
+            message: 'Lock your place now—golden tickets go fast past this point.'
+        },
+        critical: {
+            label: 'Final call for founding seats',
+            message: 'Only a handful of invites remain. Share your link to stay ahead.'
+        },
+        closed: {
+            label: 'Founding cohort is full',
+            message: 'Only insider referrals can open a seat now.'
         }
+    };
 
-        statusElement.textContent = label;
-        messageElement.textContent = message;
+    const setStatusCopy = ({ status = 'open', filled_percent: filledPercent = 0, spots_left: spotsLeft = null } = {}) => {
+        const ratio = Math.min(Math.max((filledPercent || 0) / 100, 0), 1.2);
+        const copy = copyMap[status] || copyMap.open;
+
+        statusElement.textContent = copy.label;
+        messageElement.textContent = spotsLeft !== null && spotsLeft >= 0
+            ? `${copy.message} (${spotsLeft} spots left)`
+            : copy.message;
+
         progressFill.style.width = `${Math.max(6, Math.min(ratio, 1) * 100)}%`;
+        progressFill.dataset.status = status;
     };
 
     try {
@@ -1660,26 +1672,22 @@ async function updateWaitlistCount() {
             setTimeout(() => reject(new Error('Count query timeout')), 10000)
         );
 
-        const countPromise = supabase
-            .from('waitlist_stats')
-            .select('total_signups')
-            .single();
+        const statusPromise = supabase.rpc('get_capacity_status');
 
-        const { data, error } = await Promise.race([countPromise, timeoutPromise]);
+        const { data, error } = await Promise.race([statusPromise, timeoutPromise]);
 
-        if (!error && data && typeof data.total_signups === 'number') {
-            const ratio = Math.min(Math.max(data.total_signups / capacity, 0), 1.2);
-            trace('[updateWaitlistCount] retrieved ratio:', ratio.toFixed(2));
-            setStatusCopy(ratio);
+        if (!error && data && typeof data.filled_percent === 'number') {
+            trace('[updateWaitlistCount] capacity status:', data);
+            setStatusCopy(data);
         } else {
             console.warn('Count query error or no data:', error?.message);
             trace('[updateWaitlistCount] count unavailable:', error?.message || 'no data');
-            setStatusCopy(0);
+            setStatusCopy();
         }
     } catch (error) {
         console.warn('Error fetching waitlist count:', error.message);
         trace('[updateWaitlistCount] exception caught, using default copy:', error.message);
-        setStatusCopy(0);
+        setStatusCopy();
     }
 }
 

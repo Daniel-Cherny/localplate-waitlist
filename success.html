@@ -109,16 +109,16 @@
                         <div class="tier-progress-track">
                             <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
                         </div>
-                        <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Invite one friend to reach VIP Tier</p>
+                        <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Crunching your spot in line...</p>
                     </div>
-                    <p id="waitlist-tier-cta" class="tier-status-cta">Stay in the VIP tier by inviting a friend.</p>
+                    <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                 </div>
 
                 <!-- Referral Section -->
                 <div class="form-card pt-6 mb-8 reveal-on-scroll hover:shadow-2xl transition-shadow">
                     <h2 class="font-serif text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Keep Your VIP Lead</h2>
                     <p class="text-gray-600 dark:text-gray-400 mb-6">
-                        Share your unique referral link. Every friend who joins locks in your tier and pushes you closer to Founding Member status.
+                        Share your unique referral link. Every friend who joins leaps straight into early access with you—and bumps you closer to Founding Member perks.
                     </p>
                     
                     <!-- Referral Link -->
@@ -402,42 +402,32 @@
                 this.userReferralCount = 0;
                 this.userWaitlistPosition = null;
                 this.totalCommunitySize = 0;
+                this.userPercentile = null;
                 this.supabaseClient = null;
                 this.realTimeSubscription = null;
 
                 this.waitlistCap = 500;
-                this.statusLevels = [
-                    {
-                        slug: "golden",
-                        minReferrals: 5,
-                        title: "Golden Ticket Holder",
-                        subtitle: "Invite-only circle once we're at capacity.",
-                        cta: "Gift your golden ticket to one foodie when we're maxed.",
-                        progressLabel: "You unlocked every perk – keep the momentum going."
-                    },
+                this.percentileBands = [
                     {
                         slug: "founding",
-                        minReferrals: 3,
-                        title: "Founding Member",
-                        subtitle: "Top 25% of early adopters.",
-                        cta: "Bring two more friends to help them unlock VIP status.",
-                        progressLabel: "Progress to Golden Ticket"
+                        minPercentile: 0.75,
+                        title: "Top 25% · Founding Member",
+                        subtitle: "You're pacing ahead of most of the cohort.",
+                        gradient: 'linear-gradient(90deg,#f59e0b,#f97316)'
                     },
                     {
                         slug: "vip",
-                        minReferrals: 1,
-                        title: "VIP Tier",
-                        subtitle: "Top 50% of the waitlist.",
-                        cta: "Stay in the VIP tier by inviting a friend.",
-                        progressLabel: "Progress to Founding Member"
+                        minPercentile: 0.5,
+                        title: "Top 50% · VIP Tier",
+                        subtitle: "Half the cohort is already behind you.",
+                        gradient: 'linear-gradient(90deg,#10b981,#0ea5e9)'
                     },
                     {
                         slug: "early",
-                        minReferrals: 0,
-                        title: "Early Insider",
-                        subtitle: "You're in the first wave.",
-                        cta: "Invite one friend to jump straight into VIP tier.",
-                        progressLabel: "Progress to VIP Tier"
+                        minPercentile: 0,
+                        title: "On Deck · Still early",
+                        subtitle: "You're in the door—one share puts you in the fast lane.",
+                        gradient: 'linear-gradient(90deg,#10b981,#0ea5e9)'
                     }
                 ];
 
@@ -517,7 +507,7 @@
                         
                         this.updateReferralDisplay();
                         this.updateTierProgress();
-                        this.updateTierStatus();
+                        this.refreshStanding();
                     }
                 } catch (error) {
                     console.error('Error loading user stats:', error);
@@ -540,6 +530,7 @@
                         this.dailyReferrals = data.daily_referrals || 0;
                         
                         this.updateCommunityDisplay();
+                        this.refreshStanding();
                         this.evaluateGoldenTicket();
                     }
                 } catch (error) {
@@ -580,7 +571,7 @@
                 // Update displays with animation
                 this.animateCounterUpdate();
                 this.updateTierProgress();
-                this.updateTierStatus();
+                this.refreshStanding();
                 this.evaluateGoldenTicket();
                 
                 // Check if user unlocked a new tier
@@ -609,7 +600,7 @@
                 // Update friends joined message
                 const friendsMessage = document.getElementById('friends-joined-message');
                 if (friendsMessage && this.userReferralCount > 0) {
-                    friendsMessage.textContent = `${this.userReferralCount} friend${this.userReferralCount !== 1 ? 's' : ''} joined through your link!`;
+                    friendsMessage.textContent = `${this.userReferralCount} friend${this.userReferralCount !== 1 ? 's' : ''} jumped in with your link & now start in VIP.`;
                     friendsMessage.classList.remove('hidden');
                 }
             }
@@ -673,7 +664,24 @@
                     progressLabel.textContent = `${percent}% to ${tier.title}`;
                 }
             }
-            
+
+            computePercentile() {
+                if (!this.totalCommunitySize || !this.userWaitlistPosition) {
+                    return null;
+                }
+
+                const total = Math.max(Number(this.totalCommunitySize) || 0, 1);
+                const position = Math.max(Number(this.userWaitlistPosition) || total, 1);
+                const behind = Math.max(total - position, 0);
+                const percentile = behind / total;
+                return Math.max(0, Math.min(percentile, 0.9999));
+            }
+
+            refreshStanding() {
+                this.userPercentile = this.computePercentile();
+                this.updateTierStatus();
+            }
+
             updateTierStatus() {
                 const nameEl = document.getElementById('waitlist-tier-name');
                 const subtitleEl = document.getElementById('waitlist-tier-subtitle');
@@ -685,50 +693,52 @@
                     return;
                 }
 
-                let currentLevel = this.statusLevels[this.statusLevels.length - 1];
-                let currentIndex = this.statusLevels.length - 1;
+                const percentile = typeof this.userPercentile === 'number' ? this.userPercentile : null;
 
-                for (let i = 0; i < this.statusLevels.length; i++) {
-                    const level = this.statusLevels[i];
-                    if (this.userReferralCount >= level.minReferrals) {
-                        currentLevel = level;
-                        currentIndex = i;
-                        break;
+                let activeBand = this.percentileBands[this.percentileBands.length - 1];
+                if (percentile !== null) {
+                    for (const band of this.percentileBands) {
+                        if (percentile >= band.minPercentile) {
+                            activeBand = band;
+                            break;
+                        }
                     }
                 }
 
-                const nextLevel = currentIndex > 0 ? this.statusLevels[currentIndex - 1] : null;
+                nameEl.textContent = activeBand.title;
+                subtitleEl.textContent = activeBand.subtitle;
 
-                nameEl.textContent = currentLevel.title;
-                subtitleEl.textContent = currentLevel.subtitle;
-                ctaEl.textContent = currentLevel.cta;
-
-                let progressRatio = 1;
-                let progressText = currentLevel.progressLabel;
-
-                if (nextLevel) {
-                    const denominator = nextLevel.minReferrals - currentLevel.minReferrals;
-                    const numerator = this.userReferralCount - currentLevel.minReferrals;
-                    progressRatio = denominator > 0 ? Math.min(Math.max(numerator / denominator, 0), 1) : 0;
-                    const percent = Math.round(progressRatio * 100);
-                    progressText = percent > 0 ? `${percent}% to ${nextLevel.title}` : `On deck -> ${nextLevel.title}`;
+                const nextTier = this.tiers.find(tier => tier.referralsRequired > this.userReferralCount) || null;
+                if (nextTier) {
+                    const needed = Math.max(nextTier.referralsRequired - this.userReferralCount, 1);
+                    const friendLabel = needed === 1 ? 'friend' : `${needed} friends`;
+                    const nextLabel = nextTier.title === 'Founding Member' ? 'the Top 25%' : nextTier.title;
+                    ctaEl.textContent = `Invite ${friendLabel} to skip the line into ${nextLabel} with you.`;
                 } else {
-                    progressRatio = 1;
+                    if (this.totalCommunitySize >= this.waitlistCap) {
+                        ctaEl.textContent = 'Bring friends in with you—your insider invite is the only way past the line now.';
+                    } else {
+                        ctaEl.textContent = 'Keep sharing to pull your crew into early access alongside you.';
+                    }
                 }
 
-                const gradientMap = {
-                    golden: 'linear-gradient(90deg,#f59e0b,#f97316)',
-                    founding: 'linear-gradient(90deg,#f59e0b,#f97316)',
-                    vip: 'linear-gradient(90deg,#10b981,#0ea5e9)',
-                    early: 'linear-gradient(90deg,#10b981,#0ea5e9)'
-                };
+                const gradient = activeBand.gradient || 'linear-gradient(90deg,#10b981,#0ea5e9)';
+                const fillWidth = percentile === null ? 12 : Math.max(6, Math.min(Math.round(percentile * 100), 100));
+                progressFill.style.width = `${fillWidth}%`;
+                progressFill.style.background = gradient;
 
-                const width = Math.max(progressRatio * 100, nextLevel ? 6 : 100);
-                progressFill.style.width = `${Math.min(width, 100)}%`;
-                progressFill.style.background = gradientMap[nextLevel?.slug || currentLevel.slug] || gradientMap.vip;
-                progressCopy.textContent = progressText;
+                if (percentile !== null) {
+                    const aheadPercent = Math.max(0, Math.round(percentile * 100));
+                    if (aheadPercent <= 5) {
+                        progressCopy.textContent = 'You just joined—invite a friend to leap ahead.';
+                    } else {
+                        progressCopy.textContent = `Ahead of ${aheadPercent}% of the cohort`;
+                    }
+                } else {
+                    progressCopy.textContent = 'Crunching your spot in line...';
+                }
 
-                this.goldenTicketActive = currentLevel.slug === 'golden' || this.userReferralCount >= 5;
+                this.goldenTicketActive = this.userReferralCount >= 5;
             }
             
             updateCommunityDisplay() {
@@ -1222,7 +1232,7 @@
         (function () {
             const url = document.getElementById('referral-link').value;
             const title = 'LocalPlate Founding Cohort';
-            const text = "I just locked a VIP spot in LocalPlate's 500-seat founding cohort. Grab an invite before it fills:";
+            const text = "I just locked a VIP spot in LocalPlate's 500-seat founding cohort—use my link to skip the wait with me:";
 
             const enc = encodeURIComponent;
             const encodedUrl = enc(url);

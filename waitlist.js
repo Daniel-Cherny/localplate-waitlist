@@ -1631,10 +1631,10 @@ async function updateWaitlistCount() {
 
         if (ratio >= 1) {
             label = 'Founding cohort is full';
-            message = 'Golden tickets are the only way in—share yours when it unlocks.';
+            message = 'Members control the line now—ask a friend inside to fast-track you.';
         } else if (ratio >= 0.85) {
             label = 'Final call for founding seats';
-            message = 'Secure your spot now and line up a golden ticket for friends.';
+            message = 'Secure your spot now and line up a fast-pass for your crew.';
         } else if (ratio >= 0.5) {
             label = 'VIP wave in motion';
             message = 'Founding seats are half claimed—referrals keep you ahead.';

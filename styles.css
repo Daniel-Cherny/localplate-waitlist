@@ -2640,27 +2640,27 @@ textarea:focus {
 }
 
 #tier-1 .tier-card-body {
-    background: linear-gradient(180deg, rgba(167, 243, 208, 0.45), rgba(255, 255, 255, 0.9));
+    background: linear-gradient(160deg, #6ee7b7 0%, #059669 100%);
 }
 
 #tier-2 .tier-card-body {
-    background: linear-gradient(180deg, rgba(253, 230, 138, 0.45), rgba(255, 255, 255, 0.92));
+    background: linear-gradient(160deg, #fcd34d 0%, #d97706 100%);
 }
 
 #tier-3 .tier-card-body {
-    background: linear-gradient(180deg, rgba(251, 191, 217, 0.45), rgba(255, 255, 255, 0.93));
+    background: linear-gradient(160deg, #fbcfe8 0%, #8b5cf6 100%);
 }
 
 .dark #tier-1 .tier-card-body {
-    background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(17, 24, 39, 0.85));
+    background: linear-gradient(160deg, #0f766e 0%, #064e3b 100%);
 }
 
 .dark #tier-2 .tier-card-body {
-    background: linear-gradient(180deg, rgba(245, 158, 11, 0.22), rgba(17, 24, 39, 0.85));
+    background: linear-gradient(160deg, #b45309 0%, #78350f 100%);
 }
 
 .dark #tier-3 .tier-card-body {
-    background: linear-gradient(180deg, rgba(236, 72, 153, 0.22), rgba(17, 24, 39, 0.88));
+    background: linear-gradient(160deg, #be185d 0%, #581c87 100%);
 }
 
 .tier-card-body .text-center {

@@ -58,7 +58,7 @@ A hyper-realistic, cinematic photograph: An elegant emerald green membership car
 
 In the blurred background, silhouettes of happy diners at local restaurants, their meals subtly glowing with health halos. A translucent overlay shows fading nutrition numbers and checkmarks, creating FOMO. The composition uses rule of thirds with the card slightly off-center, creating visual tension. Rich color grading with emerald and amber tones against creamy neutrals. Shot with 85mm lens, f/1.4 aperture for shallow depth of field. 
 
-Premium lifestyle photography style mixing Kinfolk magazine aesthetics with modern tech interface elements. Conveys: exclusivity, health transformation, local community, transparency, and urgent desire to join before spots run out. The image should make viewers feel they're missing out on a secret that health-conscious foodies already know.
+Premium lifestyle photography style mixing Kinfolk magazine aesthetics with modern tech interface elements. Conveys: exclusivity, health transformation, local community, transparency, and urgent desire to join before spots run out. The image should make viewers feel they're missing out on a secret that health-focused diners already know.
 
 Style: Commercial photography, lifestyle brand campaign, subtle luxury, health-tech premium product launch
 ```
@@ -95,7 +95,7 @@ Style: Commercial photography, lifestyle brand campaign, subtle luxury, health-t
 
 6. **Visual Tension**: Off-center composition creates unresolved feeling - viewers want resolution (joining waitlist)
 
-The prompt essentially creates a visual representation of being *almost* inside an exclusive club where health-conscious foodies have already solved the "eating out problem" - you can see it, almost touch it, but need to join to fully access it.
+The prompt essentially creates a visual representation of being *almost* inside an exclusive club where health-conscious diners have already solved the "eating out problem" - you can see it, almost touch it, but need to join to fully access it.
 
 ## Veo 3 Video Prompt (8-Second Version - Under 1000 Characters)
 

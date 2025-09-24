@@ -1627,7 +1627,7 @@ async function updateWaitlistCount() {
     const copyMap = {
         open: {
             label: 'Spots are open',
-            message: 'Invite a friend to jump into VIP faster.',
+            message: '',
             showSpots: false
         },
         filling: {

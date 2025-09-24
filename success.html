@@ -106,7 +106,6 @@
                         <div class="tier-progress-track">
                             <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
                         </div>
-                        <p id="waitlist-tier-progress-copy" class="tier-progress-copy">Crunching your spot in line...</p>
                     </div>
                     <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                 </div>
@@ -707,7 +706,7 @@
                 const progressFill = document.getElementById('waitlist-tier-progress-fill');
                 const progressCopy = document.getElementById('waitlist-tier-progress-copy');
 
-                if (!nameEl || !subtitleEl || !ctaEl || !progressFill || !progressCopy) {
+                if (!nameEl || !subtitleEl || !ctaEl || !progressFill) {
                     return;
                 }
 
@@ -762,7 +761,9 @@
                     }
                 }
 
-                progressCopy.textContent = progressMessage;
+                if (progressCopy) {
+                    progressCopy.textContent = progressMessage;
+                }
 
                 this.ambassadorRewardActive = this.userReferralCount >= 5;
             }

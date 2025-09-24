@@ -1484,6 +1484,10 @@ textarea:focus {
     width: 2.75rem;
 }
 
+.w-12 {
+    width: 3rem;
+}
+
 .w-20 {
     width: 5rem;
 }
@@ -1530,6 +1534,10 @@ textarea:focus {
 
 .h-11 {
     height: 2.75rem;
+}
+
+.h-12 {
+    height: 3rem;
 }
 
 .h-16 {

@@ -666,14 +666,19 @@
             }
 
             computePercentile() {
-                if (!this.totalCommunitySize || !this.userWaitlistPosition) {
+                if (!this.userWaitlistPosition) {
                     return null;
                 }
 
-                const total = Math.max(Number(this.totalCommunitySize) || 0, 1);
-                const position = Math.max(Number(this.userWaitlistPosition) || total, 1);
-                const behind = Math.max(total - position, 0);
-                const percentile = behind / total;
+                const cap = Math.max(Number(this.waitlistCap) || 1, 1);
+                const totalMembers = Math.max(Number(this.totalCommunitySize) || 0, 0);
+                const position = Math.max(Number(this.userWaitlistPosition) || cap, 1);
+
+                // Use the larger of current cohort size or the cap so early adopters
+                // get credit for how early they are relative to the 500-seat limit.
+                const denominator = Math.max(cap, totalMembers, position);
+                const ahead = Math.max(denominator - position, 0);
+                const percentile = ahead / denominator;
                 return Math.max(0, Math.min(percentile, 0.9999));
             }
 

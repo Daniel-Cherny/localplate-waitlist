@@ -1627,7 +1627,8 @@ async function updateWaitlistCount() {
     const copyMap = {
         open: {
             label: 'Spots are open',
-            message: ''
+            message: 'Invite a friend to jump into VIP faster.',
+            showSpots: false
         },
         filling: {
             label: 'Momentum is building',
@@ -1650,12 +1651,14 @@ async function updateWaitlistCount() {
     const setStatusCopy = ({ status = 'open', filled_percent: filledPercent = 0, spots_left: spotsLeft = null } = {}) => {
         const ratio = Math.min(Math.max((filledPercent || 0) / 100, 0), 1.2);
         const copy = copyMap[status] || copyMap.open;
+        const { message: copyMessage = '', showSpots = true } = copy;
 
         statusElement.textContent = copy.label;
 
-        const baseMessage = copy.message || '';
+        const baseMessage = copyMessage || '';
         if (baseMessage) {
-            messageElement.textContent = spotsLeft !== null && spotsLeft >= 0
+            const shouldAppendSpots = showSpots && spotsLeft !== null && spotsLeft >= 0;
+            messageElement.textContent = shouldAppendSpots
                 ? `${baseMessage} (${spotsLeft} spots left)`
                 : baseMessage;
         } else {

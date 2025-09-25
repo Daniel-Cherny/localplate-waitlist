@@ -33,8 +33,7 @@ window.previousStep = null; // Will be defined later
 // Handle form submission - Defined early to prevent initialization race condition
 window.handleFormSubmit = async function(e) {
     e.preventDefault();
-    console.log('[SUBMIT] Handler fired! Form submission started');
-    
+
     // Defer to the full implementation that will be set up after all dependencies are loaded
     // This ensures validateCurrentStep, saveStepData, etc. are available
     if (window._handleFormSubmitImpl) {
@@ -49,7 +48,7 @@ window.handleFormSubmit = async function(e) {
 const trace = (...args) => {
     if (!DEBUG) return;
     const t = (performance.now() / 1000).toFixed(3);
-    console.log(`[waitlist ${t}s]`, ...args);
+    if (DEBUG) console.log(`[waitlist ${t}s]`, ...args);
 };
 
 // Assertion helper
@@ -295,7 +294,6 @@ function initFormHandlers() {
     const form = document.getElementById('waitlist-form');
     
     // CRITICAL: Log form detection
-    console.log('[INIT] Form element found:', !!form);
     if (!form) {
         console.error('[INIT] CRITICAL: waitlist-form not found! Submit handler will not attach.');
         return;
@@ -381,7 +379,6 @@ function initFormHandlers() {
     if (form) {
         // handleFormSubmit is now defined early at the top of the file, so it's always available
         form.addEventListener('submit', window.handleFormSubmit);
-        console.log('[INIT] Submit handler attached successfully');
     } else {
         console.error('[INIT] Cannot attach submit handler - form is null');
     }
@@ -1168,15 +1165,6 @@ function runDiagnostics() {
     });
     
     console.group('LocalPlate Waitlist Diagnostics');
-    console.log('Full Report:', diagnostics);
-    console.log('Connection Status:', diagnostics.online ? 'Online' : 'Offline');
-    console.log('Recent Errors:', diagnostics.errors.length);
-    console.log('Supabase Client:', diagnostics.supabaseClient);
-    console.log('Required DOM Elements:', 
-        Object.entries(diagnostics.domElements)
-            .map(([id, exists]) => `${id}: ${exists ? '✓' : '✗'}`)
-            .join(', ')
-    );
     console.groupEnd();
     
     return diagnostics;
@@ -1187,11 +1175,7 @@ window.localplateDiagnostics = runDiagnostics;
 
 // CRITICAL TEST: Check for request cancellation issue (GPT-5 identified)
 window.testRequestCancellation = async function() {
-    console.log('=== TESTING FOR REQUEST CANCELLATION BUG ===');
-    console.log('This test will determine if navigation is killing your Supabase insert.');
-    console.log('Watch the Network tab for a request to /rest/v1/waitlist');
-    console.log('If it shows "(canceled)" = FOUND THE BUG!');
-    
+
     const testData = {
         first_name: 'Test',
         last_name: 'Cancel',
@@ -1208,43 +1192,36 @@ window.testRequestCancellation = async function() {
         user_agent: navigator.userAgent,
         language: navigator.language
     };
-    
+
     try {
         const supabase = window.getSupabaseClient();
-        
-        console.log('Starting insert WITHOUT awaiting...');
+
         // Intentionally NOT awaiting to simulate the bug
         const insertPromise = supabase
             .from('waitlist')
             .insert([testData])
             .select();
-            
+
         // Simulate navigation after 100ms (before request completes)
         setTimeout(() => {
-            console.log('SIMULATING NAVIGATION - Watch Network tab NOW!');
             // Don't actually navigate, just log what would happen
             console.warn('In real scenario, window.location.href would be set here');
             console.warn('This would CANCEL the pending insert request!');
         }, 100);
-        
+
         // Now properly await to see if it succeeds when not interrupted
         const { data, error } = await insertPromise;
-        
+
         if (error) {
             console.error('Insert failed:', error);
         } else if (data && data[0]) {
-            console.log('✅ Insert succeeded when not interrupted:', data[0]);
-            console.log('This proves navigation IS the problem!');
         } else {
-            console.log('⚠️ Insert returned no data (check RLS policies)');
         }
-        
+
     } catch (err) {
         console.error('Test error:', err);
     }
-    
-    console.log('=== TEST COMPLETE ===');
-    console.log('To fix: Ensure you AWAIT the insert before ANY navigation!');
+
 };
 
 // Handle form submission implementation - Simple and direct with Supabase
@@ -1351,7 +1328,6 @@ window._handleFormSubmitImpl = async function(e) {
         );
         
         // Submit directly to Supabase using POST request via .insert()
-        console.log('Submitting to Supabase via POST:', submissionData);
         
         // Add abort detection to catch navigation cancellations
         const abortController = new AbortController();
@@ -1370,7 +1346,6 @@ window._handleFormSubmitImpl = async function(e) {
             .select()
             .abortSignal(abortController.signal)
             .then(result => {
-                console.log('[INSERT] Request completed successfully');
                 return result;
             })
             .catch(err => {
@@ -1405,7 +1380,6 @@ window._handleFormSubmitImpl = async function(e) {
         }
         
         const { data, error, status, statusText } = result || {};
-        console.log('[SUBMIT] Insert result', { hasData: Array.isArray(data), dataLength: data?.length, error: error?.message, status, statusText });
         
         // Clear navigation block immediately
         insertPending = false;
@@ -1448,7 +1422,6 @@ window._handleFormSubmitImpl = async function(e) {
                     // Don't fail the whole submission for this
                 } else if (referralResult?.success) {
                     trace('[submit] referral recorded successfully');
-                    console.log('Referral recorded for code:', referredBy);
                 } else {
                     trace('[submit] referral failed:', referralResult?.message || 'unknown error');
                     console.warn('Referral recording failed:', referralResult?.message);
@@ -1467,7 +1440,6 @@ window._handleFormSubmitImpl = async function(e) {
             // Check for any identifier that confirms the row was created
             if (data[0].id || data[0].email || data[0].created_at) {
                 inserted = data[0];
-                console.log('[SUBMIT] Insert confirmed', { id: data[0].id, email: data[0].email });
             }
         }
         
@@ -1492,12 +1464,9 @@ window._handleFormSubmitImpl = async function(e) {
         }
         
         // Store success data for success.html - use formData which was populated by saveAllFormData
-        console.log('[waitlist submit] setting first_name:', formData.firstName, 'at', performance.now(), 'on', location.origin);
-        console.log('[waitlist submit] full formData:', formData);
         sessionStorage.setItem('waitlist_email', formData.email);
         sessionStorage.setItem('waitlist_first_name', formData.firstName);
         sessionStorage.setItem('waitlist_referral_code', referralCode);
-        console.log('[waitlist submit] sessionStorage set. Verification:', sessionStorage.getItem('waitlist_first_name'));
         if (inserted.id) {
             sessionStorage.setItem('waitlist_inserted_id', String(inserted.id));
         }
@@ -1507,7 +1476,6 @@ window._handleFormSubmitImpl = async function(e) {
         clearSessionStorage();
         
         trace('[submit] verified insert, storing success data, about to redirect');
-        console.log('[SUBMIT] Verified insert - navigating to success');
         window.location.href = 'success.html';
         
     } catch (error) {
@@ -1598,14 +1566,11 @@ function checkReferral() {
     const referralCode = getReferralFromURL();
     if (referralCode) {
         // Track referral visit
-        console.log('Referred by:', referralCode);
-        
+
         // Store referral code for form submission (first-touch attribution)
         if (!localStorage.getItem('referrer_code')) {
             localStorage.setItem('referrer_code', referralCode);
-            console.log('Stored referral code:', referralCode);
         } else {
-            console.log('Referral code already stored (first-touch):', localStorage.getItem('referrer_code'));
         }
         
         // Could show a welcome message
@@ -1742,7 +1707,6 @@ function initMarquee() {
             logo.addEventListener('click', (e) => {
                 e.preventDefault();
                 const restaurantName = logo.alt;
-                console.log('Restaurant clicked:', restaurantName);
                 // Track engagement
                 trackEvent('restaurant_logo_click', {
                     restaurant_name: restaurantName
@@ -1838,7 +1802,6 @@ function trackEvent(eventName, eventData = {}) {
     }
     
     // Console log for development
-    console.log('Event:', eventName, eventData);
 }
 
 // Add ripple effect to buttons

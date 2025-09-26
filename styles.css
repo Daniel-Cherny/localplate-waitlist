@@ -171,6 +171,10 @@ h1, h2, h3 {
     z-index: 1;
 }
 
+.follow-us-section {
+    margin-top: clamp(3.5rem, 7vw, 6rem);
+}
+
 .tier-progress-glow {
     background: linear-gradient(135deg,
         #a7f3d0 0%,

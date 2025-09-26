@@ -175,6 +175,12 @@ h1, h2, h3 {
     margin-top: clamp(3.5rem, 7vw, 6rem);
 }
 
+@media (min-width: 1024px) {
+    .follow-us-section {
+        padding-top: clamp(3rem, 4vw, 4rem);
+    }
+}
+
 .tier-progress-glow {
     background: linear-gradient(135deg,
         #a7f3d0 0%,

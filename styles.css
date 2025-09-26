@@ -5,8 +5,10 @@
     --emerald-500: #10b981;
     --emerald-600: #059669;
     --emerald-700: #047857;
+    --amber-400: #fbbf24;
     --amber-500: #f59e0b;
     --amber-600: #d97706;
+    --orange-500: #f97316;
     --red-500: #ef4444;
     --red-600: #dc2626;
     --blue-500: #3b82f6;
@@ -31,6 +33,9 @@
     --purple-500: #8b5cf6;
     --emerald-200: #a7f3d0;
     --red-100: #fee2e2;
+    --rose-400: #fb7185;
+    --pink-500: #ec4899;
+    --purple-600: #7c3aed;
     /* For rgba variants */
     --gray-100-rgb: 243, 244, 246;
     --gray-800-rgb: 31, 41, 55;
@@ -1811,14 +1816,10 @@ textarea:focus {
     --tw-gradient-to: #0d9488;
 }
 
-.from-amber-500 {
-    --tw-gradient-from: var(--amber-500);
-    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.to-orange-600 {
-    --tw-gradient-to: #ea580c;
-}
+.from-amber-400 { --tw-gradient-from: var(--amber-400); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.from-amber-500 { --tw-gradient-from: var(--amber-500); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.to-orange-500 { --tw-gradient-to: var(--orange-500); }
+.to-orange-600 { --tw-gradient-to: #ea580c; }
 
 .from-blue-500 {
     --tw-gradient-from: var(--blue-500);
@@ -1835,7 +1836,10 @@ textarea:focus {
 .from-blue-400 { --tw-gradient-from: var(--blue-400); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 .to-blue-500 { --tw-gradient-to: var(--blue-500); }
 .from-purple-400 { --tw-gradient-from: var(--purple-400); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.from-rose-400 { --tw-gradient-from: var(--rose-400); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+.via-pink-500 { --tw-gradient-via: var(--pink-500); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to); }
 .to-purple-500 { --tw-gradient-to: var(--purple-500); }
+.to-purple-600 { --tw-gradient-to: var(--purple-600); }
 .via-emerald-500 { --tw-gradient-via: var(--emerald-500); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to); }
 
 /* Gradient with opacity variants */

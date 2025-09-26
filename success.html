@@ -606,8 +606,8 @@
                         referralsRequired: 5,
                         title: "Glow Guide",
                         badge: "Vitality Vanguard Badge",
-                        reward: "3 months free",
-                        description: "Bring 5 health-conscious friends and enjoy 3 full months on us."
+                        reward: "2 months free",
+                        description: "Bring 5 health-conscious friends and enjoy 2 full months on us."
                     }
                 ];
 
@@ -801,9 +801,9 @@
                 if (descriptionElement && tier.description) {
                     // Use shortened versions for the new design
                     const shortDescriptions = {
-                        1: "Invite one wellness warrior to unlock your starter discount",
-                        2: "Rally three friends for a completely free first month",
-                        3: "Unite five wellness warriors for the ultimate reward"
+                        1: "1 friend away",
+                        2: "3 friends to unlock",
+                        3: "5 friends to unlock"
                     };
                     descriptionElement.textContent = shortDescriptions[tier.id] || tier.description;
                 }

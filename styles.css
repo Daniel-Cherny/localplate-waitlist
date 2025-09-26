@@ -173,19 +173,18 @@ h1, h2, h3 {
 
 .tier-progress-glow {
     background: linear-gradient(135deg,
-        rgba(167, 243, 208, 0.25) 0%,
-        rgba(20, 184, 166, 0.12) 45%,
-        rgba(253, 186, 116, 0.16) 70%,
-        rgba(251, 191, 217, 0.28) 100%);
-    backdrop-filter: blur(10px);
+        #a7f3d0 0%,
+        #14b8a6 45%,
+        #fde047 70%,
+        #fbcfe8 100%);
 }
 
 .dark .tier-progress-glow {
     background: linear-gradient(135deg,
-        rgba(6, 95, 70, 0.35) 0%,
-        rgba(4, 120, 87, 0.28) 40%,
-        rgba(120, 53, 15, 0.32) 70%,
-        rgba(131, 24, 67, 0.4) 100%);
+        #065f46 0%,
+        #047857 40%,
+        #78350f 70%,
+        #831843 100%);
 }
 
 /* Waitlist status banner */
@@ -386,15 +385,14 @@ h1, h2, h3 {
 }
 
 .tier-card {
-    border: 1px solid rgba(16, 185, 129, 0.12);
-    background: rgba(240, 253, 250, 0.45);
-    backdrop-filter: blur(6px);
+    border: 2px solid #10b981;
+    background: #ecfdf5;
     transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .dark .tier-card {
-    background: rgba(15, 118, 110, 0.08);
-    border-color: rgba(45, 212, 191, 0.18);
+    background: #065f46;
+    border-color: #10b981;
 }
 
 .tier-card:hover {
@@ -403,24 +401,24 @@ h1, h2, h3 {
 
 .tier-card.tier-locked {
     opacity: 1;
-    border-color: rgba(107, 114, 128, 0.4);
-    background: rgba(243, 244, 246, 0.8);
+    border-color: #6b7280;
+    background: #f3f4f6;
 }
 
 .dark .tier-card.tier-locked {
-    background: rgba(31, 41, 55, 0.8);
-    border-color: rgba(75, 85, 99, 0.5);
+    background: #1f2937;
+    border-color: #6b7280;
 }
 
 .tier-card.tier-unlocked {
     opacity: 1;
-    border-color: rgba(16, 185, 129, 0.5);
-    background: rgba(209, 250, 229, 0.6);
+    border-color: #10b981;
+    background: #d1fae5;
 }
 
 .dark .tier-card.tier-unlocked {
-    background: rgba(6, 95, 70, 0.4);
-    border-color: rgba(16, 185, 129, 0.6);
+    background: #065f46;
+    border-color: #10b981;
 }
 
 .tier-card .tier-title,
@@ -917,8 +915,8 @@ textarea:focus {
 .dark .dark\:border-emerald-700\/50 { border-color: rgba(5, 150, 105, 0.5); }
 .border-red-400 { border-color: #f87171; }
 
-/* Backdrop blur size */
-.backdrop-blur-sm { backdrop-filter: blur(4px); }
+/* Backdrop blur removed for vibrancy */
+.backdrop-blur-sm { /* removed */ }
 
 /* Min dimensions for icon buttons */
 .min-w-11 { min-width: 2.75rem; }
@@ -1924,11 +1922,11 @@ textarea:focus {
 }
 
 .backdrop-blur {
-    backdrop-filter: blur(8px);
+    /* removed for vibrancy */
 }
 
 .backdrop-blur-lg {
-    backdrop-filter: blur(16px);
+    /* removed for vibrancy */
 }
 
 .overflow-hidden {

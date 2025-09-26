@@ -35,7 +35,7 @@
     </script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css?v=09252025b">
+    <link rel="stylesheet" href="styles.css?v=09252025c">
     
     <!-- Inline styles removed; now consolidated in styles.css for consistency -->
     
@@ -329,13 +329,11 @@
                                 </div>
 
                                 <!-- Tier 2 - Superfood Sidekick -->
-                                <div id="tier-2" class="tier-card-premium group relative tier-locked">
+                                <div id="tier-2" class="tier-card-premium group relative">
                                     <div class="tier-card-body relative rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-amber-400 dark:group-hover:border-amber-600">
-                                        <!-- Lock Indicator -->
-                                        <div class="tier-lock-indicator absolute -top-3 -right-3 w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-amber-400 group-hover:to-orange-500 shadow-lg">
-                                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                            </svg>
+                                        <!-- Status Badge -->
+                                        <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                                            <span class="text-white text-xs font-bold">2</span>
                                         </div>
 
                                         <!-- Icon Container -->
@@ -385,18 +383,16 @@
                                 </div>
 
                                 <!-- Tier 3 - Glow Guide -->
-                                <div id="tier-3" class="tier-card-premium group relative tier-locked">
+                                <div id="tier-3" class="tier-card-premium group relative">
                                     <div class="tier-card-body relative rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-rose-400 dark:group-hover:border-rose-600">
                                         <!-- Premium Badge -->
                                         <div class="tier-premium-badge absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-rose-500 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             PREMIUM
                                         </div>
 
-                                        <!-- Lock Indicator -->
-                                        <div class="tier-lock-indicator absolute -top-3 -right-3 w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-gradient-to-br group-hover:from-rose-400 group-hover:to-purple-500 shadow-lg">
-                                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                            </svg>
+                                        <!-- Status Badge -->
+                                        <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-rose-400 to-purple-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                                            <span class="text-white text-xs font-bold">3</span>
                                         </div>
 
                                         <!-- Icon Container with Glow Effect -->

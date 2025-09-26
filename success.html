@@ -35,7 +35,7 @@
     </script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css?v=09252025s">
+    <link rel="stylesheet" href="styles.css?v=09252025r">
     
     <!-- Inline styles removed; now consolidated in styles.css for consistency -->
     
@@ -324,6 +324,7 @@
                                                 <div id="progress-bar-1" class="tier-progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <p id="progress-label-1" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">Ready to unlock</p>
                                             </div>
                                         </div>
                                     </div>
@@ -377,6 +378,7 @@
                                                 <div id="progress-bar-2" class="tier-progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <p id="progress-label-2" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">3 referrals needed</p>
                                             </div>
                                         </div>
                                     </div>
@@ -432,6 +434,7 @@
                                                 <div id="progress-bar-3" class="tier-progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <p id="progress-label-3" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">5 referrals needed</p>
                                             </div>
                                         </div>
                                     </div>
@@ -798,9 +801,9 @@
                 if (descriptionElement && tier.description) {
                     // Use shortened versions for the new design
                     const shortDescriptions = {
-                        1: "1 friend away",
-                        2: "3 friends to unlock",
-                        3: "5 friends to unlock"
+                        1: "Invite one wellness warrior to unlock your starter discount",
+                        2: "Rally three friends for a completely free first month",
+                        3: "Unite five wellness warriors for the ultimate reward"
                     };
                     descriptionElement.textContent = shortDescriptions[tier.id] || tier.description;
                 }

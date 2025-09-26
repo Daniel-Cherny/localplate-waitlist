@@ -553,36 +553,13 @@
                 this.realTimeSubscription = null;
 
                 this.waitlistCap = 500;
-                this.percentileBands = [
-                    {
-                        slug: 'vanguard',
-                        minPercentile: 0.9,
-                        title: 'Top 10% · Vitality Vanguard',
-                        subtitle: 'You’re blazing the trail—keep sharing while the momentum is yours.',
-                        gradient: 'linear-gradient(90deg,#f59e0b,#f97316)'
-                    },
-                    {
-                        slug: 'hero',
-                        minPercentile: 0.75,
-                        title: 'Top 25% · Harvest Hero',
-                        subtitle: 'Only a quarter of insiders are moving this fast—stay on the gas.',
-                        gradient: 'linear-gradient(90deg,#fbbf24,#f97316)'
-                    },
-                    {
-                        slug: 'spark',
-                        minPercentile: 0.5,
-                        title: 'Top 50% · Smoothie Spark',
-                        subtitle: 'You’re ahead of the pack—another share locks in your lead.',
-                        gradient: 'linear-gradient(90deg,#10b981,#0ea5e9)'
-                    },
-                    {
-                        slug: 'kickoff',
-                        minPercentile: 0,
-                        title: 'Kickoff Crew · Let’s get moving',
-                        subtitle: 'You’re in. Bring a wellness buddy to hit Fresh Start Friend status.',
-                        gradient: 'linear-gradient(90deg,#059669,#0ea5e9)'
-                    }
-                ];
+                // Single movement declaration - no tiers, just identity reinforcement
+                this.movementCard = {
+                    slug: 'revolution',
+                    title: 'You're Part of the Revolution',
+                    subtitle: 'You're joining thousands who believe real food from real places should be the norm. Your health matters. Your community matters. Together, we're making healthy eating as natural as breathing.',
+                    gradient: 'linear-gradient(90deg,#059669,#0ea5e9)'
+                };
 
                 this.tiers = [
                     {
@@ -880,20 +857,9 @@
                     return;
                 }
 
-                const percentile = typeof this.userPercentile === 'number' ? this.userPercentile : null;
-
-                let activeBand = this.percentileBands[this.percentileBands.length - 1];
-                if (percentile !== null) {
-                    for (const band of this.percentileBands) {
-                        if (percentile >= band.minPercentile) {
-                            activeBand = band;
-                            break;
-                        }
-                    }
-                }
-
-                nameEl.textContent = activeBand.title;
-                subtitleEl.textContent = activeBand.subtitle;
+                // Display the single movement card - no percentile calculation needed
+                nameEl.textContent = this.movementCard.title;
+                subtitleEl.textContent = this.movementCard.subtitle;
 
                 const nextTier = this.tiers.find(tier => tier.referralsRequired > this.userReferralCount) || null;
                 if (nextTier) {
@@ -908,27 +874,23 @@
                     }
                 }
 
-                const gradient = activeBand.gradient || 'linear-gradient(90deg,#10b981,#0ea5e9)';
-                const aheadPercent = percentile === null
-                    ? null
-                    : Math.max(0, Math.min(99, Math.round(percentile * 100)));
-                const fillWidth = percentile === null
-                    ? 12
-                    : Math.max(6, Math.min(Math.round(Math.max(percentile, 0.02) * 100), 100));
+                const gradient = this.movementCard.gradient || 'linear-gradient(90deg,#10b981,#0ea5e9)';
+
+                // Simple progress bar based on referral count instead of percentile
+                const fillWidth = Math.min(20 + (this.userReferralCount * 16), 100); // Start at 20%, grow with referrals
                 progressFill.style.width = `${fillWidth}%`;
                 progressFill.style.background = gradient;
 
-                let progressMessage = 'Crunching your spot in line...';
-                if (aheadPercent !== null) {
-                    if (percentile >= 0.9) {
-                        progressMessage = 'Vitality Vanguard vibes—share while the glow is bright.';
-                    } else if (percentile >= 0.75) {
-                        progressMessage = 'Harvest Hero pace—keep the momentum rolling.';
-                    } else if (percentile >= 0.5) {
-                        progressMessage = 'Smoothie Spark status—invite someone today to stay ahead.';
-                    } else {
-                        progressMessage = 'You\'re in the pack—one share pushes you into Fresh Start Friend territory.';
-                    }
+                // Movement-focused progress messages
+                let progressMessage = 'Your journey to better health starts now.';
+                if (this.userReferralCount >= 5) {
+                    progressMessage = 'You're building a healthier community. This is what leadership looks like.';
+                } else if (this.userReferralCount >= 3) {
+                    progressMessage = 'Your wellness circle is growing stronger. Keep going.';
+                } else if (this.userReferralCount >= 1) {
+                    progressMessage = 'You've started something real. Who else needs this?';
+                } else {
+                    progressMessage = 'Share with someone who cares about their health as much as you do.';
                 }
 
                 if (progressCopy) {

@@ -125,17 +125,11 @@
                 </div>
 
                 <div class="space-y-12 max-w-5xl mx-auto">
-                    <!-- Tier Status -->
+                    <!-- Movement Identity Card -->
                     <div class="form-card tier-status-card reveal-on-scroll animation-delay-250">
                         <div class="space-y-4">
                             <span id="waitlist-tier-name" class="tier-status-badge">Early Insider</span>
                             <p id="waitlist-tier-subtitle" class="tier-status-subtitle">You're already ahead of the curve.</p>
-                            <div class="tier-status-progress" role="img" aria-label="Progress to the next tier">
-                                <div class="tier-progress-track">
-                                    <div id="waitlist-tier-progress-fill" class="tier-progress-fill"></div>
-                                </div>
-                            </div>
-                            <p id="waitlist-tier-cta" class="tier-status-cta">Invite friends to move faster together.</p>
                         </div>
                     </div>
 
@@ -849,53 +843,14 @@
             updateTierStatus() {
                 const nameEl = document.getElementById('waitlist-tier-name');
                 const subtitleEl = document.getElementById('waitlist-tier-subtitle');
-                const ctaEl = document.getElementById('waitlist-tier-cta');
-                const progressFill = document.getElementById('waitlist-tier-progress-fill');
-                const progressCopy = document.getElementById('waitlist-tier-progress-copy');
 
-                if (!nameEl || !subtitleEl || !ctaEl || !progressFill) {
+                if (!nameEl || !subtitleEl) {
                     return;
                 }
 
                 // Display the single movement card - no percentile calculation needed
                 nameEl.textContent = this.movementCard.title;
                 subtitleEl.textContent = this.movementCard.subtitle;
-
-                const nextTier = this.tiers.find(tier => tier.referralsRequired > this.userReferralCount) || null;
-                if (nextTier) {
-                    const needed = Math.max(nextTier.referralsRequired - this.userReferralCount, 1);
-                    const friendLabel = needed === 1 ? 'friend' : `${needed} friends`;
-                    ctaEl.textContent = `Invite ${friendLabel} to unlock ${nextTier.title} with you.`;
-                } else {
-                    if (this.totalCommunitySize >= this.waitlistCap) {
-                        ctaEl.textContent = 'Bring friends in with you—your wellness circle is the only way past the line now.';
-                    } else {
-                        ctaEl.textContent = 'Keep sharing to pull your crew into early access alongside you.';
-                    }
-                }
-
-                const gradient = this.movementCard.gradient || 'linear-gradient(90deg,#10b981,#0ea5e9)';
-
-                // Simple progress bar based on referral count instead of percentile
-                const fillWidth = Math.min(20 + (this.userReferralCount * 16), 100); // Start at 20%, grow with referrals
-                progressFill.style.width = `${fillWidth}%`;
-                progressFill.style.background = gradient;
-
-                // Movement-focused progress messages
-                let progressMessage = 'Your journey to better health starts now.';
-                if (this.userReferralCount >= 5) {
-                    progressMessage = 'You\'re building a healthier community. This is what leadership looks like.';
-                } else if (this.userReferralCount >= 3) {
-                    progressMessage = 'Your wellness circle is growing stronger. Keep going.';
-                } else if (this.userReferralCount >= 1) {
-                    progressMessage = 'You\'ve started something real. Who else needs this?';
-                } else {
-                    progressMessage = 'Share with someone who cares about their health as much as you do.';
-                }
-
-                if (progressCopy) {
-                    progressCopy.textContent = progressMessage;
-                }
 
                 this.ambassadorRewardActive = this.userReferralCount >= 5;
             }

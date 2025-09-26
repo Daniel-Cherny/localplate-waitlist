@@ -2701,6 +2701,63 @@ textarea:focus {
     background: linear-gradient(160deg, #be185d 0%, #581c87 100%);
 }
 
+/* Light mode text contrast fixes for tier cards */
+.tier-card-body .text-white {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.tier-card-body .text-white\/90 {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.tier-card-body .text-white\/80 {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.tier-card-body .text-white\/70 {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Dark mode keeps white text */
+.dark .tier-card-body .text-white {
+    color: rgba(255, 255, 255, 1);
+}
+
+.dark .tier-card-body .text-white\/90 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.dark .tier-card-body .text-white\/80 {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.dark .tier-card-body .text-white\/70 {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Status indicator badges */
+.tier-status-indicator span {
+    color: white !important;
+}
+
+/* Tier badges need dark semi-transparent background for light mode */
+.tier-card-body .tier-badge {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.dark .tier-card-body .tier-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Fix SVG icon colors in tier cards */
+.tier-card-body svg.text-white {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.dark .tier-card-body svg.text-white {
+    color: rgba(255, 255, 255, 1);
+}
+
 .tier-card-body .text-center {
     flex: 1 1 auto;
     display: flex;

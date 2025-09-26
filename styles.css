@@ -402,14 +402,14 @@ h1, h2, h3 {
 }
 
 .tier-card.tier-locked {
-    opacity: 0.85;
-    border-color: rgba(107, 114, 128, 0.25);
-    background: rgba(243, 244, 246, 0.55);
+    opacity: 1;
+    border-color: rgba(107, 114, 128, 0.4);
+    background: rgba(243, 244, 246, 0.8);
 }
 
 .dark .tier-card.tier-locked {
-    background: rgba(31, 41, 55, 0.55);
-    border-color: rgba(75, 85, 99, 0.35);
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(75, 85, 99, 0.5);
 }
 
 .tier-card.tier-unlocked {
@@ -441,14 +441,14 @@ h1, h2, h3 {
 .tier-card.tier-locked .tier-tag,
 .tier-card.tier-locked .tier-description,
 .tier-card.tier-locked .tier-progress-caption {
-    color: rgba(55, 65, 81, 0.9);
+    color: rgba(55, 65, 81, 1);
 }
 
 .dark .tier-card.tier-locked .tier-title,
 .dark .tier-card.tier-locked .tier-tag,
 .dark .tier-card.tier-locked .tier-description,
 .dark .tier-card.tier-locked .tier-progress-caption {
-    color: rgba(229, 231, 235, 0.75);
+    color: rgba(229, 231, 235, 0.9);
 }
 
 .tier-card.tier-unlocked .tier-title,
@@ -2234,8 +2234,8 @@ textarea:focus {
 }
 @keyframes loading-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-/* Tiers and progress */
-.tier-locked { opacity: 0.6; filter: grayscale(0.3); }
+/* Tiers and progress - consolidated tier states */
+.tier-locked { opacity: 1; filter: none; }
 .tier-unlocked { opacity: 1; filter: none; }
 .tier-unlocked-glow { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); animation: pulse-glow 2s infinite alternate; }
 .tier-unlock-glow { animation: unlock-glow 1s ease-in-out; }

@@ -84,6 +84,7 @@
 
 html {
     scroll-behavior: smooth;
+    color-scheme: light;
 }
 
 body {
@@ -99,6 +100,10 @@ body {
 .dark body {
     color: white;
     background-color: var(--gray-900);
+}
+
+html.dark {
+    color-scheme: dark;
 }
 
 /* Typography */

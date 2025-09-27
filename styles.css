@@ -182,7 +182,8 @@ h1, h2, h3 {
 }
 
 .trust-badge-invisible {
-    opacity: 0;
+    visibility: hidden;
+    opacity: 0 !important;
     pointer-events: none;
 }
 

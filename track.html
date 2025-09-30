@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Referrals - LocalPlate</title>
+    <meta name="description" content="Track your LocalPlate referrals and unlock rewards.">
+    <meta name="color-scheme" content="light dark">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2310b981'/%3E%3C/svg%3E">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Apply saved theme early to avoid flash -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (error) {}
+        })();
+    </script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css?v=09302025t">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-transparent backdrop-blur-sm z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3 no-underline">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate)"/>
+                        <defs>
+                            <linearGradient id="gradient-plate" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                        LocalPlate
+                    </span>
+                </a>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                    <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414z"/>
+                    </svg>
+                    <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 ken-burns-container">
+            <div class="ken-burns-image"></div>
+        </div>
+
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90 dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/90"></div>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-4xl mx-auto space-y-8">
+
+                <!-- Header -->
+                <div class="text-center space-y-4">
+                    <h1 class="font-serif text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white">
+                        Track Your Impact
+                    </h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">
+                        See how many friends you've brought to the movement
+                    </p>
+                </div>
+
+                <!-- Lookup Form -->
+                <div id="lookup-form" class="form-card max-w-md mx-auto">
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center font-serif">Enter Your Referral Code</h2>
+                    <form onsubmit="lookupCode(event)" class="space-y-4">
+                        <div>
+                            <label for="code-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Your Referral Code
+                            </label>
+                            <input
+                                type="text"
+                                id="code-input"
+                                required
+                                placeholder="e.g. ABC12345"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            >
+                        </div>
+                        <button type="submit" class="btn-primary w-full">
+                            View My Stats
+                        </button>
+                    </form>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-6 sm:mt-8 text-center">
+                        Don't have your code? Check your email.
+                    </p>
+                </div>
+
+                <!-- Stats Display (hidden initially) -->
+                <div id="stats-display" class="hidden space-y-8">
+
+                    <!-- User Info -->
+                    <div class="form-card text-center p-6 sm:p-8">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-2 font-serif" id="user-greeting">Welcome back!</h2>
+                        <p class="text-gray-600 dark:text-gray-400">Referral Code: <span id="display-code" class="font-mono text-emerald-600 dark:text-emerald-400"></span></p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="max-w-md mx-auto">
+                        <!-- Total Referrals -->
+                        <div class="form-card text-center p-6 sm:p-8">
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Referrals</div>
+                            <div class="text-4xl sm:text-5xl font-bold text-emerald-600 dark:text-emerald-400" id="total-referrals">-</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-500 mt-2">Friends joined</div>
+                        </div>
+                    </div>
+
+                    <!-- Share the Magic -->
+                    <div class="form-card hover:shadow-2xl transition-shadow">
+                        <div class="space-y-4">
+                            <h2 class="font-serif text-3xl font-bold bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent text-center">Share the Magic</h2>
+                            <p class="text-gray-600 dark:text-gray-400 text-center">
+                                Your friends skip the line. You unlock rewards. Everyone wins.
+                            </p>
+
+                            <!-- Referral Link -->
+                            <div class="flex items-center space-x-2">
+                            <input
+                                type="text"
+                                id="share-link"
+                                readonly
+                                value="https://localplateapp.com/?ref=ABC123"
+                                class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
+                            >
+                            <button
+                                onclick="copyShareLink()"
+                                class="btn-primary group hover:scale-105 transition-all"
+                            >
+                                <span>Copy</span>
+                                <svg class="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Share Buttons -->
+                        <div class="flex flex-wrap justify-center gap-8 w-full max-w-3xl mx-auto" role="group" aria-label="Share your referral link">
+                        <!-- X/Twitter -->
+                        <a id="share-x"
+                            href="#" target="_blank" rel="noopener noreferrer"
+                            class="btn-secondary flex items-center justify-center min-w-11 min-h-11 p-3 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on X"
+                            title="Share on X"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+
+                        <!-- Facebook -->
+                        <a id="share-facebook"
+                            href="#" target="_blank" rel="noopener noreferrer"
+                            class="btn-secondary flex items-center justify-center min-w-11 min-h-11 p-3 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on Facebook"
+                            title="Share on Facebook"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+
+                        <!-- LinkedIn -->
+                        <a id="share-linkedin"
+                            href="#" target="_blank" rel="noopener noreferrer"
+                            class="btn-secondary flex items-center justify-center min-w-11 min-h-11 p-3 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on LinkedIn"
+                            title="Share on LinkedIn"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+
+                        <!-- WhatsApp -->
+                        <a id="share-whatsapp"
+                            href="#" target="_blank" rel="noopener noreferrer"
+                            class="btn-secondary flex items-center justify-center min-w-11 min-h-11 p-3 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on WhatsApp"
+                            title="Share on WhatsApp"
+                        >
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
+                            </svg>
+                        </a>
+
+                        <!-- Bluesky -->
+                        <a id="share-bluesky"
+                            href="#" target="_blank" rel="noopener noreferrer"
+                            class="btn-secondary flex items-center justify-center min-w-11 min-h-11 p-3 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                            aria-label="Share on Bluesky"
+                            title="Share on Bluesky"
+                        >
+                            <!-- Bluesky butterfly logo -->
+                            <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                                <path d="M3.468 1.948C5.303 3.325 7.276 6.118 8 7.616c.725-1.498 2.698-4.29 4.532-5.668C13.855.955 16 .186 16 2.632c0 .489-.28 4.105-.444 4.692-.572 2.04-2.653 2.561-4.504 2.246 3.236.551 4.06 2.375 2.281 4.2-3.376 3.464-4.852-.87-5.23-1.98-.07-.204-.103-.3-.103-.218 0-.081-.033.014-.102.218-.379 1.11-1.855 5.444-5.231 1.98-1.778-1.825-.955-3.65 2.28-4.2-1.85.315-3.932-.205-4.503-2.246C.28 6.737 0 3.12 0 2.632 0 .186 2.145.955 3.468 1.948"/>
+                            </svg>
+                        </a>
+                    </div>
+                        </div>
+                    </div>
+
+                    <!-- Tier Progress -->
+                    <div class="mb-8">
+                        <div class="text-center mb-8">
+                            <h3 class="text-2xl sm:text-3xl font-bold mb-3 font-serif">
+                                <span class="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 bg-clip-text text-transparent animate-gradient-x">
+                                    Unlock the Perks
+                                </span>
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                                Each friend you bring multiplies your rewards. Track your journey to premium perks.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                            <!-- Tier 1 - Catalyst -->
+                            <div id="tier-1" class="tier-card-premium group relative">
+                                <!-- Card Background & Border -->
+                                <div class="tier-card-body relative rounded-2xl p-6 border-2 border-emerald-200 dark:border-emerald-800 transition-all duration-300 group-hover:border-emerald-400 dark:group-hover:border-emerald-600 group-hover:shadow-emerald-200/50 dark:group-hover:shadow-emerald-900/50">
+                                    <!-- Status Badge -->
+                                    <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
+                                        <span class="text-white text-xs font-bold">1</span>
+                                    </div>
+
+                                    <!-- Icon Container with Animation -->
+                                    <div class="tier-icon-premium relative mx-auto mb-3 w-20 h-20">
+                                        <div class="relative w-full h-full bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                            <!-- Leaf/Smoothie Icon -->
+                                            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7c0 2.21-1.79 4-4 4S12 9.21 12 7c0-2.21 1.79-4 4-4s4 1.79 4 4zM12 7c0 2.21-1.79 4-4 4S4 9.21 4 7c0-2.21 1.79-4 4-4s4 1.79 4 4z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 11v10M8 21h8"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="text-center">
+                                        <h4 class="tier-title text-lg font-bold text-white mb-3">Catalyst</h4>
+
+                                        <!-- Reward Display -->
+                                        <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg">
+                                            <div class="text-2xl font-bold text-white">50% OFF</div>
+                                            <div class="text-xs text-white/80">First Month</div>
+                                        </div>
+
+                                        <p class="tier-description text-sm text-white/90 mb-3 leading-relaxed">
+                                            1 friend away
+                                        </p>
+
+                                        <!-- Progress Section -->
+                                        <div class="tier-progress-section">
+                                            <div class="tier-progress-header">
+                                                <span class="tier-progress-label text-white/70">Progress</span>
+                                                <span id="progress-count-1" class="tier-progress-count text-white">0/1</span>
+                                            </div>
+                                            <div id="progress-bar-1" class="tier-progress-bar">
+                                                <div class="progress-fill" style="width: 0%"></div>
+                                            </div>
+                                            <p id="progress-label-1" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">Ready to unlock</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tier 2 - VIP -->
+                            <div id="tier-2" class="tier-card-premium group relative">
+                                <div class="tier-card-body relative rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-amber-400 dark:group-hover:border-amber-600">
+                                    <!-- Status Badge -->
+                                    <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                                        <span class="text-white text-xs font-bold">2</span>
+                                    </div>
+
+                                    <!-- Icon Container -->
+                                    <div class="tier-icon-premium relative mx-auto mb-3 w-20 h-20">
+                                        <div class="relative w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                            <!-- Trophy Icon -->
+                                            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15l-2 5h4l-2-5zM7 7h10l1.5 4.5a2 2 0 01-1.9 2.5H7.4a2 2 0 01-1.9-2.5L7 7zM5 7V4a1 1 0 011-1h12a1 1 0 011 1v3"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="text-center">
+                                        <h4 class="tier-title text-lg font-bold text-white mb-3">VIP</h4>
+
+                                        <!-- Reward Display -->
+                                        <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg">
+                                            <div class="text-2xl font-bold text-white">100% OFF</div>
+                                            <div class="text-xs text-white/80">First Month Free</div>
+                                        </div>
+
+                                        <p class="tier-description text-sm text-white/90 mb-3 leading-relaxed">
+                                            3 friends to unlock
+                                        </p>
+
+                                        <!-- Progress Section -->
+                                        <div class="tier-progress-section">
+                                            <div class="tier-progress-header">
+                                                <span class="tier-progress-label text-white/70">Progress</span>
+                                                <span id="progress-count-2" class="tier-progress-count text-white">0/3</span>
+                                            </div>
+                                            <div id="progress-bar-2" class="tier-progress-bar">
+                                                <div class="progress-fill" style="width: 0%"></div>
+                                            </div>
+                                            <p id="progress-label-2" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">3 referrals needed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tier 3 - GOAT -->
+                            <div id="tier-3" class="tier-card-premium group relative">
+                                <div class="tier-card-body relative rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 group-hover:border-rose-400 dark:group-hover:border-rose-600">
+                                    <!-- Status Badge -->
+                                    <div class="tier-status-indicator absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-rose-400 to-purple-500 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg">
+                                        <span class="text-white text-xs font-bold">3</span>
+                                    </div>
+
+                                    <!-- Icon Container with Glow Effect -->
+                                    <div class="tier-icon-premium relative mx-auto mb-3 w-20 h-20">
+                                        <div class="relative w-full h-full bg-gradient-to-br from-rose-400 via-pink-500 to-purple-600 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                                            <!-- Crown/Star Icon -->
+                                            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm2.86-2h8.28l.57-4L14 8l-2-3-2 3-2.71 2L7.86 14z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="text-center">
+                                        <h4 class="tier-title text-lg font-bold text-white mb-3">GOAT 🐐</h4>
+
+                                        <!-- Reward Display with Glow -->
+                                        <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-rose-50 via-pink-50 to-purple-50 dark:from-rose-900/20 dark:via-pink-900/20 dark:to-purple-900/20 rounded-lg relative overflow-hidden">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-rose-400/10 to-purple-400/10 animate-shimmer"></div>
+                                            <div class="relative text-2xl font-bold text-white">200% OFF</div>
+                                            <div class="relative text-xs text-white/80">Two Months Free</div>
+                                        </div>
+
+                                        <p class="tier-description text-sm text-white/90 mb-3 leading-relaxed">
+                                            5 friends to unlock
+                                        </p>
+
+                                        <!-- Progress Section -->
+                                        <div class="tier-progress-section">
+                                            <div class="tier-progress-header">
+                                                <span class="tier-progress-label text-white/70">Progress</span>
+                                                <span id="progress-count-3" class="tier-progress-count text-white">0/5</span>
+                                            </div>
+                                            <div id="progress-bar-3" class="tier-progress-bar">
+                                                <div class="progress-fill" style="width: 0%"></div>
+                                            </div>
+                                            <p id="progress-label-3" class="tier-progress-caption text-xs text-white/70 mt-2 font-medium">5 referrals needed</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Follow Us -->
+                    <div class="follow-us-section text-center reveal-on-scroll">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Follow us for updates</p>
+                        <div class="flex justify-center items-center space-x-6">
+                            <a href="https://x.com/localplateapp" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-emerald-600 dark:text-gray-400 dark:hover:text-emerald-400 transition-all hover:scale-110 hover:shadow-lg rounded-lg p-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-12 sm:py-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate-footer)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate-footer" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-lg font-semibold text-gray-900 dark:text-white">LocalPlate</span>
+                </div>
+
+                <!-- Copyright -->
+                <p class="text-sm text-gray-500 dark:text-gray-500 text-center md:text-left" style="white-space: nowrap;">
+                    © 2025 LocalPlate. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span id="toast-message">Link copied!</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase
+        const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+
+        let supabase = null;
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        let currentCode = null;
+
+        // Check URL for code parameter
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const codeFromUrl = params.get('code');
+
+            if (codeFromUrl) {
+                document.getElementById('code-input').value = codeFromUrl;
+                lookupCode(new Event('submit'));
+            }
+
+            initDarkMode();
+        });
+
+        // Lookup referral code
+        async function lookupCode(event) {
+            event.preventDefault();
+
+            const code = document.getElementById('code-input').value.trim().toUpperCase();
+            if (!code) return;
+
+            if (!supabase) {
+                showToast('Database connection failed', 'error');
+                return;
+            }
+
+            try {
+                console.log('Looking up code:', code);
+
+                // Get user stats
+                const { data, error } = await supabase.rpc('get_user_referral_stats', {
+                    user_referral_code: code
+                });
+
+                console.log('RPC response:', { data, error });
+
+                if (error) {
+                    console.error('Error:', error);
+                    showToast(`Error: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (!data) {
+                    showToast('Referral code not found', 'error');
+                    return;
+                }
+
+                // Get community stats
+                const { data: communityData, error: communityError } = await supabase.rpc('get_community_stats');
+
+                console.log('Community stats:', { communityData, communityError });
+
+                currentCode = code;
+                displayStats(data, communityData);
+
+                // Update URL without reload
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('code', code);
+                window.history.pushState({}, '', newUrl);
+
+            } catch (error) {
+                console.error('Lookup error:', error);
+                showToast('Error loading stats', 'error');
+            }
+        }
+
+        // Display stats
+        function displayStats(stats, communityStats) {
+            // Hide lookup form, show stats
+            document.getElementById('lookup-form').classList.add('hidden');
+            document.getElementById('stats-display').classList.remove('hidden');
+
+            // Update display
+            document.getElementById('display-code').textContent = currentCode;
+            document.getElementById('total-referrals').textContent = stats.referral_count || 0;
+
+            // Update share link (same format as success.html)
+            // Use fallback domain when testing locally
+            const origin = window.location.origin.startsWith('file://')
+                ? 'https://localplateapp.com'
+                : window.location.origin;
+            const shareUrl = `${origin}/?ref=${currentCode}`;
+            document.getElementById('share-link').value = shareUrl;
+
+            // Setup social share links
+            setupSocialShares(shareUrl);
+
+            // Update tier progress
+            const referralCount = stats.referral_count || 0;
+            updateTierProgress(referralCount);
+        }
+
+        // Setup social share links
+        function setupSocialShares(shareUrl) {
+            const encodedUrl = encodeURIComponent(shareUrl);
+            const encodedText = encodeURIComponent("Join me on LocalPlate's waitlist! 🌱");
+
+            const setHref = (id, href) => {
+                const element = document.getElementById(id);
+                if (element) element.href = href;
+            };
+
+            setHref('share-x', `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`);
+            setHref('share-facebook', `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
+            setHref('share-linkedin', `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`);
+            setHref('share-whatsapp', `https://wa.me/?text=${encodedText}%20${encodedUrl}`);
+            setHref('share-bluesky', `https://bsky.app/intent/compose?text=${encodedText}%20${encodedUrl}`);
+        }
+
+        // Update tier progress (same logic as success.html)
+        function updateTierProgress(referralCount) {
+            const tiers = [
+                { id: 1, required: 1, shortDesc: "1 friend away" },
+                { id: 2, required: 3, shortDesc: "3 friends to unlock" },
+                { id: 3, required: 5, shortDesc: "5 friends to unlock" }
+            ];
+
+            tiers.forEach(tier => {
+                const progress = Math.min(referralCount / tier.required, 1);
+                const isUnlocked = referralCount >= tier.required;
+                updateTierCard(tier, progress, isUnlocked, referralCount);
+            });
+        }
+
+        // Update individual tier card
+        function updateTierCard(tier, progress, isUnlocked, referralCount) {
+            const tierElement = document.getElementById(`tier-${tier.id}`);
+            if (!tierElement) return;
+
+            // Update tier classes
+            if (isUnlocked) {
+                tierElement.classList.remove('tier-locked');
+                tierElement.classList.add('tier-unlocked');
+            } else {
+                tierElement.classList.add('tier-locked');
+                tierElement.classList.remove('tier-unlocked');
+            }
+
+            // Update progress count
+            const progressCount = document.getElementById(`progress-count-${tier.id}`);
+            if (progressCount) {
+                const current = Math.min(referralCount, tier.required);
+                progressCount.textContent = `${current}/${tier.required}`;
+            }
+
+            // Update progress bar
+            const progressBar = document.getElementById(`progress-bar-${tier.id}`);
+            if (progressBar) {
+                const progressFill = progressBar.querySelector('.progress-fill');
+                if (progressFill) {
+                    const percentage = Math.round(progress * 100);
+                    progressFill.style.width = `${percentage}%`;
+                    progressFill.style.transition = 'width 0.8s ease-out';
+                }
+            }
+
+            // Update progress label
+            const progressLabel = document.getElementById(`progress-label-${tier.id}`);
+            if (progressLabel) {
+                if (isUnlocked) {
+                    progressLabel.textContent = '✨ Unlocked!';
+                    progressLabel.classList.add('text-emerald-600', 'dark:text-emerald-400', 'font-bold');
+                    progressLabel.classList.remove('text-white/70');
+                } else {
+                    const remaining = tier.required - referralCount;
+                    if (remaining === 1) {
+                        progressLabel.textContent = 'Ready to unlock';
+                    } else {
+                        progressLabel.textContent = `${tier.required} referrals needed`;
+                    }
+                }
+            }
+        }
+
+        // Show lookup form
+        function showLookupForm() {
+            document.getElementById('stats-display').classList.add('hidden');
+            document.getElementById('lookup-form').classList.remove('hidden');
+            document.getElementById('code-input').value = '';
+
+            // Clear URL parameter
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('code');
+            window.history.pushState({}, '', newUrl);
+        }
+
+        // Copy share link
+        function copyShareLink() {
+            const input = document.getElementById('share-link');
+
+            navigator.clipboard.writeText(input.value).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(() => {
+                // Fallback
+                input.select();
+                document.execCommand('copy');
+                showToast('Link copied!');
+            });
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            toastMessage.textContent = message;
+
+            if (type === 'error') {
+                toast.classList.remove('bg-emerald-600');
+                toast.classList.add('bg-red-600');
+            } else {
+                toast.classList.remove('bg-red-600');
+                toast.classList.add('bg-emerald-600');
+            }
+
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Dark mode functionality
+        function initDarkMode() {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('theme-toggle');
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    if (html.classList.contains('dark')) {
+                        html.classList.remove('dark');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

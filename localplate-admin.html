@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalPlate Waitlist Admin Dashboard</title>
+    <meta name="color-scheme" content="light dark">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2310b981'/%3E%3C/svg%3E">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Apply saved theme early to avoid flash -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (error) {}
+        })();
+    </script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css?v=09302025a">
+
+    <!-- Supabase & Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white antialiased overflow-x-hidden">
+
+    <!-- Noise Texture Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-transparent backdrop-blur-sm z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3 no-underline">
+                    <svg class="w-8 h-8 logo-spin" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="20" fill="url(#gradient-plate)"/>
+                        <circle cx="14" cy="20" r="3" fill="#ef4444" class="animate-pulse-slow"/>
+                        <circle cx="24" cy="18" r="3" fill="#f59e0b" class="animate-pulse-slow animation-delay-100"/>
+                        <circle cx="34" cy="20" r="3" fill="#84cc16" class="animate-pulse-slow animation-delay-200"/>
+                        <rect x="22" y="28" width="4" height="12" rx="2" fill="#6b7280"/>
+                        <defs>
+                            <linearGradient id="gradient-plate" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#10b981"/>
+                                <stop offset="1" stop-color="#059669"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                        LocalPlate Admin
+                    </span>
+                </a>
+
+                <!-- Actions & Theme Toggle -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button onclick="refreshData()" class="px-3 py-2 sm:px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium">
+                        <span class="hidden sm:inline">Refresh</span>
+                        <svg class="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </button>
+                    <button onclick="exportData()" class="px-3 py-2 sm:px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium">
+                        <span class="hidden sm:inline">Export CSV</span>
+                        <svg class="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </button>
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all hover:scale-110" aria-label="Toggle dark mode">
+                        <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414z"/>
+                        </svg>
+                        <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Background Image with Ken Burns -->
+    <div class="fixed inset-0 ken-burns-container -z-10">
+        <div class="ken-burns-image"></div>
+    </div>
+
+    <!-- Gradient Overlay -->
+    <div class="fixed inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/90 dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/90 -z-10"></div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24 relative z-10 min-h-screen">
+
+        <!-- Page Header -->
+        <div class="text-center mb-8 sm:mb-12">
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-3">
+                Admin Dashboard
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-300">
+                Real-time waitlist analytics and insights
+            </p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <!-- Total Signups -->
+            <div class="form-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Total Signups</span>
+                    <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                    </svg>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="total-signups">-</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="total-growth">Loading...</div>
+            </div>
+
+            <!-- Today's Signups -->
+            <div class="form-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Today's Signups</span>
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="today-signups">-</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Last 24 hours</div>
+            </div>
+
+            <!-- Referral Rate -->
+            <div class="form-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Referral Rate</span>
+                    <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                    </svg>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="referral-rate">-</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Via referrals</div>
+            </div>
+
+            <!-- Daily Referrals -->
+            <div class="form-card p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Daily Referrals</span>
+                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l2.293 2.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white" id="daily-referrals">-</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Today's activity</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8">
+            <!-- Signups Over Time -->
+            <div class="form-card p-6">
+                <h3 class="text-lg sm:text-xl font-semibold mb-4 font-serif">Signups Over Time</h3>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="signups-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Referrers -->
+            <div class="form-card p-6">
+                <h3 class="text-lg sm:text-xl font-semibold mb-4 font-serif">Top Referrers</h3>
+                <div class="space-y-3" id="top-referrers">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Signups Table -->
+        <div class="form-card overflow-hidden p-0">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg sm:text-xl font-semibold font-serif">Recent Signups</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ZIP Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Referral Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Referred By</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-signups" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8 sm:py-12 relative z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500 dark:text-gray-500">
+            © 2025 LocalPlate. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        // Simple password protection
+        const password = prompt('Enter admin password:');
+        if (password !== 'localplate2025admin') {
+            document.body.innerHTML = '<div class="flex items-center justify-center min-h-screen"><p class="text-xl text-red-600">Access Denied</p></div>';
+            throw new Error('Unauthorized');
+        }
+
+        // Initialize Supabase
+        const SUPABASE_URL = window.LOCALPLATE_CONFIG?.supabase?.url || 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = window.LOCALPLATE_CONFIG?.supabase?.anonKey || 'YOUR_SUPABASE_ANON_KEY';
+
+        let supabase = null;
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+        // Store for chart instance
+        let signupsChart = null;
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            if (!supabase) {
+                console.error('Supabase not initialized');
+                alert('Database connection failed. Please refresh the page.');
+                return;
+            }
+
+            try {
+                console.log('Loading admin data...');
+
+                // Get all waitlist data using RPC function (bypasses RLS)
+                const { data: stats, error: statsError } = await supabase.rpc('get_admin_waitlist_data');
+
+                if (statsError) {
+                    console.error('Error loading stats:', statsError);
+                    alert(`Error loading data: ${statsError.message}`);
+                    return;
+                }
+
+                console.log('Loaded', stats?.length, 'signups');
+
+                const totalSignups = stats?.length || 0;
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                const todaySignups = stats?.filter(s => new Date(s.joined_at) >= todayStart).length || 0;
+                const referredSignups = stats?.filter(s => s.referred_by).length || 0;
+                const referralRate = totalSignups > 0 ? ((referredSignups / totalSignups) * 100).toFixed(1) : 0;
+
+                // Get community stats for daily referrals
+                const { data: communityStats } = await supabase.rpc('get_community_stats');
+                const dailyReferrals = communityStats?.daily_referrals || 0;
+
+                // Update UI
+                document.getElementById('total-signups').textContent = totalSignups.toLocaleString();
+                document.getElementById('total-growth').textContent = 'All time';
+                document.getElementById('today-signups').textContent = todaySignups.toLocaleString();
+                document.getElementById('referral-rate').textContent = `${referralRate}%`;
+                document.getElementById('daily-referrals').textContent = dailyReferrals.toLocaleString();
+
+                // Get data for chart (last 7 days)
+                const last7Days = [];
+                const signupsByDay = {};
+
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    date.setHours(0, 0, 0, 0);
+                    const key = date.toISOString().split('T')[0];
+                    last7Days.push({
+                        label: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                        key: key
+                    });
+                    signupsByDay[key] = 0;
+                }
+
+                stats?.forEach(signup => {
+                    const date = new Date(signup.joined_at);
+                    const key = date.toISOString().split('T')[0];
+                    if (signupsByDay.hasOwnProperty(key)) {
+                        signupsByDay[key]++;
+                    }
+                });
+
+                updateChart({
+                    labels: last7Days.map(d => d.label),
+                    data: last7Days.map(d => signupsByDay[d.key])
+                });
+
+                // Get top referrers
+                const topReferrers = {};
+                stats?.forEach(signup => {
+                    if (signup.referral_count > 0) {
+                        topReferrers[signup.referral_code] = {
+                            code: signup.referral_code,
+                            email: signup.email,
+                            count: signup.referral_count
+                        };
+                    }
+                });
+
+                const sortedReferrers = Object.values(topReferrers)
+                    .sort((a, b) => b.count - a.count)
+                    .slice(0, 5);
+
+                updateTopReferrers(sortedReferrers);
+
+                // Get recent signups
+                const recentSignups = stats
+                    ?.sort((a, b) => new Date(b.joined_at) - new Date(a.joined_at))
+                    .slice(0, 10)
+                    .map(s => ({
+                        email: s.email,
+                        zipcode: s.zipcode,
+                        referralCode: s.referral_code,
+                        referredBy: s.referred_by,
+                        joinedAt: s.joined_at
+                    }));
+
+                updateRecentSignups(recentSignups || []);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading dashboard data. See console for details.');
+            }
+        }
+
+        // Update chart
+        function updateChart(chartData) {
+            const ctx = document.getElementById('signups-chart').getContext('2d');
+
+            if (signupsChart) {
+                signupsChart.destroy();
+            }
+
+            signupsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Signups',
+                        data: chartData.data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(107, 114, 128, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update top referrers
+        function updateTopReferrers(referrers) {
+            const container = document.getElementById('top-referrers');
+            container.innerHTML = '';
+
+            if (referrers.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No referrers yet</p>';
+                return;
+            }
+
+            referrers.forEach((ref, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg';
+
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'flex items-center space-x-3';
+
+                const circleDiv = document.createElement('div');
+                circleDiv.className = `w-8 h-8 ${index === 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-gray-200 dark:bg-gray-800'} rounded-full flex items-center justify-center`;
+
+                const numberSpan = document.createElement('span');
+                numberSpan.className = `text-xs font-bold ${index === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400'}`;
+                numberSpan.textContent = String(index + 1);
+
+                const codeSpan = document.createElement('span');
+                codeSpan.className = 'text-sm font-medium';
+                codeSpan.textContent = ref.code;
+
+                const countSpan = document.createElement('span');
+                countSpan.className = 'text-sm text-gray-600 dark:text-gray-400';
+                countSpan.textContent = `${ref.count} referral${ref.count !== 1 ? 's' : ''}`;
+
+                circleDiv.appendChild(numberSpan);
+                leftDiv.appendChild(circleDiv);
+                leftDiv.appendChild(codeSpan);
+                div.appendChild(leftDiv);
+                div.appendChild(countSpan);
+                container.appendChild(div);
+            });
+        }
+
+        // Update recent signups table
+        function updateRecentSignups(signups) {
+            const tbody = document.getElementById('recent-signups');
+            tbody.innerHTML = '';
+
+            if (signups.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 5;
+                td.className = 'px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400';
+                td.textContent = 'No signups yet';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            signups.forEach(signup => {
+                const tr = document.createElement('tr');
+
+                const emailTd = document.createElement('td');
+                emailTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white';
+                emailTd.textContent = signup.email;
+
+                const zipTd = document.createElement('td');
+                zipTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                zipTd.textContent = signup.zipcode || '-';
+
+                const codeTd = document.createElement('td');
+                codeTd.className = 'px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500 dark:text-gray-400';
+                codeTd.textContent = signup.referralCode;
+
+                const referredTd = document.createElement('td');
+                referredTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                referredTd.textContent = signup.referredBy || '-';
+
+                const dateTd = document.createElement('td');
+                dateTd.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400';
+                dateTd.textContent = formatDate(signup.joinedAt);
+
+                tr.appendChild(emailTd);
+                tr.appendChild(zipTd);
+                tr.appendChild(codeTd);
+                tr.appendChild(referredTd);
+                tr.appendChild(dateTd);
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Format date
+        function formatDate(date) {
+            const d = new Date(date);
+            const now = new Date();
+            const diff = now - d;
+
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return d.toLocaleDateString();
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadDashboardData();
+        }
+
+        // Export to CSV
+        async function exportData() {
+            if (!supabase) return;
+
+            try {
+                const { data } = await supabase.from('waitlist').select('*').order('joined_at', { ascending: false });
+
+                if (!data || data.length === 0) {
+                    alert('No data to export');
+                    return;
+                }
+
+                const headers = ['Email', 'First Name', 'Last Name', 'Phone', 'ZIP Code', 'Referral Code', 'Referred By', 'Joined At'];
+                const rows = data.map(row => [
+                    row.email,
+                    row.first_name,
+                    row.last_name,
+                    row.phone,
+                    row.zipcode,
+                    row.referral_code,
+                    row.referred_by || '',
+                    row.joined_at
+                ]);
+
+                const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `localplate-waitlist-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Error exporting data');
+            }
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+
+            // Refresh every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+
+        // Dark mode functionality
+        function initDarkMode() {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('theme-toggle');
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    if (html.classList.contains('dark')) {
+                        html.classList.remove('dark');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                });
+            }
+        }
+
+        // Initialize dark mode
+        initDarkMode();
+    </script>
+</body>
+</html>

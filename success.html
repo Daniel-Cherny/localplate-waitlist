@@ -281,13 +281,7 @@
 
                                         <!-- Content -->
                                         <div class="text-center">
-                                            <h4 class="tier-title text-lg font-bold text-white mb-2">Catalyst</h4>
-                                            <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full mb-3">
-                                                <svg class="w-3 h-3 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                </svg>
-                                                <span class="tier-tag text-xs font-medium text-white">Smoothie Spark</span>
-                                            </div>
+                                            <h4 class="tier-title text-lg font-bold text-white mb-3">Catalyst</h4>
 
                                             <!-- Reward Display -->
                                             <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg">
@@ -335,13 +329,7 @@
 
                                         <!-- Content -->
                                         <div class="text-center">
-                                            <h4 class="tier-title text-lg font-bold text-white mb-2">VIP</h4>
-                                            <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full mb-3">
-                                                <svg class="w-3 h-3 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                </svg>
-                                                <span class="tier-tag text-xs font-medium text-white">Harvest Hero</span>
-                                            </div>
+                                            <h4 class="tier-title text-lg font-bold text-white mb-3">VIP</h4>
 
                                             <!-- Reward Display -->
                                             <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg">
@@ -389,13 +377,7 @@
 
                                         <!-- Content -->
                                         <div class="text-center">
-                                            <h4 class="tier-title text-lg font-bold text-white mb-2">GOAT 🐐</h4>
-                                            <div class="tier-badge inline-flex items-center px-3 py-1 rounded-full mb-3">
-                                                <svg class="w-3 h-3 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                </svg>
-                                                <span class="tier-tag text-xs font-medium text-white">VITALITY VANGUARD BADGE</span>
-                                            </div>
+                                            <h4 class="tier-title text-lg font-bold text-white mb-3">GOAT 🐐</h4>
 
                                             <!-- Reward Display with Glow -->
                                             <div class="tier-reward mb-3 py-2 px-4 bg-gradient-to-r from-rose-50 via-pink-50 to-purple-50 dark:from-rose-900/20 dark:via-pink-900/20 dark:to-purple-900/20 rounded-lg relative overflow-hidden">
@@ -542,7 +524,6 @@
                         id: 1,
                         referralsRequired: 1,
                         title: "Catalyst",
-                        badge: "Smoothie Spark Badge",
                         reward: "50% off your first month",
                         description: "Bring 1 health-conscious friend and score 50% off your first month."
                     },
@@ -550,7 +531,6 @@
                         id: 2,
                         referralsRequired: 3,
                         title: "VIP",
-                        badge: "Harvest Hero Badge",
                         reward: "100% off your first month",
                         description: "Refer 3 health-conscious friends and take 100% off your first month."
                     },
@@ -558,7 +538,6 @@
                         id: 3,
                         referralsRequired: 5,
                         title: "GOAT 🐐",
-                        badge: "Vitality Vanguard Badge",
                         reward: "2 months free",
                         description: "Bring 5 health-conscious friends and enjoy 2 full months on us."
                     }
@@ -741,13 +720,6 @@
 
                 if (titleElement && tier.title) {
                     titleElement.textContent = tier.title;
-                }
-
-                const badgeElement = tierElement.querySelector('.tier-tag');
-                if (badgeElement) {
-                    if (tier.badge) {
-                        badgeElement.textContent = tier.badge;
-                    }
                 }
 
                 const descriptionElement = tierElement.querySelector('.tier-description');

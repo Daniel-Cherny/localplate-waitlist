@@ -1567,11 +1567,9 @@ function checkReferral() {
     if (referralCode) {
         // Track referral visit
 
-        // Store referral code for form submission (first-touch attribution)
-        if (!localStorage.getItem('referrer_code')) {
-            localStorage.setItem('referrer_code', referralCode);
-        } else {
-        }
+        // Store referral code for form submission (last-touch attribution)
+        // Always update to the most recent referral link clicked
+        localStorage.setItem('referrer_code', referralCode);
         
         // Could show a welcome message
         // showReferralWelcome(referralCode);

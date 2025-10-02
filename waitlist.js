@@ -397,6 +397,30 @@
                 return;
             }
 
+            // Increment referrer's count if this user was referred
+            if (referredBy) {
+                trace('[submit] updating referrer count...');
+                try {
+                    const { data: referralResult, error: referralError } = await supabase
+                        .rpc('record_referral', { referral_code: referredBy });
+
+                    if (referralError) {
+                        console.error('Failed to record referral:', referralError);
+                        trace('[submit] referral error:', referralError.message);
+                        // Don't fail the whole submission for this
+                    } else if (referralResult?.success) {
+                        trace('[submit] referral recorded successfully');
+                    } else {
+                        trace('[submit] referral failed:', referralResult?.message || 'unknown error');
+                        console.warn('Referral recording failed:', referralResult?.message);
+                    }
+                } catch (err) {
+                    console.error('Referral tracking error:', err);
+                    trace('[submit] referral exception:', err.message);
+                    // Don't fail the whole submission for this
+                }
+            }
+
             storeSuccessSession(email, referralCode);
             await logTelemetry('lead_captured', { referred_by: referredBy || null }, { email, referral_code: referralCode });
             trackEvent('lead_captured', {

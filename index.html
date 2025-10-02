@@ -126,208 +126,54 @@
                     Track nutrition from your favorite local restaurants. Real data, real food, real results.
                 </p>
                 
-                <!-- Multi-Step Form Container -->
+                <!-- Waitlist Form Container -->
                 <div class="max-w-md mx-auto form-container reveal-on-scroll animation-delay-300">
-                    <!-- Form Progress Indicator -->
-                    <div class="flex items-center justify-center mb-8" id="progress-indicator" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3" aria-label="Form progress">
-                        <div class="flex items-center space-x-4">
-                            <div class="step-indicator active" data-step="1" aria-current="step">
-                                <span class="step-number">1</span>
-                                <span class="step-label">Personal Info</span>
-                            </div>
-                            <div class="step-connector" aria-hidden="true"></div>
-                            <div class="step-indicator" data-step="2">
-                                <span class="step-number">2</span>
-                                <span class="step-label">Location</span>
-                            </div>
-                            <div class="step-connector" aria-hidden="true"></div>
-                            <div class="step-indicator" data-step="3">
-                                <span class="step-number">3</span>
-                                <span class="step-label">Finish</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Form Card with Paper Texture -->
-                    <div class="form-card" aria-live="polite" aria-label="Multi-step waitlist form">
-                        <form id="waitlist-form" class="relative" novalidate>
-                            <!-- Step 1: Personal Information -->
-                            <div class="form-step active" id="step-1">
-                                <div class="space-y-4">
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div class="form-group">
-                                            <label for="firstName" class="form-label">First Name</label>
-                                            <input 
-                                                type="text" 
-                                                id="firstName" 
-                                                name="firstName" 
-                                                required
-                                                placeholder="John"
-                                                class="form-input"
-                                                aria-describedby="firstName-help"
-                                            >
-                                            <div id="firstName-help" class="sr-only">Enter your first name</div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="lastName" class="form-label">Last Name</label>
-                                            <input 
-                                                type="text" 
-                                                id="lastName" 
-                                                name="lastName" 
-                                                required
-                                                placeholder="Doe"
-                                                class="form-input"
-                                                aria-describedby="lastName-help"
-                                            >
-                                            <div id="lastName-help" class="sr-only">Enter your last name</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="email" class="form-label">Email Address</label>
-                                        <input 
-                                            type="email" 
-                                            id="email" 
-                                            name="email" 
-                                            required
-                                            placeholder="you@example.com"
-                                            class="form-input"
-                                            aria-describedby="email-error"
-                                        >
-                                        <span class="form-error hidden" id="email-error" role="alert" aria-live="assertive">Please enter a valid email address</span>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="phone" class="form-label">Phone Number</label>
-                                        <input 
-                                            type="tel" 
-                                            id="phone" 
-                                            name="phone" 
-                                            required
-                                            placeholder="(555) 123-4567"
-                                            class="form-input"
-                                            aria-describedby="phone-error"
-                                        >
-                                        <span class="form-error hidden" id="phone-error" role="alert" aria-live="assertive">Please enter a valid phone number</span>
-                                    </div>
-                                    
-                                    <button type="button" onclick="nextStep()" class="btn-primary w-full group">
-                                        <span>Continue</span>
-                                        <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </button>
+                    <div class="form-card" aria-live="polite" aria-label="Join the LocalPlate waitlist">
+                        <form id="waitlist-form" class="space-y-6" novalidate>
+                            <div class="space-y-4">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input 
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        required
+                                        inputmode="email"
+                                        autocomplete="email"
+                                        placeholder="you@example.com"
+                                        class="form-input"
+                                        aria-describedby="email-error"
+                                    >
+                                    <span class="form-error hidden" id="email-error" role="alert" aria-live="assertive">Please enter a valid email address</span>
                                 </div>
+
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    Join with your email to claim one of the 500 founding seats. We'll ask for the rest later.
+                                </p>
                             </div>
-                            
-                            <!-- Step 2: Location & Preferences -->
-                            <div class="form-step" id="step-2">
-                                <div class="space-y-4">
-                                    <div class="form-group">
-                                        <label for="zipcode" class="form-label">ZIP Code</label>
-                                        <input 
-                                            type="text" 
-                                            id="zipcode" 
-                                            name="zipcode" 
-                                            required
-                                            placeholder="94102"
-                                            pattern="[0-9]{5}"
-                                            maxlength="5"
-                                            class="form-input"
-                                            aria-describedby="zipcode-error"
-                                        >
-                                        <span class="form-error hidden" id="zipcode-error" role="alert" aria-live="assertive">Please enter a valid 5-digit ZIP code</span>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <fieldset>
-                                            <legend class="form-label">Dietary Preferences (Optional)</legend>
-                                            <div class="space-y-2">
-                                                <label class="checkbox-label">
-                                                    <input type="checkbox" name="preferences" value="vegetarian" class="checkbox">
-                                                    <span>Vegetarian</span>
-                                                </label>
-                                                <label class="checkbox-label">
-                                                    <input type="checkbox" name="preferences" value="vegan" class="checkbox">
-                                                    <span>Vegan</span>
-                                                </label>
-                                                <label class="checkbox-label">
-                                                    <input type="checkbox" name="preferences" value="gluten-free" class="checkbox">
-                                                    <span>Gluten-Free</span>
-                                                </label>
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                    
-                                    <div class="flex space-x-3">
-                                        <button type="button" onclick="previousStep()" class="btn-secondary flex-1">
-                                            Back
-                                        </button>
-                                        <button type="button" onclick="nextStep()" class="btn-primary flex-1 group">
-                                            <span>Continue</span>
-                                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Step 3: Finish -->
-                            <div class="form-step" id="step-3">
-                                <div class="space-y-4">
-                                    <div class="form-group">
-                                        <label for="referral-source" class="form-label">How did you hear about us?</label>
-                                        <select id="referral-source" name="referral-source" class="form-input" aria-describedby="referral-help">
-                                            <option value="">Select one...</option>
-                                            <option value="social">Social Media</option>
-                                            <option value="friend">Friend or Family</option>
-                                            <option value="restaurant">Restaurant Partner</option>
-                                            <option value="search">Google Search</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <div id="referral-help" class="sr-only">Optional: Select how you discovered LocalPlate</div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="restaurant-suggestion" class="form-label">Restaurant you'd like to see (Optional)</label>
-                                        <input 
-                                            type="text" 
-                                            id="restaurant-suggestion" 
-                                            name="restaurant-suggestion" 
-                                            placeholder="Your favorite local spot"
-                                            class="form-input"
-                                            aria-describedby="restaurant-help"
-                                        >
-                                        <div id="restaurant-help" class="sr-only">Optional: Suggest a restaurant you'd like to see on LocalPlate</div>
-                                    </div>
-                                    
-                                    <div class="flex space-x-3">
-                                        <button type="button" onclick="previousStep()" class="btn-secondary flex-1">
-                                            Back
-                                        </button>
-                                        <button type="submit" id="submit-btn" class="btn-primary flex-1 group">
-                                            <span id="submit-text">Join Waitlist</span>
-                                            <svg id="submit-loader" class="hidden animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+
+                            <button type="submit" id="submit-btn" class="btn-primary w-full group">
+                                <span id="submit-text">Lock My Spot</span>
+                                <svg id="submit-loader" class="hidden animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </button>
+
+                            <p class="text-xs text-center text-gray-500 dark:text-gray-400">
+                                No spam. We'll email you as soon as your market opens.
+                            </p>
                         </form>
-                        
-                        <!-- Trust Indicators -->
+
                         <div class="flex items-center justify-center space-x-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                             <div class="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                                 </svg>
                                 <span>Secure & Private</span>
                             </div>
                             <div class="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
                                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
                                 </svg>

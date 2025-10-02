@@ -493,26 +493,9 @@
         }
     }
 
-    function buildStatusCopy({ percent, spots_left, status }) {
+    function buildStatusCopy({ status }) {
         if (status === 'closed') {
             return 'Founding Cohort · waitlist paused';
-        }
-        if (typeof spots_left === 'number' && spots_left <= 0) {
-            return 'Founding Cohort · final spots reviewing';
-        }
-        if (typeof percent === 'number') {
-            if (percent >= 90) {
-                return 'Founding Cohort · < 10% of seats left';
-            }
-            if (percent >= 75) {
-                return 'Founding Cohort · filling fast — secure your seat';
-            }
-            if (percent >= 50) {
-                return 'Founding Cohort · 500 seats · half claimed';
-            }
-        }
-        if (typeof spots_left === 'number') {
-            return 'Founding Cohort · ' + spots_left + ' spots left of 500';
         }
         return 'Founding Cohort · limited to 500 invites';
     }

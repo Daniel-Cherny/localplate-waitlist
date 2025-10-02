@@ -58,9 +58,9 @@ try {
 console.log(chalk.bold('\n2. Session Storage Keys (waitlist.js:1496-1504)'));
 const expectedKeys = [
     'waitlist_email',
-    'waitlist_first_name',
     'waitlist_referral_code',
-    'waitlist_timestamp'
+    'waitlist_timestamp',
+    'waitlist_lead_context'
 ];
 
 expectedKeys.forEach(key => {
@@ -100,7 +100,7 @@ tiers.forEach(tier => {
 
 // 6. Check share button platforms
 console.log(chalk.bold('\n6. Share Button Platforms'));
-const platforms = ['X/Twitter', 'Facebook', 'LinkedIn', 'WhatsApp', 'Instagram', 'Bluesky'];
+const platforms = ['X/Twitter', 'Facebook', 'LinkedIn', 'WhatsApp', 'Bluesky', 'Copy Link'];
 platforms.forEach(platform => {
     console.log(chalk.green(`${platform} share button configured`));
 });

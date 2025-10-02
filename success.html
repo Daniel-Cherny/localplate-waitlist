@@ -152,7 +152,7 @@
                                 class="flex-1 bg-white/90 dark:bg-gray-800/90 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
                             >
                             <button 
-                                onclick="copyLink()" 
+                                onclick="copyLink(event)" 
                                 class="btn-primary group hover:scale-105 transition-all"
                             >
                                 <span>Copy</span>
@@ -225,6 +225,56 @@
                             </svg>
                         </a>
                     </div>
+                        </div>
+                    </div>
+
+                    <!-- Progressive Profile (Optional) -->
+                    <div class="form-card reveal-on-scroll" id="profile-card">
+                        <div class="space-y-5">
+                            <div class="text-center space-y-2">
+                                <h3 class="font-serif text-2xl font-semibold">Want to personalize your invite?</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Totally optional—share a few details so we can tailor launch updates.</p>
+                            </div>
+                            <form id="profile-form" class="space-y-4" novalidate>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label for="profile-first-name" class="form-label">First Name</label>
+                                        <input type="text" id="profile-first-name" name="firstName" autocomplete="given-name" placeholder="John" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-phone" class="form-label">Phone</label>
+                                        <input type="tel" id="profile-phone" name="phone" autocomplete="tel" placeholder="(555) 123-4567" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="form-group">
+                                        <label for="profile-zip" class="form-label">ZIP Code</label>
+                                        <input type="text" id="profile-zip" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="94102" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profile-hear" class="form-label">How did you hear about us?</label>
+                                        <select id="profile-hear" name="referralSource" class="form-input">
+                                            <option value="">Select one...</option>
+                                            <option value="flyer">Flyer / QR code</option>
+                                            <option value="friend">Friend or family</option>
+                                            <option value="social">Social media</option>
+                                            <option value="event">Fitness or wellness event</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <button type="submit" id="profile-submit" class="btn-secondary w-full sm:w-auto">
+                                        <span id="profile-submit-text">Save details</span>
+                                        <svg id="profile-submit-loader" class="hidden animate-spin h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </button>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">We’ll never share your info. Skip it now and finish later any time.</p>
+                                    <div id="profile-status" class="hidden text-sm"></div>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -498,6 +548,304 @@
     </div>
     
     <script>
+        const DEBUG = new URLSearchParams(location.search).has('debug');
+        const SUCCESS_EMAIL_KEY = 'waitlist_email';
+        const SUCCESS_REFERRAL_KEY = 'waitlist_referral_code';
+        const SUCCESS_CONTEXT_KEY = 'waitlist_lead_context';
+        const PROFILE_STORAGE_KEY = 'waitlist_profile_data';
+
+        const leadContext = loadLeadContext();
+        const cachedEmail = sessionStorage.getItem(SUCCESS_EMAIL_KEY) || '';
+        const cachedReferralCode = sessionStorage.getItem(SUCCESS_REFERRAL_KEY) || '';
+
+        function trace(...args) {
+            if (DEBUG) {
+                console.log('[success]', ...args);
+            }
+        }
+
+        function loadLeadContext() {
+            try {
+                const raw = sessionStorage.getItem(SUCCESS_CONTEXT_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (error) {
+                trace('loadLeadContext failed', error.message);
+                return {};
+            }
+        }
+
+        function sanitizeMetadata(metadata = {}) {
+            return Object.fromEntries(
+                Object.entries(metadata).filter(([, value]) => value !== undefined && value !== null && value !== '')
+            );
+        }
+
+        async function logTelemetry(eventType, payload = {}) {
+            try {
+                if (!eventType) return;
+                const supabase = window.getSupabaseClient();
+                const metadata = sanitizeMetadata({
+                    ...payload,
+                    landing_url: leadContext?.landing_url,
+                    referrer: leadContext?.referrer,
+                });
+                const utms = leadContext?.utms || {};
+                await supabase.from('waitlist_events').insert([
+                    {
+                        event_type: eventType,
+                        occurred_at: new Date().toISOString(),
+                        metadata,
+                        email: cachedEmail || null,
+                        referral_code: cachedReferralCode || null,
+                        utm_source: utms.utm_source || null,
+                        utm_medium: utms.utm_medium || null,
+                        utm_campaign: utms.utm_campaign || null,
+                    }
+                ]);
+            } catch (error) {
+                trace('logTelemetry failed', error.message);
+            }
+        }
+
+        function trackEvent(eventName, eventData = {}) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, eventData);
+            }
+        }
+
+        function loadProfileFromSession() {
+            try {
+                const raw = sessionStorage.getItem(PROFILE_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (error) {
+                trace('loadProfileFromSession failed', error.message);
+                return {};
+            }
+        }
+
+        function persistProfileToSession(profile) {
+            try {
+                sessionStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile || {}));
+            } catch (error) {
+                trace('persistProfileToSession failed', error.message);
+            }
+        }
+
+        let profileState = Object.assign({
+            firstName: '',
+            phone: '',
+            zip: '',
+            referralSource: ''
+        }, loadProfileFromSession() || {});
+
+        const profileForm = document.getElementById('profile-form');
+        const profileFirstNameInput = document.getElementById('profile-first-name');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const profileZipInput = document.getElementById('profile-zip');
+        const profileHearInput = document.getElementById('profile-hear');
+        const profileStatus = document.getElementById('profile-status');
+        const profileSubmitButton = document.getElementById('profile-submit');
+        const profileSubmitText = document.getElementById('profile-submit-text');
+        const profileSubmitLoader = document.getElementById('profile-submit-loader');
+
+        function updateGreetingName(name) {
+            const displayName = name && name.trim() ? name.trim() : 'friend';
+            const el = document.getElementById('user-name');
+            if (el) {
+                el.textContent = displayName;
+            }
+        }
+
+        function hydrateProfileForm() {
+            if (!profileForm) return;
+            if (profileFirstNameInput) {
+                profileFirstNameInput.value = profileState.firstName || '';
+            }
+            if (profilePhoneInput) {
+                profilePhoneInput.value = profileState.phone ? formatPhone(profileState.phone) : '';
+            }
+            if (profileZipInput) {
+                profileZipInput.value = profileState.zip || '';
+            }
+            if (profileHearInput) {
+                profileHearInput.value = profileState.referralSource || '';
+            }
+        }
+
+        function clearProfileStatus() {
+            if (!profileStatus) return;
+            profileStatus.className = 'hidden text-sm';
+            profileStatus.textContent = '';
+        }
+
+        function setProfileStatus(message, type = 'success') {
+            if (!profileStatus) return;
+            profileStatus.textContent = message;
+            profileStatus.classList.remove('hidden', 'text-emerald-600', 'text-red-500', 'text-red-600');
+            profileStatus.classList.add(type === 'error' ? 'text-red-600' : 'text-emerald-600');
+        }
+
+        function setProfileLoading(isLoading) {
+            if (!profileSubmitButton) return;
+            profileSubmitButton.disabled = isLoading;
+            if (profileSubmitText) {
+                profileSubmitText.classList.toggle('hidden', isLoading);
+            }
+            if (profileSubmitLoader) {
+                profileSubmitLoader.classList.toggle('hidden', !isLoading);
+            }
+        }
+
+        function updateProfileState(patch = {}) {
+            const normalized = Object.assign({}, patch);
+            if (typeof normalized.firstName === 'string') {
+                normalized.firstName = normalized.firstName.trim();
+            }
+            if (typeof normalized.phone === 'string') {
+                normalized.phone = normalized.phone.replace(/\D/g, '');
+            }
+            if (typeof normalized.zip === 'string') {
+                normalized.zip = normalized.zip.replace(/\D/g, '');
+            }
+            profileState = Object.assign({}, profileState, normalized);
+            persistProfileToSession(profileState);
+            hydrateProfileForm();
+            updateGreetingName(profileState.firstName);
+        }
+
+        function mergeRemoteProfile(remote = {}) {
+            const patch = {};
+            if (remote.first_name && remote.first_name !== profileState.firstName) {
+                patch.firstName = remote.first_name;
+            }
+            if (remote.phone && remote.phone !== profileState.phone) {
+                patch.phone = remote.phone.replace(/\D/g, '');
+            }
+            if (remote.zipcode && remote.zipcode !== profileState.zip) {
+                patch.zip = remote.zipcode;
+            }
+            if (remote.referral_source && remote.referral_source !== profileState.referralSource) {
+                patch.referralSource = remote.referral_source;
+            }
+            if (Object.keys(patch).length) {
+                updateProfileState(patch);
+            }
+        }
+
+        hydrateProfileForm();
+        updateGreetingName(profileState.firstName);
+
+        profilePhoneInput?.addEventListener('input', (event) => {
+            clearProfileStatus();
+            const digits = event.target.value.replace(/\D/g, '').slice(0, 10);
+            event.target.value = formatPhone(digits);
+        });
+
+        profileZipInput?.addEventListener('input', (event) => {
+            clearProfileStatus();
+            event.target.value = event.target.value.replace(/\D/g, '').slice(0, 5);
+        });
+
+        profileFirstNameInput?.addEventListener('input', clearProfileStatus);
+        profileHearInput?.addEventListener('change', clearProfileStatus);
+
+        profileForm?.addEventListener('submit', handleProfileSubmit);
+
+        async function handleProfileSubmit(event) {
+            event.preventDefault();
+            clearProfileStatus();
+
+            if (!cachedEmail || !cachedReferralCode) {
+                setProfileStatus('Session expired. Please rejoin the waitlist to update details.', 'error');
+                return;
+            }
+
+            const firstName = (profileFirstNameInput?.value || '').trim();
+            const phoneDigits = (profilePhoneInput?.value || '').replace(/\D/g, '').slice(0, 10);
+            const zipDigits = (profileZipInput?.value || '').replace(/\D/g, '').slice(0, 5);
+            const referralSource = (profileHearInput?.value || '').trim();
+
+            if (!firstName && !phoneDigits && !zipDigits && !referralSource) {
+                setProfileStatus('Add at least one detail to save.', 'error');
+                return;
+            }
+
+            if (phoneDigits && phoneDigits.length < 10) {
+                setProfileStatus('Phone number needs 10 digits.', 'error');
+                return;
+            }
+
+            if (profileZipInput && profileZipInput.value && zipDigits.length !== 5) {
+                setProfileStatus('ZIP should be 5 digits.', 'error');
+                return;
+            }
+
+            const payload = {
+                p_email: cachedEmail,
+                p_referral_code: cachedReferralCode
+            };
+
+            const fields = [];
+            if (firstName && firstName !== profileState.firstName) {
+                payload.p_first_name = firstName;
+                fields.push('first_name');
+            }
+            if (phoneDigits && phoneDigits !== profileState.phone) {
+                payload.p_phone = phoneDigits;
+                fields.push('phone');
+            }
+            if (zipDigits && zipDigits !== profileState.zip) {
+                payload.p_zipcode = zipDigits;
+                fields.push('zipcode');
+            }
+            if (referralSource && referralSource !== profileState.referralSource) {
+                payload.p_referral_source = referralSource;
+                fields.push('referral_source');
+            }
+
+            if (fields.length === 0) {
+                setProfileStatus('You\'re already up to date.', 'error');
+                return;
+            }
+
+            setProfileLoading(true);
+            try {
+                const supabase = window.getSupabaseClient();
+                const { data, error } = await supabase.rpc('update_waitlist_profile', payload);
+
+                if (error || data?.success === false) {
+                    const message = data?.message || error?.message || 'Unable to save details. Please try again.';
+                    trace('profile update error', message);
+                    setProfileStatus(message, 'error');
+                    return;
+                }
+
+                const patch = {};
+                if (payload.p_first_name) patch.firstName = payload.p_first_name;
+                if (payload.p_phone) patch.phone = payload.p_phone;
+                if (payload.p_zipcode) patch.zip = payload.p_zipcode;
+                if (payload.p_referral_source) patch.referralSource = payload.p_referral_source;
+                updateProfileState(patch);
+
+                setProfileStatus('Details saved! Thanks for sharing.', 'success');
+                logTelemetry('profile_updated', { fields });
+                trackEvent('profile_updated', { fields });
+            } catch (err) {
+                trace('profile update exception', err.message);
+                setProfileStatus('Something went wrong. Please try again.', 'error');
+            } finally {
+                setProfileLoading(false);
+            }
+        }
+
+        function formatPhone(value) {
+            if (!value) return '';
+            const digits = value.replace(/\D/g, '').slice(0, 10);
+            if (digits.length <= 3) return digits;
+            if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+            return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+
         // Real-time gamification system
         class ReferralGamificationSystem {
             constructor() {
@@ -590,6 +938,11 @@
                     }
                     
                     if (data) {
+                        if (data.profile && typeof data.profile === 'object') {
+                            mergeRemoteProfile(data.profile);
+                        } else {
+                            mergeRemoteProfile(data);
+                        }
                         this.userReferralCount = data.referral_count || 0;
                         this.userWaitlistPosition = data.waitlist_position || null;
                         
@@ -1091,9 +1444,6 @@
             });
         })();
         
-        // Debug mode check
-        const DEBUG = new URLSearchParams(location.search).has('debug');
-        
         // Initialize Supabase client when needed
         window.getSupabaseClient = function() {
             if (DEBUG) console.log('[getSupabaseClient] called');
@@ -1144,29 +1494,15 @@
             }
         }
         
-        // Get user data from session storage (already validated above)
-        const email = sessionStorage.getItem('waitlist_email');
-        const referralCode = sessionStorage.getItem('waitlist_referral_code');
-        
         // Update page with user data
-        if (email) {
-            const v = sessionStorage.getItem('waitlist_first_name');
-            console.log('[success] read first_name:', v, 'at', performance.now(), 'on', location.origin);
-            console.log('[success] all sessionStorage keys:', Object.keys(sessionStorage));
-            const firstName = v || 'friend';
-            document.addEventListener('DOMContentLoaded', () => {
-                const el = document.getElementById('user-name');
-                if (el) {
-                    el.textContent = firstName;
-                    console.log('[success] set user-name to:', firstName);
-                }
-            });
-        }
-        
-        if (referralCode) {
-            const referralLink = `${window.location.origin}/?ref=${referralCode}`;
+        if (cachedReferralCode) {
+            const referralLink = `${window.location.origin}/?ref=${cachedReferralCode}`;
             document.getElementById('referral-link').value = referralLink;
         }
+        
+        logTelemetry('success_page_view');
+        trackEvent('success_page_view', {});
+
         // Confetti animation
         function launchConfetti() {
             const canvas = document.getElementById('confetti-canvas');
@@ -1235,9 +1571,10 @@
         setTimeout(launchConfetti, 500);
         
         // Enhanced copy link function with better feedback
-        function copyLink() {
+        function copyLink(ev) {
             const input = document.getElementById('referral-link');
-            const button = event.target;
+            const buttonCandidate = ev?.currentTarget || ev?.target || document.getElementById('share-copy');
+            const button = buttonCandidate instanceof HTMLElement ? buttonCandidate : null;
             
             // Modern clipboard API with fallback
             const copyText = async () => {
@@ -1259,30 +1596,36 @@
             copyText().then(success => {
                 if (success) {
                     // Button feedback
-                    const originalText = button.innerHTML;
-                    button.innerHTML = `
+                    const originalText = button ? button.innerHTML : '';
+                    if (button) {
+                        button.innerHTML = `
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                         </svg>
                         Copied!
                     `;
-                    button.classList.add('copy-success');
+                        button.classList.add('copy-success');
+                    }
                     
                     // Show toast
                     const toast = document.getElementById('copy-toast');
-                    toast.classList.remove('hidden');
+                    if (toast) {
+                        toast.classList.remove('hidden');
+                    }
                     
                     // Reset after delay
                     setTimeout(() => {
-                        button.innerHTML = originalText;
-                        button.classList.remove('copy-success');
-                        toast.classList.add('hidden');
+                        if (button) {
+                            button.innerHTML = originalText;
+                            button.classList.remove('copy-success');
+                        }
+                        if (toast) {
+                            toast.classList.add('hidden');
+                        }
                     }, 3000);
                     
-                    // Track copy event
-                    if (window.gamificationSystem) {
-                        console.log('[GAMIFICATION] Referral link copied');
-                    }
+                    logTelemetry('share_clicked', { channel: 'copy_link' });
+                    trackEvent('share_clicked', { channel: 'copy_link' });
                 } else {
                     // Show error feedback
                     console.error('Failed to copy to clipboard');
@@ -1295,64 +1638,41 @@
             });
         }
         
-        // Share functions for all 6 platforms
-// Simple share functionality - GPT-5 minimal approach
-        (function () {
-            const url = document.getElementById('referral-link').value;
-            const title = 'LocalPlate Founding Cohort';
+        // Share functions for all platforms with telemetry
+        (function initializeShareButtons() {
+            const referralInput = document.getElementById('referral-link');
+            if (!referralInput) return;
+
+            const url = referralInput.value;
             const text = "I just locked a wellness head start in LocalPlate's 500-seat founding cohort—use my link to skip the wait with me:";
 
             const enc = encodeURIComponent;
             const encodedUrl = enc(url);
             const encodedText = enc(text);
 
-            // Populate anchor hrefs so they work even if JS errors elsewhere
-            const setHref = (id, href) => {
+            const shareTargets = [
+                { id: 'share-x', href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`, channel: 'x' },
+                { id: 'share-facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, channel: 'facebook' },
+                { id: 'share-linkedin', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, channel: 'linkedin' },
+                { id: 'share-whatsapp', href: `https://wa.me/?text=${encodedText}%20${encodedUrl}`, channel: 'whatsapp' },
+                { id: 'share-bluesky', href: `https://bsky.app/intent/compose?text=${encodedText}%20${encodedUrl}`, channel: 'bluesky' }
+            ];
+
+            shareTargets.forEach(({ id, href, channel }) => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.setAttribute('href', href);
+                    el.addEventListener('click', () => {
+                        logTelemetry('share_clicked', { channel });
+                        trackEvent('share_clicked', { channel });
+                    });
                 }
-            };
+            });
 
-            // Set up working anchor links
-            setHref('share-x', `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`);
-            setHref('share-facebook', `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
-            setHref('share-linkedin', `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`);
-            setHref('share-whatsapp', `https://wa.me/?text=${encodedText}%20${encodedUrl}`);
-            setHref('share-bluesky', `https://bsky.app/intent/compose?text=${encodedText}%20${encodedUrl}`);
-
-            // Copy button
             const copyBtn = document.getElementById('share-copy');
             if (copyBtn) {
-                copyBtn.addEventListener('click', () => {
-                    copyToClipboard(url).then(() => {
-                        alert('Link copied to clipboard.');
-                    }).catch(() => {
-                        alert('Copy failed. Please copy the URL manually.');
-                    });
-                });
-            }
-
-            function copyToClipboard(text) {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    return navigator.clipboard.writeText(text);
-                }
-                return new Promise((resolve, reject) => {
-                    const ta = document.createElement('textarea');
-                    ta.value = text;
-                    ta.style.position = 'fixed';
-                    ta.style.opacity = '0';
-                    document.body.appendChild(ta);
-                    ta.focus();
-                    ta.select();
-                    try {
-                        const ok = document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        ok ? resolve() : reject();
-                    } catch (e) {
-                        document.body.removeChild(ta);
-                        reject(e);
-                    }
+                copyBtn.addEventListener('click', (evt) => {
+                    copyLink(evt);
                 });
             }
         })();

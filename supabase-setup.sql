@@ -164,9 +164,59 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Progressive profile update function (allows anonymous updates post-signup)
+CREATE OR REPLACE FUNCTION update_waitlist_profile(
+    p_email VARCHAR DEFAULT NULL,
+    p_referral_code VARCHAR DEFAULT NULL,
+    p_first_name VARCHAR DEFAULT NULL,
+    p_phone VARCHAR DEFAULT NULL,
+    p_zipcode VARCHAR DEFAULT NULL,
+    p_referral_source VARCHAR DEFAULT NULL
+)
+RETURNS JSONB AS $$
+DECLARE
+    trimmed_first VARCHAR := NULLIF(TRIM(COALESCE(p_first_name, '')), '');
+    trimmed_zip VARCHAR := NULLIF(TRIM(COALESCE(p_zipcode, '')), '');
+    trimmed_source VARCHAR := NULLIF(TRIM(COALESCE(p_referral_source, '')), '');
+    digits_phone VARCHAR := NULLIF(regexp_replace(COALESCE(p_phone, ''), '\\D', '', 'g'), '');
+    updated_row waitlist;
+BEGIN
+    IF (p_email IS NULL OR LENGTH(TRIM(p_email)) = 0) AND (p_referral_code IS NULL OR LENGTH(TRIM(p_referral_code)) = 0) THEN
+        RETURN jsonb_build_object('success', false, 'message', 'Missing identifier');
+    END IF;
+
+    UPDATE waitlist
+    SET
+        first_name = COALESCE(trimmed_first, first_name),
+        phone = COALESCE(digits_phone, phone),
+        zipcode = COALESCE(trimmed_zip, zipcode),
+        referral_source = COALESCE(trimmed_source, referral_source),
+        updated_at = NOW()
+    WHERE (p_email IS NOT NULL AND LOWER(email) = LOWER(p_email))
+       OR (p_referral_code IS NOT NULL AND referral_code = p_referral_code)
+    RETURNING * INTO updated_row;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('success', false, 'message', 'Record not found');
+    END IF;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'profile', jsonb_build_object(
+            'first_name', updated_row.first_name,
+            'phone', updated_row.phone,
+            'zipcode', updated_row.zipcode,
+            'referral_source', updated_row.referral_source
+        )
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
 -- Sample data for testing (optional)
 -- INSERT INTO waitlist (email, zipcode, referral_code) VALUES
 -- ('test1@example.com', '94102', 'TEST1234'),
 -- ('test2@example.com', '94103', 'TEST5678'),
 -- ('test3@example.com', '94104', 'TEST9012')
 -- ON CONFLICT DO NOTHING;
+
+GRANT EXECUTE ON FUNCTION update_waitlist_profile(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR) TO anon, authenticated;

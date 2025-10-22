@@ -35,20 +35,6 @@
         })();
     </script>
 
-    <!-- Access Protection: Redirect to index if not coming from waitlist flow -->
-    <script>
-        (function() {
-            // Check if user completed waitlist signup (keys set in waitlist.js)
-            const hasValidSession = sessionStorage.getItem('waitlist_email') &&
-                                   sessionStorage.getItem('waitlist_timestamp');
-
-            if (!hasValidSession) {
-                // Redirect to index if trying to access success page directly
-                window.location.replace('index.html');
-            }
-        })();
-    </script>
-
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css?v=09262025p">
     

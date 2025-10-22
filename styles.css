@@ -98,6 +98,13 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Responsive scroll padding for mobile */
+@media (max-width: 768px) {
+    html {
+        scroll-padding-top: 6rem;
+    }
+}
+
 /* Dark Mode */
 .dark body {
     color: white;
@@ -1500,6 +1507,13 @@ textarea:focus {
 
 .pt-28 {
     padding-top: 5.5rem;
+}
+
+/* Increase top padding on mobile to prevent header from being pushed to viewport top */
+@media (max-width: 768px) {
+    .pt-28 {
+        padding-top: 6.5rem;
+    }
 }
 
 .pt-96 {

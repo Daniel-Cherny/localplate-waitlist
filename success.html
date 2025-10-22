@@ -35,6 +35,20 @@
         })();
     </script>
 
+    <!-- Access Protection: Redirect to index if not coming from waitlist flow -->
+    <script>
+        (function() {
+            // Check if user completed waitlist signup (keys set in waitlist.js)
+            const hasValidSession = sessionStorage.getItem('waitlist_email') &&
+                                   sessionStorage.getItem('waitlist_timestamp');
+
+            if (!hasValidSession) {
+                // Redirect to index if trying to access success page directly
+                window.location.replace('index.html');
+            }
+        })();
+    </script>
+
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css?v=09262025p">
     
@@ -121,7 +135,7 @@
 
                 <!-- Subheading -->
                 <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 animate-fade-in-up animation-delay-200">
-                    Welcome to the Founding Cohort, <span id="user-name" class="font-medium text-gray-900 dark:text-white">friend</span>!
+                    Welcome to the Founding Cohort!
                 </p>
                 </div>
 
@@ -528,7 +542,7 @@
                     </svg>
                     <span class="text-lg font-semibold text-gray-900 dark:text-white">LocalPlate</span>
                 </div>
-                
+
                 <!-- Copyright -->
                 <p class="text-sm text-gray-500 dark:text-gray-500 text-center md:text-left" style="white-space: nowrap;">
                     © 2025 LocalPlate. All rights reserved.

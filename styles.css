@@ -84,6 +84,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* Account for fixed navbar (4rem) + extra spacing */
     color-scheme: light;
     forced-color-adjust: none;
 }
@@ -1491,6 +1492,22 @@ textarea:focus {
 
 .pt-16 {
     padding-top: 4rem;
+}
+
+.pt-20 {
+    padding-top: 5rem;
+}
+
+.pt-28 {
+    padding-top: 5.5rem;
+}
+
+.pt-96 {
+    padding-top: 24rem;
+}
+
+.pb-20 {
+    padding-bottom: 5rem;
 }
 
 
@@ -3086,5 +3103,152 @@ textarea:focus {
     .tier-icon-premium svg {
         width: 2rem !important;
         height: 2rem !important;
+    }
+}
+
+/* ======================================
+   LEGAL PAGES - PROSE STYLING
+   ====================================== */
+
+/* Prose container for legal content */
+.prose {
+    max-width: 65ch;
+    line-height: 1.8;
+    font-size: var(--text-base);
+}
+
+/* Headings */
+.prose h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--gray-900);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.prose h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--gray-900);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Paragraphs */
+.prose p {
+    margin-bottom: 1rem;
+    color: var(--gray-700);
+    line-height: 1.8;
+}
+
+/* Lists */
+.prose ul,
+.prose ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    color: var(--gray-700);
+}
+
+.prose li {
+    margin-bottom: 0.5rem;
+    color: var(--gray-700);
+    line-height: 1.7;
+}
+
+.prose ul {
+    list-style-type: disc;
+}
+
+.prose ol {
+    list-style-type: decimal;
+}
+
+/* Links */
+.prose a {
+    color: var(--emerald-600);
+    text-decoration: underline;
+    transition: color var(--transition-base);
+}
+
+.prose a:hover {
+    color: var(--emerald-700);
+}
+
+/* Strong/Bold */
+.prose strong {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+/* Spacing utilities */
+.prose section + section {
+    margin-top: 3rem;
+}
+
+/* Dark mode for prose */
+.dark .prose h2,
+.dark .prose h3 {
+    color: white;
+}
+
+.dark .prose p,
+.dark .prose li {
+    color: var(--gray-300);
+}
+
+.dark .prose a {
+    color: var(--emerald-400);
+}
+
+.dark .prose a:hover {
+    color: var(--emerald-300);
+}
+
+.dark .prose strong {
+    color: white;
+}
+
+/* Legal page specific utilities */
+.prose .bg-gray-100 {
+    background-color: var(--gray-100);
+}
+
+.dark .prose .bg-gray-100 {
+    background-color: var(--gray-800);
+}
+
+.prose .border-gray-200 {
+    border-color: var(--gray-200);
+}
+
+.dark .prose .border-gray-200 {
+    border-color: var(--gray-700);
+}
+
+.prose .rounded-lg {
+    border-radius: 0.75rem;
+}
+
+.prose .p-6 {
+    padding: 1.5rem;
+}
+
+.prose .border {
+    border-width: 1px;
+    border-style: solid;
+}
+
+/* Responsive typography for prose */
+@media (max-width: 640px) {
+    .prose {
+        font-size: var(--text-sm);
+    }
+
+    .prose h2 {
+        font-size: var(--text-2xl);
+    }
+
+    .prose h3 {
+        font-size: var(--text-xl);
     }
 }

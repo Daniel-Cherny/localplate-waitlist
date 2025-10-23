@@ -101,7 +101,7 @@ body {
 /* Responsive scroll padding for mobile */
 @media (max-width: 768px) {
     html {
-        scroll-padding-top: 7.5rem;
+        scroll-padding-top: 6rem;
     }
 }
 
@@ -1512,7 +1512,7 @@ textarea:focus {
 /* Increase top padding on mobile to prevent header from being pushed to viewport top */
 @media (max-width: 768px) {
     .pt-28 {
-        padding-top: 7.5rem;
+        padding-top: 6rem;
     }
 }
 

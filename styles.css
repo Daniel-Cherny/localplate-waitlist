@@ -84,7 +84,7 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem; /* Account for fixed navbar (4rem) + extra spacing */
+    scroll-padding-top: 8rem; /* Account for fixed navbar + generous spacing */
     color-scheme: light;
     forced-color-adjust: none;
 }
@@ -101,7 +101,7 @@ body {
 /* Responsive scroll padding for mobile */
 @media (max-width: 768px) {
     html {
-        scroll-padding-top: 6rem;
+        scroll-padding-top: 9rem;
     }
 }
 
@@ -1506,13 +1506,13 @@ textarea:focus {
 }
 
 .pt-28 {
-    padding-top: 5.5rem;
+    padding-top: 8rem;
 }
 
 /* Increase top padding on mobile to prevent header from being pushed to viewport top */
 @media (max-width: 768px) {
     .pt-28 {
-        padding-top: 6.5rem;
+        padding-top: 9rem;
     }
 }
 
